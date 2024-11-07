@@ -1,0 +1,27 @@
+.navbar {
+    background-color: #ffffff;
+    padding: 2rem;
+    width: 100%; /* Takes up the first quarter of the screen horizontally */
+    margin: 0 auto; /* Centers the navbar horizontally */
+    position: fixed;
+    top: 0;
+  }
+  
+  .nav-list {
+    list-style: none;
+    display: flex;
+    gap: 1rem;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .nav-item button {
+    color: #ffffff;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .nav-item button:hover {
+    text-decoration: underline;
+  }
