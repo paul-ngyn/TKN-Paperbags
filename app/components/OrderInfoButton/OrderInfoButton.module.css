@@ -1,0 +1,13 @@
+.navButton {
+    color: black;
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: fixed;
+    top: 2vh;
+    left: 40vw;
+  }
+  
+  .navButton:hover {
+    text-decoration: underline;
+  }

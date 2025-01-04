@@ -9,7 +9,7 @@ interface ProductButtonProps {
 const ProductButton: React.FC<ProductButtonProps> = ({ setPage }) => {
   return (
     <button onClick={() => setPage('product')} className={styles.navButton}>
-      Products
+      Bags
     </button>
   );
 };

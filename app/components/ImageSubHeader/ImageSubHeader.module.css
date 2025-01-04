@@ -1,0 +1,35 @@
+.subHeader {
+  background-color: #2d7ef3;
+  width: 100vw;
+  height: 350px; /* Adjust height as needed */
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+  align-items: center;
+  flex-direction: column;
+}
+
+.overlayText {
+  color: white;
+  font-size: 40px; /* Adjust font size as needed */
+  text-align: center;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Add text shadow */
+  
+}
+.designButton {
+  background-color: white;
+  color: #2d7ef3;
+  border: 2px solid #2d7ef3;
+  border-radius: 22px; /* Adjust border radius as needed */
+  padding: 10px 20px;
+  font-size: 24px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+  margin-top: 30px;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Add button shadow */  
+}
+.designButton:hover {
+  background-color: #f0f0f0; /* Light grey background on hover */
+  color: #2d7ef3; /* Keep the text color the same */
+}
