@@ -1,5 +1,5 @@
 .subHeader {
-  background-color: #2d7ef3;
+  background-color: #1b4f9a;
   width: 100vw;
   height: 350px; /* Adjust height as needed */
   display: flex;
@@ -19,8 +19,8 @@
 }
 .designButton {
   background-color: white;
-  color: #2d7ef3;
-  border: 2px solid #2d7ef3;
+  color: #004990;
+  border: 2px solid #004990;
   border-radius: 22px; /* Adjust border radius as needed */
   padding: 10px 20px;
   font-size: 24px;
@@ -31,5 +31,5 @@
 }
 .designButton:hover {
   background-color: #f0f0f0; /* Light grey background on hover */
-  color: #2d7ef3; /* Keep the text color the same */
+  color: #004990; /* Keep the text color the same */
 }
