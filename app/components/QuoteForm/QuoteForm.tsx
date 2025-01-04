@@ -109,7 +109,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
             Submit
           </button>
           <button type="button" onClick={onClose} className={styles.cancelButton}>
-            Cancel
+            Cancel Cancel
           </button>
         </div>
       </form>
