@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import NavBar from '../app/components/NavBar/NavBar';
 import ImageSubHeader from './components/ImageSubHeader/ImageSubHeader';
 import '../app/globals.css';
+import QuoteForm from './components/QuoteForm/QuoteForm';
 
 export default function Home() {
   const [page, setPage] = useState('logo');
@@ -26,6 +27,13 @@ export default function Home() {
         {page === 'about' && <h1>About Us Page</h1>}
         {page === 'contact' && <h1>Contact Us Page</h1>}
         {page === 'orderinfo' && <h1>Order Information Page</h1>}
+        {page === 'quote' && (
+        <div>
+          <h1>Get A Quote Page</h1>
+          <QuoteForm onClose={() => setPage('logo')} /> {/* Render the form */}
+        </div>
+      )}
+        
       </div>
     </div>
   );

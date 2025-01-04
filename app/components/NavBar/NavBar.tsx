@@ -5,6 +5,7 @@ import ProductButton from '../ProductButton/ProductButton';
 import AboutUsButton from '../AboutUsButton/AboutUsButton';
 import ContactUsButton from '../ContactUsButton/ContactUsButton';
 import OrderInfoButton from '../OrderInfoButton/OrderInfoButton';
+import QuoteReqButton from '../QuoteReqButton/QuoteReqButon';
 import styles from './NavBar.module.css';
 
 interface NavBarProps {
@@ -29,6 +30,9 @@ const NavBar: React.FC<NavBarProps> = ({ setPage }) => {
         </li>
         <li className={styles.navItem}>
           <OrderInfoButton setPage={setPage} />
+        </li>
+        <li className={styles.navItem}>
+          <QuoteReqButton setPage={setPage} />
         </li>
       </ul>
     </nav>
