@@ -5,6 +5,11 @@ import NavBar from '../app/components/NavBar/NavBar';
 import ImageSubHeader from './components/ImageSubHeader/ImageSubHeader';
 import '../app/globals.css';
 import QuoteForm from './components/QuoteForm/QuoteForm';
+import Image from 'next/image';
+
+import baglogo from './public/baglogo.jpg';
+import recyclelogo from './public/recyclelogo.png';
+import timelogo from './public/timelogo.jpg';
 
 export default function Home() {
   const [page, setPage] = useState('logo');
@@ -17,10 +22,22 @@ export default function Home() {
           <>
             <ImageSubHeader text="Welcome to our Product WebApp" />
             <div className="paragraph">
-              <p>
-                At MTC we are dedicated to offering custom quality paper bags. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-              </p>
+              <p>Why Choose MTC?</p>
             </div>
+            <section className="features">
+              <div className="feature">
+                <Image src={baglogo} alt="Feature 1" width={200} height={200} className="feature-image" />
+                <p className="feature-text">High Quality</p>
+              </div>
+              <div className="feature">
+                <Image src={recyclelogo} alt="Feature 2" width={150} height={150} className="feature-image2" />
+                <p className="feature-text">Custom Designs</p>
+              </div>
+              <div className="feature">
+                <Image src={timelogo} alt="Feature 3" width={150} height={150} className="feature-image3" />
+                <p className="feature-text">Affordable Prices</p>
+              </div>
+            </section>
           </>
         )}
         {page === 'product' && <h1>Product Page</h1>}

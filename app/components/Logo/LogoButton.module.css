@@ -4,8 +4,8 @@
     border: none;
     cursor: pointer;
     position: fixed;
-    top: 2vh;
-    left: 2vw;
+    top: 0.6vh;
+    left: 1vw;
   }
   
   .navButton:hover {
