@@ -26,8 +26,8 @@ export default function Home() {
 
   return (
     <div className="app">
-      <div className="grid grid-rows-[auto_1fr_auto] justify-items-center min-h-screen w-full">
-        <NavBar setPage={setPage} />
+      <NavBar setPage={setPage} />
+      <div className="container">
         {page === 'logo' && (
           <>
             <ImageSubHeader text="Welcome to our Product WebApp" setPage={setPage} />
@@ -37,15 +37,15 @@ export default function Home() {
             <section className="features">
               <div className="feature">
                 <Image src={baglogo} alt="Feature 1" width={300} height={300} className="feature-image" />
-                <p className="feature-text">High Quality</p>
+                <p className="feature-text">High Quality Paper Bags</p>
               </div>
               <div className="feature">
                 <Image src={biodegradable} alt="Feature 2" width={150} height={150} className="feature-image2" />
-                <p className="feature-text">Custom Designs</p>
+                <p className="feature-text">Biodegradable and Compostable</p>
               </div>
               <div className="feature">
                 <Image src={timelogo} alt="Feature 3" width={150} height={150} className="feature-image3" />
-                <p className="feature-text">Affordable Prices</p>
+                <p className="feature-text">Swift and Efficient Service</p>
               </div>
             </section>
           </>
@@ -55,9 +55,9 @@ export default function Home() {
         {page === 'contact' && <h1>Contact Us Page</h1>}
         {page === 'orderinfo' && <h1>Order Information Page</h1>}
         {page === 'quote' && (
-         <div className={`quote-form-container ${showQuoteForm ? 'show' : ''}`}>
-         <QuoteForm onClose={() => setPage('logo')} /> {/* Render the form */}
-       </div>
+          <div className={`quote-form-container ${showQuoteForm ? 'show' : ''}`}>
+            <QuoteForm onClose={() => setPage('logo')} /> {/* Render the form */}
+          </div>
         )}
       </div>
     </div>
