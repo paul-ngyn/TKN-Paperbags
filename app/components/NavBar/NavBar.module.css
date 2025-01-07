@@ -1,27 +1,30 @@
 .navbar {
-    background-color: #ffffff;
-    padding: 2rem;
-    width: 100%; /* Takes up the first quarter of the screen horizontally */
-    margin: 0 auto; /* Centers the navbar horizontally */
-    position: fixed;
-    top: 0;
-  }
-  
-  .nav-list {
-    list-style: none;
-    display: flex;
-    gap: 1rem;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .nav-item button {
-    color: #ffffff;
-    background: none;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .nav-item button:hover {
-    text-decoration: underline;
-  }
+  background-color: #ffffff;
+  padding: 2rem;
+  width: 100%; /* Takes up the full width of the screen */
+  margin: 0 auto; /* Centers the navbar horizontally */
+  position: fixed;
+  top: 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Add shadow */
+  z-index: 1000; /* Ensure the navbar is above other content */
+}
+
+
+.nav-list {
+  list-style: none;
+  display: flex;
+  gap: 1rem;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-item button {
+  color: #000000; /* Change text color to black for better contrast */
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.nav-item button:hover {
+  text-decoration: underline;
+}
