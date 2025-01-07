@@ -5,13 +5,18 @@ import styles from './ImageSubHeader.module.css';
 
 interface ImageSubHeaderProps {
   text: string;
+  setPage: (page: string) => void;
 }
 
-const ImageSubHeader: React.FC<ImageSubHeaderProps> = ({ text }) => {
+const ImageSubHeader: React.FC<ImageSubHeaderProps> = ({ text, setPage }) => {
   return (
     <div className={styles.subHeader}>
-      <div className={styles.overlayText}>CUSTOM PAPER BAGS AT WHOLESALE PRICES. <br /> INSTANTLY DESIGNED BY YOU.</div>
-      <button className={styles.designButton}>DESIGN NOW</button>
+      <div className={styles.overlayText}>
+        CUSTOM PAPER BAGS AT WHOLESALE PRICES.<br /> INSTANTLY DESIGNED BY YOU.
+      </div>
+      <button className={styles.designButton} onClick={() => setPage('quote')}>
+        GET A QUOTE NOW
+      </button>
     </div>
   );
 };

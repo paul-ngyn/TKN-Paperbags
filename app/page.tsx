@@ -20,13 +20,13 @@ export default function Home() {
         <NavBar setPage={setPage} />
         {page === 'logo' && (
           <>
-            <ImageSubHeader text="Welcome to our Product WebApp" />
+            <ImageSubHeader text="Welcome to our Product WebApp" setPage={setPage} />
             <div className="paragraph">
               <p>Why Choose MTC?</p>
             </div>
             <section className="features">
               <div className="feature">
-                <Image src={baglogo} alt="Feature 1" width={200} height={200} className="feature-image" />
+                <Image src={baglogo} alt="Feature 1" width={150} height={150} className="feature-image" />
                 <p className="feature-text">High Quality</p>
               </div>
               <div className="feature">
@@ -45,12 +45,11 @@ export default function Home() {
         {page === 'contact' && <h1>Contact Us Page</h1>}
         {page === 'orderinfo' && <h1>Order Information Page</h1>}
         {page === 'quote' && (
-        <div>
-          <h1>Get A Quote Page</h1>
-          <QuoteForm onClose={() => setPage('logo')} /> {/* Render the form */}
-        </div>
-      )}
-        
+          <div>
+            <h1>Get A Quote Page</h1>
+            <QuoteForm onClose={() => setPage('logo')} /> {/* Render the form */}
+          </div>
+        )}
       </div>
     </div>
   );
