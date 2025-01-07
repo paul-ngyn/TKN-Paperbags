@@ -10,6 +10,7 @@ import Image from 'next/image';
 import baglogo from './public/baglogo.jpg';
 import recyclelogo from './public/recyclelogo.png';
 import timelogo from './public/timelogo.jpg';
+import biodegradable from './public/biodegradablelogo.jpg';
 
 export default function Home() {
   const [page, setPage] = useState('logo');
@@ -26,11 +27,11 @@ export default function Home() {
             </div>
             <section className="features">
               <div className="feature">
-                <Image src={baglogo} alt="Feature 1" width={150} height={150} className="feature-image" />
+                <Image src={baglogo} alt="Feature 1" width={300} height={300} className="feature-image" />
                 <p className="feature-text">High Quality</p>
               </div>
               <div className="feature">
-                <Image src={recyclelogo} alt="Feature 2" width={150} height={150} className="feature-image2" />
+                <Image src={biodegradable} alt="Feature 2" width={150} height={150} className="feature-image2" />
                 <p className="feature-text">Custom Designs</p>
               </div>
               <div className="feature">
