@@ -72,6 +72,14 @@ body {
   margin-top: 10px;
 }
 
+.quote-form-container {
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.quote-form-container.show {
+  opacity: 1;
+}
 
 @layer utilities {
   .text-balance {

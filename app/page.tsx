@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import NavBar from '../app/components/NavBar/NavBar';
 import ImageSubHeader from './components/ImageSubHeader/ImageSubHeader';
 import '../app/globals.css';
@@ -14,6 +14,15 @@ import biodegradable from './public/biodegradablelogo.jpg';
 
 export default function Home() {
   const [page, setPage] = useState('logo');
+  const [showQuoteForm, setShowQuoteForm] = useState(false);
+
+  useEffect(() => {
+    if (page === 'quote') {
+      setShowQuoteForm(true);
+    } else {
+      setShowQuoteForm(false);
+    }
+  }, [page]);
 
   return (
     <div className="app">
@@ -46,10 +55,9 @@ export default function Home() {
         {page === 'contact' && <h1>Contact Us Page</h1>}
         {page === 'orderinfo' && <h1>Order Information Page</h1>}
         {page === 'quote' && (
-          <div>
-            <h1>Get A Quote Page</h1>
-            <QuoteForm onClose={() => setPage('logo')} /> {/* Render the form */}
-          </div>
+         <div className={`quote-form-container ${showQuoteForm ? 'show' : ''}`}>
+         <QuoteForm onClose={() => setPage('logo')} /> {/* Render the form */}
+       </div>
         )}
       </div>
     </div>
