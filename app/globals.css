@@ -33,7 +33,7 @@ body {
   height: 30%;
   font-size: 32px;
   text-align: CENTER;
-  padding-left: 30%;  
+  padding-left: 25%;  
 }
 
 .features {
@@ -43,7 +43,7 @@ body {
   flex-wrap: nowrap; /* Optional: allows wrapping if there are too many items */
   margin-bottom:10px;
   margin-top: 10px;
-  padding-left: 30%; /* Move features to the right */
+  padding-left: 25%; /* Move features to the right */
 }
 
 .feature {
