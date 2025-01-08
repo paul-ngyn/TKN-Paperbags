@@ -6,6 +6,7 @@ import ImageSubHeader from './components/ImageSubHeader/ImageSubHeader';
 import '../app/globals.css';
 import QuoteForm from './components/QuoteForm/QuoteForm';
 import Image from 'next/image';
+import Footer from './components/Footer/Footer';
 
 import baglogo from './public/baglogo.jpg';
 import recyclelogo from './public/recyclelogo.png';
@@ -72,6 +73,7 @@ export default function Home() {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 }

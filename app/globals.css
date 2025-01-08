@@ -4,13 +4,13 @@
 @tailwind utilities;
 
 :root {
-  --background: #171717;
-  --foreground: #ffffff;
+  --background: white;
+  --foreground: #0a0a0a;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #white;
+    --background: white;
     --foreground: #0a0a0a;
   }
 }
@@ -26,7 +26,22 @@ body {
   height: 100%;
 }
 
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
 
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.container {
+  flex: 1; /* Grow to push footer down */
+  padding-bottom: 20px;
+}
 
 .paragraph {
   width: 100%; /* Adjust width as needed */
@@ -88,20 +103,20 @@ body {
 }
 
 .feature-button {
-  background-color: #007bff; /* Blue background color */
+  background-color: #1c51a3; /* Blue background color */
   color: white;
   border: none;
   padding: 10px 20px;
   border-radius: 12px; /* Add border radius */
   cursor: pointer;
   margin-top: 38px; /* Add space above the button */
-  margin-left: 55.4%;
+  margin-left: 55.1%;
   font-weight: bold;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4); /* Add button shadow */
 }
 
 .feature-button:hover {
-  background-color: #0056b3; /* Darker blue on hover */
+  background-color: #086cd6; /* lighter blue on hover */
 }
 
 .quote-form-container {
