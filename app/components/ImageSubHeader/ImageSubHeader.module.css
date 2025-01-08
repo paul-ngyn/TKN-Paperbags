@@ -30,6 +30,6 @@
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Add button shadow */  
 }
 .designButton:hover {
-  background-color: #f0f0f0; /* Light grey background on hover */
+  background-color: #dcdcdc; /* Light grey background on hover */
   color: #004990; /* Keep the text color the same */
 }

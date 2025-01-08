@@ -38,16 +38,28 @@ export default function Home() {
               <div className="feature">
                 <Image src={baglogo} alt="Feature 1" width={300} height={300} className="feature-image" />
                 <p className="feature-text">High Quality Paper Bags</p>
+                <div className="feature-description">
+                  <p>Our paper bags are made from the highest quality materials, ensuring durability and strength.</p>
+                </div>
               </div>
               <div className="feature">
                 <Image src={biodegradable} alt="Feature 2" width={150} height={150} className="feature-image2" />
                 <p className="feature-text">Biodegradable and Compostable</p>
+                <div className="feature-description">
+                  <p>Our products are environmentally friendly, biodegradable, and compostable.</p>
+                </div>
               </div>
               <div className="feature">
                 <Image src={timelogo} alt="Feature 3" width={150} height={150} className="feature-image3" />
                 <p className="feature-text">Swift and Efficient Service</p>
+                <div className="feature-description">
+                  <p>We provide fast and efficient service to meet your needs promptly.</p>
+                </div>
               </div>
             </section>
+            <div className="center-button-container">
+              <button className="feature-button" onClick={() => setPage('product')}>Check Out Our Products</button>
+            </div>
           </>
         )}
         {page === 'product' && <h1>Product Page</h1>}
