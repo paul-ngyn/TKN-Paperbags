@@ -128,6 +128,34 @@ html, body {
   opacity: 1;
 }
 
+.productDetailsContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 20px;
+  border-radius: 8px; /* Optional: Add border radius */
+  flex: 1; /* Allow the details container to take up available space */
+  margin-left: 200px; /* Add space between the image and details */
+  margin-top: 100px;
+}
+
+.productName {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+.productDescription {
+  font-size: 16px;
+  margin-bottom: 20px;
+  margin-top: 100px;
+}
+
+.productOptions {
+  font-size: 16px;
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

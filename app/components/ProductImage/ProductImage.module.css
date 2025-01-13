@@ -1,0 +1,11 @@
+.productImageContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    border-radius: 8px; /* Optional: Add border radius */
+    margin-top: 80px;
+    margin-left: 175px;
+    margin-right: 200px;
+}
+  

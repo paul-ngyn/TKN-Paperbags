@@ -7,9 +7,9 @@ import '../app/globals.css';
 import QuoteForm from './components/QuoteForm/QuoteForm';
 import Image from 'next/image';
 import Footer from './components/Footer/Footer';
+import ProductImage from './components/ProductImage/ProductImage';
 
 import baglogo from './public/baglogo.jpg';
-import recyclelogo from './public/recyclelogo.png';
 import timelogo from './public/timelogo.jpg';
 import biodegradable from './public/biodegradablelogo.jpg';
 
@@ -63,7 +63,25 @@ export default function Home() {
             </div>
           </>
         )}
-        {page === 'product' && <h1>Product Page</h1>}
+        {page === 'product' && (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
+            <ProductImage />
+            <div className="productDetailsContainer">
+              <h2 className="productName">Paper Bag</h2>
+              <div className="productOptions">
+                <label htmlFor="productOptions">Choose an option:</label>
+                <select id="productOptions" name="productOptions">
+                  <option value="small">Small</option>
+                  <option value="medium">Medium</option>
+                  <option value="large">Large</option>
+                </select>
+              </div>
+              <p className="productDescription">
+                Our paper bags are made from the highest quality materials, ensuring durability and strength.
+              </p>
+            </div>
+          </div>
+        )}
         {page === 'about' && <h1>About Us Page</h1>}
         {page === 'contact' && <h1>Contact Us Page</h1>}
         {page === 'orderinfo' && <h1>Order Information Page</h1>}
