@@ -8,7 +8,7 @@ interface ImageSubHeaderProps {
   setPage: (page: string) => void;
 }
 
-const ImageSubHeader: React.FC<ImageSubHeaderProps> = ({ text, setPage }) => {
+const ImageSubHeader: React.FC<ImageSubHeaderProps> = ({ setPage }) => {
   return (
     <div className={styles.subHeader}>
       <div className={styles.overlayText}>

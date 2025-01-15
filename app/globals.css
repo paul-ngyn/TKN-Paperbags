@@ -44,11 +44,13 @@ html, body {
 }
 
 .paragraph {
-  width: 100%; /* Adjust width as needed */
+  width: 99.8%; /* Adjust width as needed */
   height: 30%;
   font-size: 32px;
+  font-weight: bold ;
   text-align: CENTER;
   padding-left: 25%;  
+  font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
 
 .features {
@@ -135,15 +137,15 @@ html, body {
   padding: 20px;
   border-radius: 8px; /* Optional: Add border radius */
   flex: 1; /* Allow the details container to take up available space */
-  margin-left: 200px; /* Add space between the image and details */
+  margin-left: 100px; /* Add space between the image and details */
   margin-top: 100px;
 }
 
 .productName {
   font-size: 24px;
   font-weight: bold;
-  margin-bottom: 10px;
-  margin-top: 10px;
+  margin-bottom: 100px;
+  margin-top: 26px;
 }
 
 .productDescription {

@@ -45,9 +45,9 @@ export default function Home() {
               </div>
               <div className="feature">
                 <Image src={biodegradable} alt="Feature 2" width={150} height={150} className="feature-image2" />
-                <p className="feature-text">Biodegradable and Compostable</p>
+                <p className="feature-text">Biodegradable and Recyclable</p>
                 <div className="feature-description">
-                  <p>Our products are environmentally friendly, biodegradable, and compostable.</p>
+                  <p>Our products are environmentally friendly, biodegradable, recyclable and compostable.</p>
                 </div>
               </div>
               <div className="feature">
