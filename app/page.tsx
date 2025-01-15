@@ -25,6 +25,13 @@ export default function Home() {
     }
   }, [page]);
 
+  const handleOpenQuoteForm = () => {
+    setShowQuoteForm(true);
+  };
+
+  const handleCloseQuoteForm = () => {
+    setShowQuoteForm(false);
+  };
   return (
     <div className="app">
       <NavBar setPage={setPage} />
@@ -79,6 +86,12 @@ export default function Home() {
               <p className="productDescription">
                 Our paper bags are made from the highest quality materials, ensuring durability and strength.
               </p>
+              <button
+                className="feature-button"
+                onClick={handleOpenQuoteForm}
+              >
+                Request a Quote
+              </button>
             </div>
           </div>
         )}
@@ -91,6 +104,13 @@ export default function Home() {
           </div>
         )}
       </div>
+      {showQuoteForm && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <QuoteForm onClose={handleCloseQuoteForm} />
+          </div>
+        </div>
+      )}
       <Footer />
     </div>
   );
