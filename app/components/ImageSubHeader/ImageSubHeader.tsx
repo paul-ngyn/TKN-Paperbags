@@ -9,7 +9,7 @@ interface ImageSubHeaderProps {
   setPage: (page: string) => void;
 }
 
-const ImageSubHeader: React.FC<ImageSubHeaderProps> = ({ setPage }) => {
+const ImageSubHeader: React.FC<ImageSubHeaderProps> = ({ }) => {
   const [showModal, setShowModal] = useState(false);
   const handleOpenModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
