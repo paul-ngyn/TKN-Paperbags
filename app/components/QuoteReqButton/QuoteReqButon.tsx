@@ -7,7 +7,7 @@ interface QuoteReqButtonProps {
   setPage: (page: string) => void;
 }
 
-const QuoteReqButton: React.FC<QuoteReqButtonProps> = ({ setPage }) => {
+const QuoteReqButton: React.FC<QuoteReqButtonProps> = ({}) => {
   const [showModal, setShowModal] = useState(false);
   const handleOpenModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
