@@ -12,6 +12,7 @@ import ProductImage from './components/ProductImage/ProductImage';
 import baglogo from './public/baglogo.jpg';
 import timelogo from './public/timelogo.jpg';
 import biodegradable from './public/biodegradablelogo.jpg';
+import recyclelogo from './public/recyclelogo.png';
 
 export default function Home() {
   const [page, setPage] = useState('logo');
@@ -75,6 +76,10 @@ export default function Home() {
             <ProductImage />
             <div className="productDetailsContainer">
               <h2 className="productName">Paper Bag</h2>
+              <div className="logoContainer">
+                <Image src={recyclelogo} alt="Recycle Logo" width={35} height={35} />
+                <Image src={biodegradable} alt="Biodegradable Logo" width={40} height={40} />
+              </div>
               <div className="productOptions">
                 <label htmlFor="productOptions">Choose an option:</label>
                 <select id="productOptions" name="productOptions">
@@ -86,12 +91,10 @@ export default function Home() {
               <p className="productDescription">
                 Our paper bags are made from the highest quality materials, ensuring durability and strength.
               </p>
-              <button
-                className="feature-button"
-                onClick={handleOpenQuoteForm}
-              >
-                Request a Quote
-              </button>
+              <div className="buttonContainer">
+                <button className="product-button" onClick={handleOpenQuoteForm}>Request a Quote</button>
+                <button className="product-button" onClick={() => setPage("orderinfo")}>Image Upload Details</button>
+              </div>
             </div>
           </div>
         )}

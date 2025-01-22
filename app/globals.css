@@ -108,16 +108,28 @@ html, body {
   background-color: #1c51a3; /* Blue background color */
   color: white;
   border: none;
-  padding: 10px 20px;
+  padding: 10px 10px;
   border-radius: 12px; /* Add border radius */
   cursor: pointer;
   margin-top: 38px; /* Add space above the button */
-  margin-left: 55.1%;
+  margin-left: 55.6%;
   font-weight: bold;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4); /* Add button shadow */
 }
 
-.feature-button:hover {
+.product-button {
+  background-color: #1c51a3; /* Blue background color */
+  color: white;
+  border: none;
+  padding: 10px 10px;
+  border-radius: 12px; /* Add border radius */
+  cursor: pointer;
+  margin-top: 20px; 
+  font-weight: bold;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Add button shadow */
+  margin-right: 25px;
+}
+.feature-button:hover, .product-button:hover {
   background-color: #086cd6; /* lighter blue on hover */
 }
 
@@ -144,8 +156,14 @@ html, body {
 .productName {
   font-size: 24px;
   font-weight: bold;
-  margin-bottom: 100px;
+  margin-bottom: 10px;
   margin-top: 26px;
+}
+
+.logoContainer {
+  display: flex;
+  gap: 6px; /* Add space between logos */
+  margin-bottom: 55px; /* Add space below the logos */
 }
 
 .productDescription {
