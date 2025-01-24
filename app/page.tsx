@@ -83,7 +83,7 @@ export default function Home() {
                 </div>
               </div>
               <div className = "brand-paragraph">
-                <p>We are the exclusive distributors of TKN products if you want to learn more about MTC and our brands please click here.</p>
+                <p>We are the exclusive distributors of TKN products if you want to learn more about MTC and our brands please click 'Learn More'.</p>
               </div>
               <div className = "learn-buttoncontainer">
                 <button className="learn-button" onClick={() => setPage('about')}>Learn More</button>
