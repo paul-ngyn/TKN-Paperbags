@@ -83,7 +83,7 @@ export default function Home() {
                 </div>
               </div>
               <div className = "brand-paragraph">
-                <p>We are the exclusive distributors of TKN products if you want to learn more about MTC and our brands please click 'Learn More'.</p>
+                <p>We are the exclusive distributors of TKN products if you want to learn more about MTC and our brands please click &apos;Learn More&apos;.</p>
               </div>
               <div className = "learn-buttoncontainer">
                 <button className="learn-button" onClick={() => setPage('about')}>Learn More</button>
@@ -115,7 +115,7 @@ export default function Home() {
               </p>
               <div className="buttonContainer">
                 <button className="product-button" onClick={handleOpenQuoteForm}>Request a Quote</button>
-                <button className="product-button" onClick={() => setPage("orderinfo")}>Image Upload Details</button>
+                <button className="product-button" onClick={() => setPage('orderinfo')}>Image Upload Details</button>
               </div>
             </div>
           </div>
