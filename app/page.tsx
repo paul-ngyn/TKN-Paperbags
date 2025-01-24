@@ -13,6 +13,7 @@ import baglogo from './public/baglogo.jpg';
 import timelogo from './public/timelogo.jpg';
 import biodegradable from './public/biodegradablelogo.jpg';
 import recyclelogo from './public/recyclelogo.png';
+import tknlogo from './public/tkn_products.png';
 
 export default function Home() {
   const [page, setPage] = useState('logo');
@@ -41,21 +42,23 @@ export default function Home() {
           <>
             <ImageSubHeader text="Welcome to our Product WebApp" setPage={setPage} />
             <div className="paragraph">
-              <p>Why Choose MTC?</p>
+              <div className="section-title">
+                <h2>Why Choose MTC?</h2>
+              </div>
             </div>
             <section className="features">
-              <div className="feature">
-                <Image src={baglogo} alt="Feature 1" width={300} height={300} className="feature-image" />
-                <p className="feature-text">High Quality Paper Bags</p>
-                <div className="feature-description">
-                  <p>Our paper bags are made from the highest quality materials, ensuring durability and strength.</p>
-                </div>
-              </div>
-              <div className="feature">
-                <Image src={biodegradable} alt="Feature 2" width={150} height={150} className="feature-image2" />
+            <div className="feature">
+                <Image src={biodegradable} alt="Feature 2" width={150} height={150} className="feature-image2" /> 
                 <p className="feature-text">Biodegradable and Recyclable</p>
                 <div className="feature-description">
                   <p>Our products are environmentally friendly, biodegradable, recyclable and compostable.</p>
+                </div>
+              </div>
+              <div className="feature">
+                <Image src={baglogo} alt="Feature 1" width={150} height={150} className="feature-image" />
+                <p className="feature-text">High Quality Paper Bags</p>
+                <div className="feature-description">
+                  <p>Our paper bags are made from the highest quality materials, ensuring durability and strength.</p>
                 </div>
               </div>
               <div className="feature">
@@ -69,6 +72,24 @@ export default function Home() {
             <div className="center-button-container">
               <button className="feature-button" onClick={() => setPage('product')}>Check Out Our Products</button>
             </div>
+            <hr className="section-divider" />
+            <section className="brands">
+            <div className="section-title2">
+                <h2>Our Brands</h2>
+              </div>
+              <div className="brand-container">
+                <div className="brand">
+                  <Image src={tknlogo} alt="TKN Logo" width={100} height={100} />
+                </div>
+              </div>
+              <div className = "brand-paragraph">
+                <p>We are the exclusive distributors of TKN products if you want to learn more about MTC and our brands please click here.</p>
+              </div>
+              <div className = "learn-buttoncontainer">
+                <button className="learn-button" onClick={() => setPage('about')}>Learn More</button>
+              </div>
+            </section>
+            <hr className="section-divider" />
           </>
         )}
         {page === 'product' && (
@@ -77,8 +98,9 @@ export default function Home() {
             <div className="productDetailsContainer">
               <h2 className="productName">Paper Bag</h2>
               <div className="logoContainer">
-                <Image src={recyclelogo} alt="Recycle Logo" width={35} height={35} />
-                <Image src={biodegradable} alt="Biodegradable Logo" width={40} height={40} />
+                <Image src={recyclelogo} alt="Recycle Logo" width={40} height={15} />
+                <Image src={biodegradable} alt="Biodegradable Logo" width={45} height={15} />
+                <Image src={tknlogo} alt="TKN Products Logo" width={45} height={30} />
               </div>
               <div className="productOptions">
                 <label htmlFor="productOptions">Choose an option:</label>

@@ -41,26 +41,58 @@ html, body {
 .container {
   flex: 1; /* Grow to push footer down */
   padding-bottom: 20px;
+  width: 100%;
+  max-width: 100%;
 }
 
-.paragraph {
-  width: 99.8%; /* Adjust width as needed */
-  height: 30%;
-  font-size: 32px;
-  font-weight: bold ;
-  text-align: CENTER;
-  padding-left: 25%;  
-  font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+.section-title {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 40px 0;
+  padding-left: 38.2%;
 }
+
+.section-title2 {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 40px 0;
+  padding-left: 41.4%;
+}
+
+.section-title::before,
+.section-title::after, .section-title2::before, .section-title2::after {
+  content: "";
+  flex: 0 0 60px; /* Set a fixed width for the lines */
+  border-bottom: 3px solid black;
+  border-radius: 20px;
+  margin: 0 10px; /* Adjust the margin to bring the lines closer to the title */
+}
+
+.section-title h2, .section-title2 h2 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.section-divider {
+  border: 0;
+  height: 1px;
+  background: white; /*set to white for now as we are using title headers */
+  margin: 40px 0;
+  width: 100%;
+}
+
 
 .features {
   display: flex;
   justify-content: normal;
-  width: 100%;
+  width: 80%;
   flex-wrap: nowrap; /* Optional: allows wrapping if there are too many items */
   margin-bottom:10px;
-  margin-top: 30px;
-  padding-left: 25%; /* Move features to the right */
+  margin-top: 30px; 
+  margin-left: 10.6%;
 }
 
 .feature {
@@ -68,37 +100,36 @@ html, body {
   flex-direction: column;
   align-items: center;
   width: 100%; /* Adjust width as needed */
-  margin: 0 100px;
+  margin: 0 80px;
 }
 
 
 .feature-image {
-  width: 74%; /* Adjust width as needed */
+  width: 45%; /* Adjust width as needed */
   height: auto;
-  border-radius: 4px; /* Optional: Add border radius */
 }
 
 .feature-image2 {
-  width: 89%; /* Adjust width as needed */
+  width: 54%; /* Adjust width as needed */
   height: auto;
-  border-radius: 4px; /* Optional: Add border radius */
+
 }
 
 .feature-image3 {
-  width: 80%; /* Adjust width as needed */
+  width: 48%; /* Adjust width as needed */
   height: auto;
-  border-radius: 4px; /* Optional: Add border radius */
 }
 
 .feature-text {
-  font-size: 18px;
+  font-size: 24px;
   text-align: center;
   margin-top: 10px;
   font-weight: bold;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
 .feature-description {
-  font-size: 14px; /* Smaller text for the description */
+  font-size: 16px; /* Smaller text for the description */
   text-align: center;
   margin-top: 10px;
   color: #766; /* Optional: Lighter color for the description */
@@ -111,8 +142,8 @@ html, body {
   padding: 10px 10px;
   border-radius: 12px; /* Add border radius */
   cursor: pointer;
-  margin-top: 38px; /* Add space above the button */
-  margin-left: 55.6%;
+  margin-top: 28px; /* Add space above the button */
+  margin-left: 45.1%;
   font-weight: bold;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4); /* Add button shadow */
 }
@@ -122,15 +153,16 @@ html, body {
   color: white;
   border: none;
   padding: 10px 10px;
-  border-radius: 12px; /* Add border radius */
+  border-radius: 8px; /* Add border radius */
   cursor: pointer;
   margin-top: 20px; 
   font-weight: bold;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Add button shadow */
   margin-right: 25px;
+  display: flex;
 }
-.feature-button:hover, .product-button:hover {
-  background-color: #086cd6; /* lighter blue on hover */
+.feature-button:hover, .product-button:hover, .learn-button:hover {
+  background-color: #016ca5; /* lighter blue on hover */
 }
 
 .quote-form-container {
@@ -154,7 +186,7 @@ html, body {
 }
 
 .productName {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: bold;
   margin-bottom: 10px;
   margin-top: 26px;
@@ -162,7 +194,7 @@ html, body {
 
 .logoContainer {
   display: flex;
-  gap: 6px; /* Add space between logos */
+  gap: 10px; /* Add space between logos */
   margin-bottom: 55px; /* Add space below the logos */
 }
 
@@ -174,6 +206,57 @@ html, body {
 
 .productOptions {
   font-size: 16px;
+}
+
+
+.our-brands {
+  text-align: center;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-weight: bold;
+  font-size: 32px;
+  padding-left: 1%;
+}
+
+.brand-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px; /* Add space between brand logos */
+  width: 100%;
+  margin-top: 5px;
+}
+
+.brand { /* brand logo */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+  margin-left: 11px;
+}
+
+.brand-paragraph {
+  font-size: 16px;
+  text-align: center;
+  margin-top: 10px;
+  color: #766; /* Optional: Lighter color for the description */}
+
+
+.learn-buttoncontainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2%;
+  margin-bottom: 20px;
+  padding-left: 16px;
+}
+.learn-button {
+  background-color: #1c51a3; /* Blue background color */
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 12px; /* Add border radius */
+  cursor: pointer;
+  font-weight: bold;
+  display: flex;
 }
 
 @layer utilities {

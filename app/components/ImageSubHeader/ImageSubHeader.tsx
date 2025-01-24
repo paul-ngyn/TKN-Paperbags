@@ -16,7 +16,7 @@ const ImageSubHeader: React.FC<ImageSubHeaderProps> = ({ }) => {
   return (
     <div className={styles.subHeader}>
       <div className={styles.overlayText}>
-        CUSTOM PAPER BAGS AT WHOLESALE PRICES.<br /> INSTANTLY DESIGNED BY YOU.
+        CUSTOM PAPER BAGS AT AFFORDABLE PRICES.<br /> INSTANTLY DESIGNED BY YOU.
       </div>
       <button className={styles.designButton} onClick={handleOpenModal}>
         GET A QUOTE NOW
