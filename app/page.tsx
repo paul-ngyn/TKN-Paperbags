@@ -75,15 +75,15 @@ export default function Home() {
             <hr className="section-divider" />
             <section className="brands">
             <div className="section-title2">
-                <h2>Our Brands</h2>
+                <h2>Our Brand</h2>
               </div>
               <div className="brand-container">
                 <div className="brand">
-                  <Image src={tknlogo} alt="TKN Logo" width={100} height={100} />
+                  <Image src={tknlogo} alt="TKN Logo" width={265} height={265} />
+                  <div className="brand-paragraph">
+                    <p>We are the exclusive distributors of TKN products. If you want to learn more about MTC and TKN, please click &apos;Learn More&apos;.</p>
+                  </div>
                 </div>
-              </div>
-              <div className = "brand-paragraph">
-                <p>We are the exclusive distributors of TKN products if you want to learn more about MTC and our brands please click &apos;Learn More&apos;.</p>
               </div>
               <div className = "learn-buttoncontainer">
                 <button className="learn-button" onClick={() => setPage('about')}>Learn More</button>
