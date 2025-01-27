@@ -49,7 +49,7 @@ html, body {
   display: flex;
   align-items: center;
   text-align: center;
-  margin: 40px 0;
+  margin: 52px 0;
   padding-left: 38.2%;
 }
 
@@ -58,7 +58,7 @@ html, body {
   align-items: center;
   text-align: center;
   margin: 40px 0;
-  padding-left: 41.4%;
+  padding-left: 41%;
 }
 
 .section-title::before,
@@ -92,7 +92,7 @@ html, body {
   flex-wrap: nowrap; /* Optional: allows wrapping if there are too many items */
   margin-bottom:10px;
   margin-top: 30px; 
-  margin-left: 10.6%;
+  margin-left: 10%;
 }
 
 .feature {
@@ -142,8 +142,8 @@ html, body {
   padding: 10px 10px;
   border-radius: 12px; /* Add border radius */
   cursor: pointer;
-  margin-top: 28px; /* Add space above the button */
-  margin-left: 45.1%;
+  margin-top: 37px; /* Add space above the button */
+  margin-left: 44.5%;
   font-weight: bold;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4); /* Add button shadow */
 }
@@ -214,7 +214,6 @@ html, body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   font-weight: bold;
   font-size: 32px;
-  padding-left: 1%;
 }
 
 .brand-container {
@@ -230,7 +229,7 @@ html, body {
   flex-direction: column;
   align-items: center;
   margin-bottom: 20px;
-  margin-left: 11px;
+  padding-right: 4px;
 }
 
 .brand-paragraph {
@@ -244,9 +243,9 @@ html, body {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 2%;
+  margin-top: 2.5%;
   margin-bottom: 20px;
-  padding-left: 13px;
+  padding-right: 5px;
 }
 .learn-button {
   background-color: #1c51a3; /* Blue background color */
