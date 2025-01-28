@@ -139,11 +139,11 @@ html, body {
   background-color: #1c51a3; /* Blue background color */
   color: white;
   border: none;
-  padding: 10px 10px;
-  border-radius: 12px; /* Add border radius */
+  padding: 15px 15px;
+  border-radius: 14px; /* Add border radius */
   cursor: pointer;
   margin-top: 37px; /* Add space above the button */
-  margin-left: 44.4%;
+  margin-left: 44.3%;
   font-weight: bold;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4); /* Add button shadow */
 }
@@ -250,13 +250,11 @@ html, body {
   margin-bottom: 2%;
 }
 
-
-
 .learn-buttoncontainer {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 1%;
+  margin-top: 0.25%;
   margin-bottom: 20px;
   padding-right: 8px;
 }
@@ -264,7 +262,7 @@ html, body {
   background-color: #1c51a3; /* Blue background color */
   color: white;
   border: none;
-  padding: 12px 20px;
+  padding: 15px 15px;
   border-radius: 12px; /* Add border radius */
   cursor: pointer;
   font-weight: bold;
