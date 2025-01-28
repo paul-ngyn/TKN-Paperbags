@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import NavBar from '../app/components/NavBar/NavBar';
 import ImageSubHeader from './components/ImageSubHeader/ImageSubHeader';
 import '../app/globals.css';
@@ -18,6 +18,7 @@ import tknlogo from './public/tkn_products.png';
 export default function Home() {
   const [page, setPage] = useState('logo');
   const [showQuoteForm, setShowQuoteForm] = useState(false);
+  const brandRef = useRef(null);
 
   useEffect(() => {
     if (page === 'quote') {
@@ -26,6 +27,26 @@ export default function Home() {
       setShowQuoteForm(false);
     }
   }, [page]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    const brandElements = document.querySelectorAll('.brand');
+    brandElements.forEach((el) => observer.observe(el));
+
+    return () => {
+      brandElements.forEach((el) => observer.unobserve(el));
+    };
+  }, []);
 
   const handleOpenQuoteForm = () => {
     setShowQuoteForm(true);
@@ -78,7 +99,7 @@ export default function Home() {
                 <h2>Our Brand</h2>
               </div>
               <div className="brand-container">
-                <div className="brand">
+                <div className="brand" ref = {brandRef}>
                   <Image src={tknlogo} alt="TKN Logo" width={260} height={260} />
                   <div className="brand-paragraph">
                     <p>We are the exclusive distributors of TKN products. If you want to learn more about MTC and TKN, please click &apos;Learn More&apos;.</p>
