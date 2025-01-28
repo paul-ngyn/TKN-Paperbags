@@ -19,9 +19,8 @@ const ProductPage: React.FC<ProductPageProps> = ({ handleOpenQuoteForm, handleNa
       <div className="productDetailsContainer">
         <h2 className="productName">Paper Bag</h2>
         <div className="logoContainer">
-          <Image src={recyclelogo} alt="Recycle Logo" width={40} height={15} />
-          <Image src={biodegradable} alt="Biodegradable Logo" width={45} height={15} />
-          <Image src={tknlogo} alt="TKN Products Logo" width={45} height={30} />
+          <Image src={recyclelogo} alt="Recycle Logo" width={40} height={20} />
+          <Image src={tknlogo} alt="TKN Products Logo" width={40} height={30} />
         </div>
         <div className="productOptions">
           <label htmlFor="productOptions">Choose an option:</label>

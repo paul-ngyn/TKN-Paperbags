@@ -110,7 +110,7 @@ html, body {
 }
 
 .feature-image2 {
-  width: 57%; /* Adjust width as needed */
+  width: 53.4%; /* Adjust width as needed */
   height: auto;
 
 }
@@ -194,9 +194,9 @@ html, body {
 
 .logoContainer {
   display: flex;
-  gap: 10px; /* Add space between logos */
-  margin-bottom: 55px; /* Add space below the logos */
-  max-height: 40px;
+  gap: 8px; /* Add space between logos */
+  margin-bottom: 45px; /* Add space below the logos */
+  max-height: 42px;
   margin-top: 2px;
 }
 
