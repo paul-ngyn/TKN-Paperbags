@@ -3,12 +3,12 @@ import React from 'react';
 import styles from './ProductButton.module.css';
 
 interface ProductButtonProps {
-  setPage: (page: string) => void;
+  onClick: (page: string) => void;
 }
 
-const ProductButton: React.FC<ProductButtonProps> = ({ setPage }) => {
+const ProductButton: React.FC<ProductButtonProps> = ({ onClick }) => {
   return (
-    <button onClick={() => setPage('product')} className={styles.navButton}>
+    <button onClick={() => onClick('product')} className={styles.navButton}>
       Bags
     </button>
   );

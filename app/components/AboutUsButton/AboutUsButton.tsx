@@ -3,12 +3,12 @@ import React from 'react';
 import styles from './AboutUsButton.module.css';
 
 interface AboutUsButtonProps {
-  setPage: (page: string) => void;
+  onClick: () => void;
 }
 
-const AboutUsButton: React.FC<AboutUsButtonProps> = ({ setPage }) => {
+const AboutUsButton: React.FC<AboutUsButtonProps> = ({ onClick}) => {
   return (
-    <button onClick={() => setPage('about')} className={styles.navButton}>
+    <button onClick={onClick} className={styles.navButton}>
       About Us
     </button>
   );
