@@ -4,7 +4,6 @@ import React from 'react';
 import Image from 'next/image';
 import ProductImage from './ProductImage/ProductImage';
 import recyclelogo from '../public/recyclelogo.png';
-import biodegradable from '../public/biodegradablelogo.jpg';
 import tknlogo from '../public/tkn_products.png';
 
 interface ProductPageProps {

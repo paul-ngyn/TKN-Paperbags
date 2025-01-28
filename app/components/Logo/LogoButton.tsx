@@ -12,7 +12,7 @@ interface LogoButtonProps {
 const LogoButton: React.FC<LogoButtonProps> = ({ onClick }) => {
   return (
     <button onClick={onClick} className={styles.navButton}>
-      <Image src={Mtc} alt="MTC Logo" width={100} height={60} />
+      <Image src={Mtc} alt="MTC Logo" width={99.2} height={60} />
     </button>
   );
 };
