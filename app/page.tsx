@@ -79,7 +79,7 @@ export default function Home() {
               </div>
               <div className="brand-container">
                 <div className="brand">
-                  <Image src={tknlogo} alt="TKN Logo" width={265} height={265} />
+                  <Image src={tknlogo} alt="TKN Logo" width={260} height={260} />
                   <div className="brand-paragraph">
                     <p>We are the exclusive distributors of TKN products. If you want to learn more about MTC and TKN, please click &apos;Learn More&apos;.</p>
                   </div>
