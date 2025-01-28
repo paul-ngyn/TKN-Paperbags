@@ -8,6 +8,7 @@ import AboutUsButton from '../AboutUsButton/AboutUsButton';
 import ContactUsButton from '../ContactUsButton/ContactUsButton';
 import OrderInfoButton from '../OrderInfoButton/OrderInfoButton';
 import styles from './NavBar.module.css';
+import QuoteReqButton from '../QuoteReqButton/QuoteReqButon';
 
 const NavBar: React.FC = () => {
   const router = useRouter();
@@ -35,6 +36,9 @@ const NavBar: React.FC = () => {
         </li>
         <li className={styles.navItem}>
           <OrderInfoButton onClick={() => handleNavigation('orderinfo')} />
+        </li>
+        <li className={styles.navItem}>
+          <QuoteReqButton/>
         </li>
       </ul>
     </nav>

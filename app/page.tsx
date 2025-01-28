@@ -2,13 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import NavBar from '../app/components/NavBar/NavBar';
 import LogoPage from '../app/components/LogoPage';
 import ProductPage from '../app/components/ProductPage';
 import AboutPage from '../app/components/AboutPage';
 import '../app/globals.css';
 import QuoteForm from './components/QuoteForm/QuoteForm';
-import Footer from './components/Footer/Footer';
+import ContactPage from './components/ContactUsPage';
+import InfoPage from './components/InfoPage';
 
 export default function Home() {
   const router = useRouter();
@@ -38,15 +38,14 @@ export default function Home() {
 
   return (
     <div className="app">
-      <NavBar setPage={handleNavigation} />
       <div className="container">
         {page === 'logo' && <LogoPage handleNavigation={handleNavigation} />}
         {page === 'product' && (
           <ProductPage handleOpenQuoteForm={handleOpenQuoteForm} handleNavigation={handleNavigation} />
         )}
         {page === 'about' && <AboutPage />}
-        {page === 'contact' && <h1>Contact Us Page</h1>}
-        {page === 'orderinfo' && <h1>Order Information Page</h1>}
+        {page === 'contact' && <ContactPage/>}
+        {page === 'orderinfo' && <InfoPage/>}
         {page === 'quote' && (
           <div className={`quote-form-container ${showQuoteForm ? 'show' : ''}`}>
             <QuoteForm onClose={() => handleNavigation('logo')} /> {/* Render the form */}
@@ -60,7 +59,6 @@ export default function Home() {
           </div>
         </div>
       )}
-      <Footer />
     </div>
   );
 }
