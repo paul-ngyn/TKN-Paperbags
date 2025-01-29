@@ -44,22 +44,22 @@ const ProductPage: React.FC<ProductPageProps> = ({ handleOpenQuoteForm, handleNa
         <div className="processlogoContainer">
           <div className={styles.logoWithDescription}>
             <Image className = {styles.logoImage} src={quoteicon} alt="Quote Logo" width={50} height={35} />
-            <p className={styles.logoDescription}>Quote Requested</p>
+            <p className={styles.logoDescription}>QUOTE REQUESTED</p>
           </div>
           <div className="divider"></div>
           <div className={styles.logoWithDescription}>
             <Image className = {styles.logoImage} src={customerserviceicon} alt="Service Logo" width={55} height={30} />
-            <p className={styles.logoDescription}>Talk to a Representative</p>
+            <p className={styles.logoDescription}>CONFIRM YOUR ORDER</p>
           </div>
           <div className="divider"></div>
           <div className={styles.logoWithDescription}>
             <Image className = {styles.logoImage} src={packicon} alt="Pack Logo" width={55} height={30} />
-            <p className={styles.logoDescription}>Customized & Packed</p>
+            <p className={styles.logoDescription}>CUSTOMIZED & PACKED</p>
           </div>
           <div className="divider"></div>
           <div className={styles.logoWithDescription}>
             <Image className = {styles.logoImage} src={shipicon} alt="Ship Logo" width={60} height={30} />
-            <p className={styles.logoDescription}>Delivered to You</p>
+            <p className={styles.logoDescription}>DELIVERED TO YOU</p>
           </div>
         </div>
       </div>
