@@ -41,7 +41,7 @@ export default function Home() {
       <div className="container">
         {page === 'logo' && <LogoPage handleNavigation={handleNavigation} />}
         {page === 'product' && (
-          <ProductPage handleOpenQuoteForm={handleOpenQuoteForm} handleNavigation={handleNavigation} />
+          <ProductPage handleNavigation={handleNavigation} />
         )}
         {page === 'about' && <AboutPage />}
         {page === 'contact' && <ContactPage/>}

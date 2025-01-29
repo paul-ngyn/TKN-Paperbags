@@ -7,15 +7,11 @@ import ProductPage from '../components/ProductPage/ProductPage';
 const Product: React.FC = () => {
   const router = useRouter();
 
-  const handleOpenQuoteForm = () => {
-    // Implement quote form logic here if needed
-  };
-
   const handleNavigation = (page: string) => {
     router.push(`/${page}`);
   };
 
-  return <ProductPage handleOpenQuoteForm={handleOpenQuoteForm} handleNavigation={handleNavigation} />;
+  return <ProductPage handleNavigation={handleNavigation} />;
 };
 
 export default Product;

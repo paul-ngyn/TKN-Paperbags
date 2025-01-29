@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, {useState} from 'react';
 import Image from 'next/image';
 import ProductImage from '../ProductImage/ProductImage';
 import recyclelogo from '../../public/recyclelogo.png';
@@ -10,13 +10,18 @@ import customerserviceicon from '../../public/customerservice.png';
 import packicon from '../../public/pack.png';
 import shipicon from '../../public/shippingtruck.png';
 import styles from './ProductPage.module.css';
+import QuoteForm from '../QuoteForm/QuoteForm';
 
 interface ProductPageProps {
-  handleOpenQuoteForm: () => void;
   handleNavigation: (page: string) => void;
 }
 
-const ProductPage: React.FC<ProductPageProps> = ({ handleOpenQuoteForm, handleNavigation }) => {
+
+const ProductPage: React.FC<ProductPageProps> = ({ handleNavigation }) => {
+  const [showModal, setShowModal] = useState(false);
+  const handleOpenModal = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
+
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
       <ProductImage />
@@ -38,8 +43,10 @@ const ProductPage: React.FC<ProductPageProps> = ({ handleOpenQuoteForm, handleNa
           Our paper bags are made from the highest quality materials, ensuring durability and strength.
         </p>
         <div className="buttonContainer">
-          <button className="product-button" onClick={handleOpenQuoteForm}>Request a Quote</button>
-          <button className="product-button" onClick={() => handleNavigation('orderinfo')}>Image Upload Details</button>
+          <button className="product-button" onClick={handleOpenModal}>Request a Quote</button>
+          <a href="/orderinfo" className="product-button-link">
+            Image Upload Details
+          </a>
         </div>
         <div className="processlogoContainer">
           <div className={styles.logoWithDescription}>
@@ -63,6 +70,13 @@ const ProductPage: React.FC<ProductPageProps> = ({ handleOpenQuoteForm, handleNa
           </div>
         </div>
       </div>
+      {showModal && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
+            <QuoteForm onClose={handleCloseModal} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
