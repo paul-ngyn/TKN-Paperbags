@@ -262,7 +262,7 @@ html, body {
 .processlogoContainer {
   display: flex;
   gap: 20px; /* Add space between logos */
-  margin-top: 50px;
+  margin-top: 70px;
   margin-bottom: 25px; /* Add space below the logos */
   max-height: 90px;
 }

@@ -7,6 +7,8 @@ import recyclelogo from '../../public/recyclelogo.png';
 import tknlogo from '../../public/tkn_products.png';
 import quoteicon from '../../public/quoteicon.png';
 import customerserviceicon from '../../public/customerservice.png';
+import packicon from '../../public/pack.png';
+import shipicon from '../../public/shippingtruck.png';
 import styles from './ProductPage.module.css';
 
 interface ProductPageProps {
@@ -42,12 +44,22 @@ const ProductPage: React.FC<ProductPageProps> = ({ handleOpenQuoteForm, handleNa
         <div className="processlogoContainer">
           <div className={styles.logoWithDescription}>
             <Image className = {styles.logoImage} src={quoteicon} alt="Quote Logo" width={50} height={35} />
-            <p className={styles.logoDescription}>Request a Quote</p>
+            <p className={styles.logoDescription}>Quote Requested</p>
           </div>
           <div className="divider"></div>
           <div className={styles.logoWithDescription}>
             <Image className = {styles.logoImage} src={customerserviceicon} alt="Service Logo" width={55} height={30} />
             <p className={styles.logoDescription}>Talk to a Representative</p>
+          </div>
+          <div className="divider"></div>
+          <div className={styles.logoWithDescription}>
+            <Image className = {styles.logoImage} src={packicon} alt="Pack Logo" width={55} height={30} />
+            <p className={styles.logoDescription}>Customized & Packed</p>
+          </div>
+          <div className="divider"></div>
+          <div className={styles.logoWithDescription}>
+            <Image className = {styles.logoImage} src={shipicon} alt="Ship Logo" width={60} height={30} />
+            <p className={styles.logoDescription}>Shipped to You</p>
           </div>
         </div>
       </div>
