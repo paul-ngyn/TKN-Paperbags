@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import LogoPage from '../app/components/LogoPage';
-import ProductPage from '../app/components/ProductPage';
+import ProductPage from './components/ProductPage/ProductPage';
 import AboutPage from '../app/components/AboutPage';
 import '../app/globals.css';
 import QuoteForm from './components/QuoteForm/QuoteForm';

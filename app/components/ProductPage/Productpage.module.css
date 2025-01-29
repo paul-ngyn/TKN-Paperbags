@@ -1,0 +1,12 @@
+.logoWithDescription {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+.logoDescription {
+    font-size: 14px; /* Adjust font size as needed */
+    margin-top: 8px; /* Adjust spacing as needed */
+    text-align: center;
+  }
+

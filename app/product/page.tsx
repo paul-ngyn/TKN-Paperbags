@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import ProductPage from '../components/ProductPage';
+import ProductPage from '../components/ProductPage/ProductPage';
 
 const Product: React.FC = () => {
   const router = useRouter();

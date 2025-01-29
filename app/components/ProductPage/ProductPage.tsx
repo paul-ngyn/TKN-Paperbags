@@ -2,9 +2,12 @@
 
 import React from 'react';
 import Image from 'next/image';
-import ProductImage from './ProductImage/ProductImage';
-import recyclelogo from '../public/recyclelogo.png';
-import tknlogo from '../public/tkn_products.png';
+import ProductImage from '../ProductImage/ProductImage';
+import recyclelogo from '../../public/recyclelogo.png';
+import tknlogo from '../../public/tkn_products.png';
+import quoteicon from '../../public/quoteicon.png';
+import customerserviceicon from '../../public/customerservice.png';
+import styles from './ProductPage.module.css';
 
 interface ProductPageProps {
   handleOpenQuoteForm: () => void;
@@ -35,6 +38,17 @@ const ProductPage: React.FC<ProductPageProps> = ({ handleOpenQuoteForm, handleNa
         <div className="buttonContainer">
           <button className="product-button" onClick={handleOpenQuoteForm}>Request a Quote</button>
           <button className="product-button" onClick={() => handleNavigation('orderinfo')}>Image Upload Details</button>
+        </div>
+        <div className="processlogoContainer">
+          <div className={styles.logoWithDescription}>
+            <Image className = {styles.logoImage} src={quoteicon} alt="Quote Logo" width={50} height={35} />
+            <p className={styles.logoDescription}>Request a Quote</p>
+          </div>
+          <div className="divider"></div>
+          <div className={styles.logoWithDescription}>
+            <Image className = {styles.logoImage} src={customerserviceicon} alt="Service Logo" width={55} height={30} />
+            <p className={styles.logoDescription}>Talk to a Representative</p>
+          </div>
         </div>
       </div>
     </div>
