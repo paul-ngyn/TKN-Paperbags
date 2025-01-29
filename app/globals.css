@@ -239,14 +239,14 @@ html, body {
   border-radius: 8px; /* Optional: Add border radius */
   flex: 1; /* Allow the details container to take up available space */
   margin-left: 100px; /* Add space between the image and details */
-  margin-top: 100px;
+  margin-top: 90px;
 }
 
 .productName {
   font-size: 32px;
   font-weight: bold;
   margin-bottom: 5px;
-  margin-top: 26px;
+  margin-top: 16px;
 }
 
 .productDescription {
