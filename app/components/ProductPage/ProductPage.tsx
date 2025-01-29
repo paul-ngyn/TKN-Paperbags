@@ -59,7 +59,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ handleOpenQuoteForm, handleNa
           <div className="divider"></div>
           <div className={styles.logoWithDescription}>
             <Image className = {styles.logoImage} src={shipicon} alt="Ship Logo" width={60} height={30} />
-            <p className={styles.logoDescription}>Shipped to You</p>
+            <p className={styles.logoDescription}>Delivered to You</p>
           </div>
         </div>
       </div>

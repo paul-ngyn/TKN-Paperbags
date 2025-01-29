@@ -5,8 +5,9 @@
   }
   
 .logoDescription {
-    font-size: 14px; /* Adjust font size as needed */
+    font-size: 13px; /* Adjust font size as needed */
     margin-top: 8px; /* Adjust spacing as needed */
     text-align: center;
+    width: 65%;
   }
 
