@@ -48,6 +48,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
     <div className={styles.formContainer}>
       <h2>Get A Quote</h2>
       <form onSubmit={handleSubmit}>
+        <div className={styles.nameGroup}>
       <div className={styles.formGroup}>
           <label htmlFor="firstName">First Name</label>
           <input
@@ -60,6 +61,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
             required
           />
         </div>
+        
         <div className={styles.formGroup}>
           <label htmlFor="lastName">Last Name</label>
           <input
@@ -71,6 +73,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
             onChange={handleChange}
             required
           />
+        </div>
         </div>
         <div className={styles.formGroup}>
           <label htmlFor="email">Email</label>
