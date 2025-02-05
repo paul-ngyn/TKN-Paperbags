@@ -17,7 +17,7 @@ interface ProductPageProps {
   handleNavigation: (page: string) => void;
 }
 
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ProductPage: React.FC<ProductPageProps> = ({ handleNavigation }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedOption, setSelectedOption] = useState('small');
