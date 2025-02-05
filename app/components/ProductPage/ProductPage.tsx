@@ -11,6 +11,7 @@ import packicon from '../../public/pack.png';
 import shipicon from '../../public/shippingtruck.png';
 import styles from './ProductPage.module.css';
 import QuoteForm from '../QuoteForm/QuoteForm';
+import ProductTable from '../ProductTable/ProductTable';
 
 interface ProductPageProps {
   handleNavigation: (page: string) => void;
@@ -19,8 +20,13 @@ interface ProductPageProps {
 
 const ProductPage: React.FC<ProductPageProps> = ({ handleNavigation }) => {
   const [showModal, setShowModal] = useState(false);
+  const [selectedOption, setSelectedOption] = useState('small');
   const handleOpenModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
+
+  const handleOptionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedOption(e.target.value);
+  };
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
@@ -28,20 +34,21 @@ const ProductPage: React.FC<ProductPageProps> = ({ handleNavigation }) => {
       <div className="productDetailsContainer">
         <h2 className="productName">Paper Bag</h2>
         <div className="logoContainer">
-          <Image src={recyclelogo} alt="Recycle Logo" width={40} height={20} />
-          <Image src={tknlogo} alt="TKN Products Logo" width={40} height={30} />
+          <Image src={recyclelogo} alt="Recycle Logo" width={38} height={20} />
+          <Image src={tknlogo} alt="TKN Products Logo" width={38} height={30} />
         </div>
+        <p className="productDescription">
+          Our kraft paper bags are made from the highest quality materials, ensuring durability and strength.
+        </p>
         <div className="productOptions">
-          <label htmlFor="productOptions">Choose an option:</label>
-          <select id="productOptions" name="productOptions">
+          <label htmlFor="productOptions">Choose a Size:</label>
+          <select id="productOptions" name="productOptions" value={selectedOption} onChange={handleOptionChange}>
             <option value="small">Small</option>
             <option value="medium">Medium</option>
             <option value="large">Large</option>
           </select>
         </div>
-        <p className="productDescription">
-          Our paper bags are made from the highest quality materials, ensuring durability and strength.
-        </p>
+        <ProductTable selectedOption={selectedOption} />
         <div className="buttonContainer">
           <button className="product-button" onClick={handleOpenModal}>Request a Quote</button>
           <a href="/orderinfo" className="product-button-link">

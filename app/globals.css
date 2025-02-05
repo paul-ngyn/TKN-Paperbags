@@ -152,7 +152,7 @@ html, body {
   background-color: #1c51a3; /* Blue background color */
   color: white;
   border: none;
-  padding: 12px 265px;
+  padding: 12px 280px;
   border-radius: 8px; /* Add border radius */
   cursor: pointer;
   margin-top: 20px; 
@@ -193,7 +193,7 @@ html, body {
 .logoContainer {
   display: flex;
   gap: 8px; /* Add space between logos */
-  margin-bottom: 45px; /* Add space below the logos */
+  margin-bottom: 25px; /* Add space below the logos */
   max-height: 40px;
   margin-top: 1px;
 }
@@ -255,13 +255,13 @@ html, body {
   font-size: 32px;
   font-weight: bold;
   margin-bottom: 5px;
-  margin-top: 16px;
+  margin-top: 2px;
 }
 
 .productDescription {
   font-size: 16px;
   margin-bottom: 25px;
-  margin-top: 100px;
+  margin-top: 2px;
 }
 
 .productOptions {
