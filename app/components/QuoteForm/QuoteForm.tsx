@@ -8,7 +8,8 @@ interface QuoteFormProps {
 
 const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
   const [formData, setFormData] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     phone: '',
     details: '',
@@ -47,14 +48,26 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
     <div className={styles.formContainer}>
       <h2>Get A Quote</h2>
       <form onSubmit={handleSubmit}>
-        <div className={styles.formGroup}>
-          <label htmlFor="name">Name</label>
+      <div className={styles.formGroup}>
+          <label htmlFor="firstName">First Name</label>
           <input
             className={styles.inputField}
             type="text"
-            id="name"
-            name="name"
-            value={formData.name}
+            id="firstName"
+            name="firstName"
+            value={formData.firstName}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className={styles.formGroup}>
+          <label htmlFor="lastName">Last Name</label>
+          <input
+            className={styles.inputField}
+            type="text"
+            id="lastName"
+            name="lastName"
+            value={formData.lastName}
             onChange={handleChange}
             required
           />
