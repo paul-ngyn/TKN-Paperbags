@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import ContactPage from '../components/ContactUsPage';
+import ContactPage from '../components/ContactUsPage/ContactUsPage';
 
 const Contact: React.FC = () => {
   const router = useRouter();

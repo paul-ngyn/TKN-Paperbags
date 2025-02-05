@@ -7,8 +7,8 @@ import ProductPage from './components/ProductPage/ProductPage';
 import AboutPage from '../app/components/AboutPage';
 import '../app/globals.css';
 import QuoteForm from './components/QuoteForm/QuoteForm';
-import ContactPage from './components/ContactUsPage';
-import InfoPage from './components/InfoPage';
+import ContactPage from './components/ContactUsPage/ContactUsPage';
+import InfoPage from './components/InfoPage/InfoPage';
 
 export default function Home() {
   const router = useRouter();

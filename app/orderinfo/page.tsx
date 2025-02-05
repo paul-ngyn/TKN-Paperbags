@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import InfoPage from '../components/InfoPage';
+import InfoPage from '../components/InfoPage/InfoPage';
 
 const OrderInfo: React.FC = () => {
   const router = useRouter();
