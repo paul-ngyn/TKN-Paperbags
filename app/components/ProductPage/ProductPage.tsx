@@ -37,7 +37,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ handleNavigation }) => {
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
       <ProductImage />
       <div className="productDetailsContainer">
-        <h2 className="productName">Paper Bag</h2>
+        <h2 className="productName">Kraft Paper Bag</h2>
         <div className="logoContainer">
           <Image src={recyclelogo} alt="Recycle Logo" width={38} height={20} />
           <Image src={tknlogo} alt="TKN Products Logo" width={38} height={30} />
@@ -46,7 +46,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ handleNavigation }) => {
           Our kraft paper bags are made from the highest quality materials, ensuring durability and strength.
         </p>
         <div className="productOptions">
-          <label htmlFor="productOptions">Choose a Size:</label>
+          <label htmlFor="productOptions">Select a Size:</label>
           <select id="productOptions" name="productOptions" value={selectedOption} onChange={handleOptionChange}>
             <option value="small">Small</option>
             <option value="medium">Medium</option>
@@ -54,7 +54,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ handleNavigation }) => {
           </select>
         </div>
         <div className="productOptions">
-          <label htmlFor="handleOptions">Choose a Handle Type:</label>
+          <label htmlFor="handleOptions">Select a Handle Type:</label>
           <select id="handleOptions" name="handleOptions" value={selectedHandle} onChange={handleHandleChange}>
             <option value="none">None</option>
             <option value="rope">Rope</option>

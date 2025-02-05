@@ -85,6 +85,14 @@ const LogoPage: React.FC<LogoPageProps> = ({ handleNavigation }) => {
         <div className="learn-buttoncontainer">
           <button className="learn-button" onClick={() => handleNavigation('about')}>Learn More</button>
         </div>
+        <div className="contact-info">
+          <div className="Contact-Title">
+          <p>Any Questions?</p>
+            </div>
+            <div className="Contact-Description">
+          <p>Please call us at 777-777-7777 or email Mtc@gmail.com</p>
+          </div>
+        </div>
       </section>
       <hr className="section-divider" />
     </>

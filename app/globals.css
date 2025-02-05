@@ -240,42 +240,6 @@ html, body {
   margin-bottom: 2%;
 }
 
-.productDetailsContainer {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 20px;
-  border-radius: 8px; /* Optional: Add border radius */
-  flex: 1; /* Allow the details container to take up available space */
-  margin-left: 100px; /* Add space between the image and details */
-  margin-top: 90px;
-}
-
-.productName {
-  font-size: 32px;
-  font-weight: bold;
-  margin-bottom: 5px;
-  margin-top: 2px;
-}
-
-.productDescription {
-  font-size: 16px;
-  margin-bottom: 25px;
-  margin-top: 2px;
-}
-
-.productOptions {
-  font-size: 16px;
-}
-
-.processlogoContainer {
-  display: flex;
-  gap: 5px; /* Add space between logos */
-  margin-top: 70px;
-  margin-bottom: 25px; /* Add space below the logos */
-  max-height: 90px;
-}
-
 .learn-buttoncontainer {
   display: flex;
   justify-content: center;
@@ -295,6 +259,74 @@ html, body {
   display: flex;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Add button shadow */
 }
+
+.contact-info {
+  background-color: #1c51a3;
+  color: white;
+  text-align: center;
+  padding: 40px;
+  margin-top: 100px;
+}
+
+.Contact-Title {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Add text shadow */
+}
+
+.Contact-Description {
+  font-size: 18px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4); /* Add text shadow */
+}
+
+.productDetailsContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 20px;
+  border-radius: 8px; /* Optional: Add border radius */
+  flex: 1; /* Allow the details container to take up available space */
+  margin-left: 100px; /* Add space between the image and details */
+  margin-top: 75px;
+}
+
+.productName {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.productDescription {
+  font-size: 16px;
+  margin-bottom: 25px;
+  margin-top: 2px;
+}
+
+.productOptions {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.productOptions select {
+  border: 1px solid #ccc; /* Border around the dropdown */
+  margin-left: 6px;
+  padding: 6px; /* Padding inside the dropdown */
+  background-color: white; /* Background color of the dropdown */
+  border-radius: 4px; /* Optional: Rounded corners */
+  width: 10%; /* Optional: Full width */
+  box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
+}
+
+.processlogoContainer {
+  display: flex;
+  gap: 5px; /* Add space between logos */
+  margin-top: 60px;
+  margin-bottom: 25px; /* Add space below the logos */
+  max-height: 90px;
+}
+
+
 
 @layer utilities {
   .text-balance {

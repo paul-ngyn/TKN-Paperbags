@@ -6,7 +6,8 @@
   
   .productTable th, .productTable td {
     border: 1px solid #ddd;
-    padding: 8px;
+    padding: 7px;
+    font-size: 16px;
   }
   
   .productTable th {
