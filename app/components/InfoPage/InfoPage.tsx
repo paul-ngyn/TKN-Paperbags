@@ -6,7 +6,7 @@ import styles from './InfoPage.module.css';
 interface InfoPageProps {
   handleNavigation?: (page: string) => void;
 }
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const InfoPage: React.FC<InfoPageProps> = ({ handleNavigation }) => {
   return (
     <div className={styles.container}>

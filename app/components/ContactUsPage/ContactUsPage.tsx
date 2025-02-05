@@ -6,7 +6,7 @@ import styles from './ContactUsPage.module.css';
 interface ContactPageProps {
   handleNavigation?: (page: string) => void;
 }
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ContactPage: React.FC<ContactPageProps> = ({ handleNavigation }) => {
   const [formData, setFormData] = useState({
     name: '',
