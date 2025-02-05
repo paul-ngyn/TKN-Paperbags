@@ -91,7 +91,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ handleNavigation }) => {
         </div>
       </div>
       {showModal && (
-        <div className={styles.modalOverlay}>
+        <div style={{ backgroundColor: 'rgba(0, 0, 0, 0.4)', position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
           <div className={styles.modalContent}>
             <QuoteForm onClose={handleCloseModal} />
           </div>
