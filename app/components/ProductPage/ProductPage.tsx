@@ -9,7 +9,7 @@ import quoteicon from '../../public/quoteicon.png';
 import customerserviceicon from '../../public/customerservice.png';
 import packicon from '../../public/pack.png';
 import shipicon from '../../public/shippingtruck.png';
-import styles from './Productpage.module.css';
+import styles from './ProductPage.module.css';
 import QuoteForm from '../QuoteForm/QuoteForm';
 import ProductTable from '../ProductTable/ProductTable';
 
