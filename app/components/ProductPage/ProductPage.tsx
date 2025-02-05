@@ -17,15 +17,20 @@ interface ProductPageProps {
   handleNavigation: (page: string) => void;
 }
 
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ProductPage: React.FC<ProductPageProps> = ({ handleNavigation }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedOption, setSelectedOption] = useState('small');
+  const [selectedHandle, setSelectedHandle] = useState('flat');
   const handleOpenModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
 
   const handleOptionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedOption(e.target.value);
+  };
+
+  const handleHandleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedHandle(e.target.value);
   };
 
   return (
@@ -48,7 +53,15 @@ const ProductPage: React.FC<ProductPageProps> = ({ handleNavigation }) => {
             <option value="large">Large</option>
           </select>
         </div>
-        <ProductTable selectedOption={selectedOption} />
+        <div className="productOptions">
+          <label htmlFor="handleOptions">Choose a Handle Type:</label>
+          <select id="handleOptions" name="handleOptions" value={selectedHandle} onChange={handleHandleChange}>
+            <option value="none">None</option>
+            <option value="rope">Rope</option>
+            <option value="flat">Flat</option>
+          </select>
+        </div>
+        <ProductTable selectedOption={selectedOption} selectedHandle={selectedHandle} />
         <div className="buttonContainer">
           <button className="product-button" onClick={handleOpenModal}>Request a Quote</button>
           <a href="/orderinfo" className="product-button-link">

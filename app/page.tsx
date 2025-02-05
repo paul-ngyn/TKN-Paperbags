@@ -23,9 +23,6 @@ export default function Home() {
     }
   }, [page]);
 
-  const handleOpenQuoteForm = () => {
-    setShowQuoteForm(true);
-  };
 
   const handleCloseQuoteForm = () => {
     setShowQuoteForm(false);

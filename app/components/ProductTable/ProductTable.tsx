@@ -5,47 +5,96 @@ import styles from './ProductTable.module.css';
 
 interface ProductTableProps {
   selectedOption: string;
+  selectedHandle: string;
 }
 
-interface SizeData {
+interface HandleData {
   dimensions: string;
   capacity: string;
   price: string;
   quantity: number;
-  handle: string;
   weight: string;
+}
+
+interface SizeData {
+  [handle: string]: HandleData;
 }
 
 const sizeData: Record<string, SizeData> = {
   small: {
-    dimensions: '10x11',
-    capacity: '5 KG',
-    price: '$0.50',
-    quantity: 250,
-    handle: 'Rope / Flat',
-    weight: '28 / 35 LB'
+    none: {
+      dimensions: '10x11x17',
+      capacity: '5 KG',
+      price: '$0.50',
+      quantity: 250,
+      weight: '28 LB'
+    },
+    rope: {
+      dimensions: '10x11x13',
+      capacity: '5 KG',
+      price: '$0.55',
+      quantity: 250,
+      weight: '30 LB'
+    },
+    flat: {
+      dimensions: '10x11x12',
+      capacity: '5 KG',
+      price: '$0.50',
+      quantity: 250,
+      weight: '28 LB'
+    }
   },
   medium: {
-    dimensions: '12x12',
-    capacity: '10 KG',
-    price: '$0.75',
-    quantity: 250,
-    handle: 'Rope / Flat',
-    weight: '28 / 35 LB'
+    none: {
+      dimensions: '12x12x17',
+      capacity: '10 KG',
+      price: '$0.75',
+      quantity: 250,
+      weight: '28 LB'
+    },
+    rope: {
+      dimensions: '12x12x15',
+      capacity: '10 KG',
+      price: '$0.80',
+      quantity: 250,
+      weight: '30 LB'
+    },
+    flat: {
+      dimensions: '12x12x14',
+      capacity: '10 KG',
+      price: '$0.75',
+      quantity: 250,
+      weight: '28 LB'
+    }
   },
   large: {
-    dimensions: '14x13',
-    capacity: '20 KG',
-    price: '$1.00',
-    quantity: 250,
-    handle: 'Rope / Flat',
-     weight: '28 / 35 LB'
+    none: {
+      dimensions: '14x13x19',
+      capacity: '20 KG',
+      price: '$1.00',
+      quantity: 250,
+      weight: '28 LB'
+    },
+    rope: {
+      dimensions: '14x13x16',
+      capacity: '20 KG',
+      price: '$1.05',
+      quantity: 250,
+      weight: '30 LB'
+    },
+    flat: {
+      dimensions: '14x13x14',
+      capacity: '20 KG',
+      price: '$1.00',
+      quantity: 250,
+      weight: '28 LB'
+    }
   },
-  // Add more sizes here
+  // Add more sizes and handle types here
 };
 
-const ProductTable: React.FC<ProductTableProps> = ({ selectedOption }) => {
-  const data = sizeData[selectedOption];
+const ProductTable: React.FC<ProductTableProps> = ({ selectedOption, selectedHandle }) => {
+  const data = sizeData[selectedOption]?.[selectedHandle];
 
   if (!data) {
     return null;
@@ -75,10 +124,6 @@ const ProductTable: React.FC<ProductTableProps> = ({ selectedOption }) => {
         <tr>
           <td>Quantity</td>
           <td>{data.quantity}</td>
-        </tr>
-        <tr>
-          <td>Handle</td>
-          <td>{data.handle}</td>
         </tr>
         <tr>
           <td>Weight</td>
