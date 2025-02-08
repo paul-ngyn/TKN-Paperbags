@@ -213,7 +213,7 @@ html, body {
   gap: 20px; /* Add space between brand logos */
   width: 100%;
   margin-top: 10px;
-  padding-left: 13.5%;
+  padding-left: 20.5%;
 }
 
 .brand { /* brand logo */
@@ -234,7 +234,7 @@ html, body {
 .brand-paragraph {
   font-size: 18px;
   text-align: left; /* Align text to the left */
-  margin-left: 8.5%; /* Add space between the logo and the paragraph */
+  margin-left: 6.5%; /* Add space between the logo and the paragraph */
   color: #766; /* Optional: Lighter color for the description */
   width: 45%;
   margin-bottom: 2%;
