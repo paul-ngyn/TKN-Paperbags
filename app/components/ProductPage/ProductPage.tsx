@@ -2,7 +2,7 @@
 
 import React, {useState} from 'react';
 import Image from 'next/image';
-import ProductImage from '../ProductImage/ProductImage';
+import ProductImageCarousel from '../ProductImageCarousel/ProductImageCarousel';
 import recyclelogo from '../../public/recyclelogo.png';
 import tknlogo from '../../public/tkn_products.png';
 import quoteicon from '../../public/quoteicon.png';
@@ -12,6 +12,10 @@ import shipicon from '../../public/shippingtruck.png';
 import styles from './Productpage.module.css';
 import QuoteForm from '../QuoteForm/QuoteForm';
 import ProductTable from '../ProductTable/ProductTable';
+import ropehandle from '../../public/paperbagproduct.jpg';
+import flathandle from '../../public/flathandle1.jpeg';
+import flathandle2 from '../../public/flathandle2.jpg.jpeg';
+import nohandle from '../../public/nohandle.jpeg';
 
 interface ProductPageProps {
   handleNavigation: (page: string) => void;
@@ -35,7 +39,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ handleNavigation }) => {
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
-      <ProductImage />
+      <ProductImageCarousel images={[ropehandle, flathandle, flathandle2, nohandle]} />
       <div className="productDetailsContainer">
         <h2 className="productName">Kraft Paper Bag</h2>
         <div className="logoContainer">

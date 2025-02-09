@@ -1,0 +1,80 @@
+.carouselContainer {
+    display: flex;
+    flex-direction: row; /* Ensure content is in a row */
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 680px; /* Adjust to include arrow button spacing */
+    margin-top: 100px;
+    margin-left: 180px;
+  }
+  
+  /* Vertical preview container on the left */
+  .previewContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 100%;
+    margin-bottom: 230px;
+  }
+  .previewItem {
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    transition: border 0.2s;
+  }
+  
+  .previewItem:hover {
+    border-color: #1c51a3;
+  }
+  
+  .activePreview {
+    border-color: #1c51a3;
+  }
+  
+  .previewImage {
+    border-radius: 4px;
+  }
+  
+  /* Main image container with arrow buttons */
+  .mainImageContainer {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 60px;
+    margin-bottom: 50px;
+  }
+  
+  .imageContainer {
+    width: 520px;
+    overflow: hidden;
+    max-height: 500px;
+    min-height: 590px;
+    max-width: 600px;
+    min-width: 520px;
+  }
+  
+  .arrowButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+    padding: 10px;
+    margin-top: 350px;
+    margin-left: 15px;
+    margin-right: -5px;
+  }
+  
+  /* Position left arrow */
+  .arrowButton:first-of-type {
+    left: 200px;
+  }
+  
+  /* Position right arrow */
+  .arrowButton:last-of-type {
+    right: 200px;
+  }

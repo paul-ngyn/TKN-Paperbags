@@ -288,7 +288,7 @@ html, body {
   padding: 20px;
   border-radius: 8px; /* Optional: Add border radius */
   flex: 1; /* Allow the details container to take up available space */
-  margin-left: 150px; /* Add space between the image and details */
+  margin-left: 110px; /* Add space between the image and details */
   margin-top: 75px;
 }
 
@@ -314,7 +314,7 @@ html, body {
   margin-left: 6px;
   padding: 6px; /* Padding inside the dropdown */
   background-color: white; /* Background color of the dropdown */
-  border-radius: 4px; /* Optional: Rounded corners */
+  border-radius: 6px; /* Optional: Rounded corners */
   width: 10%; /* Optional: Full width */
   box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
 }

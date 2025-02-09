@@ -16,9 +16,17 @@ const Footer: React.FC = () => {
           <Image src={mtcLogo} alt="MTC Logo" width={150} height={150} />
         </div>
         <div className={styles.contactInfo}>
-          <p>Address: 123 Maple Street, City, Country</p>
+        <p>
+          <a
+            href="https://www.google.com/maps/place/Maple+Trade+Corporation/@37.6508929,-122.1439502,17z/data=!4m6!3m5!1s0x808f7f163c7d2c37:0xd5adc61a49cb242e!8m2!3d37.6508929!4d-122.1417615!16s%2Fg%2F1tcyxnl_?entry=ttu&g_ep=EgoyMDI1MDIwNS4xIKXMDSoASAFQAw%3D%3D"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+      Address: 2660 W Winton Ave, Hayward, CA 94545
+         </a>
+        </p>
           <p>Phone: 777-777-7777</p>
-          <p>Email: info@mapletradecorp.com</p>
+          <p>Email: admin@mapletradecorp.com</p>
         </div>
       </div>
       <div className={styles.linksContainer}>

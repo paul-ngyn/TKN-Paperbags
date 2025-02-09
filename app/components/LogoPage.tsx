@@ -91,7 +91,7 @@ const LogoPage: React.FC<LogoPageProps> = ({ handleNavigation }) => {
             <p>Any Questions?</p>
           </div>
           <div className="Contact-Description">
-            <p>Please call us at 777-777-7777 or email Mtc@gmail.com</p>
+            <p>Please call us at 777-777-7777 or email admin@mapletradecorp.com</p>
           </div>
         </div>
       </section>
