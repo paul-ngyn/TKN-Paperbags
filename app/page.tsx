@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import LogoPage from '../app/components/LogoPage';
 import ProductPage from './components/ProductPage/ProductPage';
-import AboutPage from '../app/components/AboutPage';
+import AboutPage from './components/AboutPage/AboutPage';
 import '../app/globals.css';
 import QuoteForm from './components/QuoteForm/QuoteForm';
 import ContactPage from './components/ContactUsPage/ContactUsPage';

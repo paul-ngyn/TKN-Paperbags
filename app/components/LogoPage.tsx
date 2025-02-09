@@ -8,6 +8,7 @@ import timelogo from '../public/timelogo.jpg';
 import biodegradable from '../public/biodegradablelogo.jpg';
 import tknlogo from '../public/tkn_products.png';
 import paperbagheader from '../public/paperbagfullheader2.jpg';
+import Link from 'next/link';
 
 interface LogoPageProps {
   handleNavigation: (page: string) => void;
@@ -91,8 +92,15 @@ const LogoPage: React.FC<LogoPageProps> = ({ handleNavigation }) => {
             <p>Any Questions?</p>
           </div>
           <div className="Contact-Description">
-            <p>Please call us at 777-777-7777 or email admin@mapletradecorp.com</p>
-          </div>
+          <p>
+            Please use our{" "}
+            <Link href="/contact" style={{ textDecoration: 'underline' }}>
+              contact form
+            </Link>
+            <br />
+            We may also be reached at 777-777-777 or admin@mapletradecorp.com
+          </p>
+        </div>
         </div>
       </section>
       <hr className="section-divider" />
