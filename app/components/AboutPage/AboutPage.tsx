@@ -26,13 +26,17 @@ const AboutPage: React.FC<AboutPageProps> = ({ handleNavigation }) => {
             />
           </div>
           <div className={`${styles.textContainer} ${styles.fadeIn}`}>
-          <h2 style={{ fontWeight: "bold" }}>MAPLE TRADE CORPORATION (MTC)</h2>
+          <h2 style={{ fontWeight: "bold", marginBottom: '20px' }}>MAPLE TRADE CORPORATION (MTC)</h2>
             <p>
-            MTC was founded in 2006 in the heart of San Francisco and in 2019 we expanded our operations and facilities to Hayward, CA.
+            MTC was founded in 2006 in the heart of San Francisco,expanding our operations and facilities to Hayward, CA in 2019.
+            </p>
             <br />
-            Our goal is to provide the highest quality of eco-friendly, biodegradable, and compostable products seen in the world today.
+            <p>
+            Our goal is to provide the highest quality, eco-friendly, biodegradable, and compostable products seen in the world today.
+            </p>
             <br />
-            With more than 10+ years of experience in the plastic container business, we take pride in our products and service and are honored to provide solutions for food service professionals across North America. 
+            <p>
+            With more than 10+ years of experience in distribution, we take pride in our products and service and are honored to provide solutions for food service professionals across North America. 
             </p>
           </div>
         </div>
@@ -41,18 +45,21 @@ const AboutPage: React.FC<AboutPageProps> = ({ handleNavigation }) => {
       <div className={styles.section}>
         <div className={styles.logoTextRow}>
           <div className={`${styles.textContainer} ${styles.fadeIn}`}>
-          <h2 style={{ fontWeight: "bold" }}>TKN - OUR BRAND</h2>
+          <h2 style={{ fontWeight: "bold", marginBottom: '20px' }}>TKN PRODUCTS - OUR BRAND</h2>
             <p>
-              Discover our TKN products and how our expertise ensures seamless integration
-              of cutting‑edge designs with practicality.
+              Our TKN branded products feature high quality materials ensuring durability and strength.
+            </p>
+            <br />
+            <p>
+              Our products are environmentally friendly, biodegradable, recyclable and compostable.
             </p>
           </div>
           <div className={styles.logoContainer}>
             <Image
               src={tknLogo}
               alt="TKN Logo"
-              width={200}
-              height={200}
+              width={220}
+              height={220}
               className={styles.fadeIn}
             />
           </div>
