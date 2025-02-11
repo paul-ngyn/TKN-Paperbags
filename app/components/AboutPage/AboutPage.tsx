@@ -9,7 +9,7 @@ import tknLogo from "../../public/tkn_products.png";
 interface AboutPageProps {
   handleNavigation?: (page: string) => void;
 }
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const AboutPage: React.FC<AboutPageProps> = ({ handleNavigation }) => {
   return (
     <div className={styles.container}>
