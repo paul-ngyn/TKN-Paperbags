@@ -141,7 +141,7 @@ html, body {
   padding: 15px 15px;
   border-radius: 14px; /* Add border radius */
   cursor: pointer;
-  margin-top: 40px; /* Add space above the button */
+  margin-top: 30px; /* Add space above the button */
   margin-left: 44.3%;
   font-weight: bold;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4); /* Add button shadow */
@@ -154,7 +154,7 @@ html, body {
   padding: 12px 280px;
   border-radius: 8px; /* Add border radius */
   cursor: pointer;
-  margin-top: 22px; 
+  margin-top: 16px; 
   font-weight: bold;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Add button shadow */
   margin-right: 15px;
@@ -298,12 +298,13 @@ html, body {
 }
 
 .productDescription {
-  font-size: 18px;
+  font-size: 16px;
   margin-bottom: 5px;
+  font-weight: bold;
 }
 
 .productGuidelines {
-  font-size: 17px;
+  font-size: 16px;
   margin-bottom: 10px;
   margin-top: 2px;
   font-weight: bold;
@@ -332,7 +333,7 @@ html, body {
 .processlogoContainer {
   display: flex;
   gap: 5px; /* Add space between logos */
-  margin-top: 22px;
+  margin-top: 26px;
   margin-bottom: 25px; /* Add space below the logos */
   max-height: 90px;
 }

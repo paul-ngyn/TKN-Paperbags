@@ -70,7 +70,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ handleNavigation }) => {
         </div>
         <ProductTable selectedOption={selectedOption} selectedHandle={selectedHandle} />
         <p className="productSubject">
-          *Prices may vary based on customization and quantity. Please request a quote for more information.
+          *Pricing may vary based on customization and quantity. Please request a quote for more information.
         </p>
         <div className="buttonContainer">
           <button className="product-button" onClick={handleOpenModal}>Request a Quote</button>
