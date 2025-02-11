@@ -36,7 +36,7 @@ const ProductImageCarousel: React.FC<ProductImageCarouselProps> = ({ images }) =
               src={img}
               alt={`Preview ${index + 1}`}
               width={80}
-              height={80}
+              height={80}   
               className={styles.previewImage}
             />
           </div>

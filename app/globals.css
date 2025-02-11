@@ -40,7 +40,6 @@ html, body {
 
 .container {
   flex: 1; /* Grow to push footer down */
-  padding-bottom: 20px;
   width: 100%;
   max-width: 100%;
 }
@@ -155,7 +154,7 @@ html, body {
   padding: 12px 280px;
   border-radius: 8px; /* Add border radius */
   cursor: pointer;
-  margin-top: 20px; 
+  margin-top: 22px; 
   font-weight: bold;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Add button shadow */
   margin-right: 15px;
@@ -289,7 +288,7 @@ html, body {
   border-radius: 8px; /* Optional: Add border radius */
   flex: 1; /* Allow the details container to take up available space */
   margin-left: 100px; /* Add space between the image and details */
-  margin-top: 75px;
+  margin-top: 64px;
 }
 
 .productName {
@@ -299,14 +298,25 @@ html, body {
 }
 
 .productDescription {
-  font-size: 16px;
-  margin-bottom: 25px;
+  font-size: 18px;
+  margin-bottom: 5px;
+}
+
+.productGuidelines {
+  font-size: 17px;
+  margin-bottom: 10px;
   margin-top: 2px;
+  font-weight: bold;
+}
+
+.productSubject {
+  font-size: 12px;
 }
 
 .productOptions {
   font-size: 16px;
   margin-bottom: 10px;
+  margin-top: 10px;
 }
 
 .productOptions select {
@@ -315,14 +325,14 @@ html, body {
   padding: 6px; /* Padding inside the dropdown */
   background-color: white; /* Background color of the dropdown */
   border-radius: 6px; /* Optional: Rounded corners */
-  width: 10%; /* Optional: Full width */
+  width: 11%; /* Optional: Full width */
   box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
 }
 
 .processlogoContainer {
   display: flex;
   gap: 5px; /* Add space between logos */
-  margin-top: 60px;
+  margin-top: 22px;
   margin-bottom: 25px; /* Add space below the logos */
   max-height: 90px;
 }

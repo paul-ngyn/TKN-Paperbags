@@ -47,7 +47,10 @@ const ProductPage: React.FC<ProductPageProps> = ({ handleNavigation }) => {
           <Image src={tknlogo} alt="TKN Products Logo" width={38} height={30} />
         </div>
         <p className="productDescription">
-          Our kraft paper bags are made from the highest quality materials, ensuring durability and strength.
+          Our customizable kraft paper bags are made from the highest quality materials, ensuring durability and strength.
+        </p>
+        <p className="productGuidelines">
+          Sizes and dimensions listed below are a general guideline, customers should input their desired dimensions and handle type when requesting a quote.
         </p>
         <div className="productOptions">
           <label htmlFor="productOptions">Select a Size:</label>
@@ -66,6 +69,9 @@ const ProductPage: React.FC<ProductPageProps> = ({ handleNavigation }) => {
           </select>
         </div>
         <ProductTable selectedOption={selectedOption} selectedHandle={selectedHandle} />
+        <p className="productSubject">
+          *Prices may vary based on customization and quantity. Please request a quote for more information.
+        </p>
         <div className="buttonContainer">
           <button className="product-button" onClick={handleOpenModal}>Request a Quote</button>
           <a href="/orderinfo" className="product-button-link">

@@ -1,7 +1,7 @@
 .footer {
     background-color: #1c51a3; /* Same blue color as the subheader */
     color: white;
-    padding: 20px;
+    padding: 10px;
     text-align: center;
     display: flex;
     flex-direction: column;
