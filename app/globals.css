@@ -192,7 +192,7 @@ html, body {
 .logoContainer {
   display: flex;
   gap: 8px; /* Add space between logos */
-  margin-bottom: 25px; /* Add space below the logos */
+  margin-bottom: 30px; /* Add space below the logos */
   max-height: 40px;
   margin-top: 1px;
 }
@@ -299,7 +299,6 @@ html, body {
 
 .productDescription {
   font-size: 16px;
-  margin-bottom: 5px;
   font-weight: bold;
 }
 

@@ -50,7 +50,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ handleNavigation }) => {
           Our customizable kraft paper bags are made from the highest quality materials, ensuring durability and strength.
         </p>
         <p className="productGuidelines">
-          Please note that sizes and dimensions listed below are a general guideline, customers should input their desired dimensions and handle type when requesting a quote.
+          Please note that sizes listed below are for reference only. Bag dimensions are fully customizable and customers should input their desired dimensions and handle type when requesting a quote.
         </p>
         <div className="productOptions">
           <label htmlFor="productOptions">Select a Size:</label>
