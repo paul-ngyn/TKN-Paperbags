@@ -28,7 +28,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ handleNavigation }) => {
           <div className={`${styles.textContainer} ${styles.fadeIn}`}>
           <h2 style={{ fontWeight: "bold", marginBottom: '20px' }}>MAPLE TRADE CORPORATION (MTC)</h2>
             <p>
-            MTC was founded in 2006 in the heart of San Francisco,expanding our operations and facilities to Hayward, CA in 2019.
+            MTC was founded in 2006 in the heart of San Francisco, expanding our operations and facilities to Hayward, California in 2019.
             </p>
             <br />
             <p>
@@ -36,7 +36,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ handleNavigation }) => {
             </p>
             <br />
             <p>
-            With more than 10+ years of experience in distribution, we take pride in our products and service and are honored to provide solutions for food service professionals across North America. 
+            With over 15+ years of experience in the distribution business, we take pride in our products and service and are honored to provide solutions for food service professionals across America. 
             </p>
           </div>
         </div>

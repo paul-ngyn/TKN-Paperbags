@@ -12,11 +12,13 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
     lastName: '',
     email: '',
     phone: '',
+    dimensions: '',
+    handletype: '',
     details: '',
     pdf: null as File | null,
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement |  HTMLSelectElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -46,7 +48,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
 
   return (
     <div className={styles.formContainer}>
-      <h2>Get A Quote</h2>
+      <h2 className={styles.heading}>Get a Quote</h2>
       <form onSubmit={handleSubmit}>
         <div className={styles.nameGroup}>
       <div className={styles.formGroup}>
@@ -98,6 +100,34 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
             onChange={handleChange}
             required
           />
+        </div>
+        <div className={styles.formGroup}>
+          <label htmlFor="dimensions">Bag Dimensions</label>
+          <input
+            className={styles.inputField}
+            type="text"
+            id="dimensions"
+            name="dimensions"
+            value={formData.dimensions}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className={styles.formGroup}>
+        <label htmlFor="handletype">Handle Type</label>
+        <select
+          className={styles.inputField}
+          id="handletype"
+          name="handletype"
+          value={formData.handletype}
+          onChange={handleChange}
+          required
+        >
+          <option value="">Please Select a Handle Type</option>
+          <option value="rope">Rope</option>
+          <option value="flat">Flat</option>
+          <option value="none">None</option>
+        </select>
         </div>
         <div className={styles.formGroup}>
           <label htmlFor="details">Details</label>

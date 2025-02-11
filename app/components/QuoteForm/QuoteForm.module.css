@@ -10,13 +10,19 @@
     justify-content: center;
     align-items: normal;
     position: absolute;
-    top: 45%;
+    top: 47%;
     left: 50%;
     transform: translate(-50%, -50%);
     color: rgb(0, 0, 0);
   }
   
   .h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    text-align: center;
+  }
+
+  .heading { /* css for h2 */
     margin-bottom: 20px;
     font-size: 24px;
     text-align: center;
@@ -45,6 +51,7 @@
     border-radius: 8px;
     background-color: #ffffff;
     color: #000000;
+    max-height: 310px;
   }
   
   .textarea {
