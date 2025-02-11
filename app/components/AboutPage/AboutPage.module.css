@@ -25,6 +25,10 @@
     flex-shrink: 0;
     padding-bottom: 90px;
   }
+
+  .logoContainer2 {
+    flex-shrink: 0;
+  }
   
   .textContainer {
     max-width: 700px;

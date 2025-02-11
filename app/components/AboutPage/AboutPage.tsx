@@ -54,7 +54,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ handleNavigation }) => {
               Our products are environmentally friendly, biodegradable, recyclable and compostable.
             </p>
           </div>
-          <div className={styles.logoContainer}>
+          <div className={styles.logoContainer2}>
             <Image
               src={tknLogo}
               alt="TKN Logo"
