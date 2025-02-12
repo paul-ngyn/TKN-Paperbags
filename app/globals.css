@@ -192,7 +192,7 @@ html, body {
 .logoContainer {
   display: flex;
   gap: 8px; /* Add space between logos */
-  margin-bottom: 30px; /* Add space below the logos */
+  margin-bottom: 32px; /* Add space below the logos */
   max-height: 40px;
   margin-top: 1px;
 }
