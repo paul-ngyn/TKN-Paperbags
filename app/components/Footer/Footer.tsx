@@ -30,7 +30,7 @@ const Footer: React.FC = () => {
         </div>
       </div>
       <div className={styles.linksContainer}>
-        <Link href="/bags" className={styles.footerLink}>Bags</Link>
+        <Link href="/product" className={styles.footerLink}>Bags</Link>
         <Link href="/about" className={styles.footerLink}>About Us</Link>
         <Link href="/contact" className={styles.footerLink}>Contact Us</Link>
         <Link href="/orderinfo" className={styles.footerLink}>Ordering Information</Link>
