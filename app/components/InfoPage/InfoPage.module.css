@@ -1,9 +1,9 @@
 .container {
     display: flex;
     justify-content: space-between;
-    padding: 60px;
+    padding: 55px;
     margin-top: 80px;
-    margin-bottom: 425px;
+    margin-bottom: 20.5%;
     margin-right: 20px;
     margin-left: 50px;
   }

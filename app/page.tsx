@@ -40,9 +40,9 @@ export default function Home() {
         {page === 'product' && (
           <ProductPage handleNavigation={handleNavigation} />
         )}
-        {page === 'about' && <AboutPage />}
-        {page === 'contact' && <ContactPage/>}
-        {page === 'orderinfo' && <InfoPage/>}
+        {page === 'about' && <AboutPage handleNavigation={handleNavigation}  />}
+        {page === 'contact' && <ContactPage handleNavigation={handleNavigation} />}
+        {page === 'orderinfo' && <InfoPage handleNavigation={handleNavigation} />}
         {page === 'quote' && (
           <div className={`quote-form-container ${showQuoteForm ? 'show' : ''}`}>
             <QuoteForm onClose={() => handleNavigation('logo')} /> {/* Render the form */}
