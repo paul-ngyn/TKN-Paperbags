@@ -1,40 +1,47 @@
 .container {
     display: flex;
-    justify-content: space-between;
-    padding: 55px;
-    margin-top: 80px;
-    margin-bottom: 20.5%;
-    margin-right: 20px;
-    margin-left: 50px;
-  }
-  
-  .section {
-    width: 45%;
+    flex-direction: column;
+    gap: 20px;
     padding: 20px;
-    background-color: white;
-    border-radius: 8px;
+    margin-top: 7.5%;
+    margin-bottom: 200px;
   }
   
-  .section h2 {
+.section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    width: 75%;
+    margin-left: 13.5%;
+    margin-bottom: 4%;
+  }
+  
+.section h2 {
     font-size: 32px;
     margin-bottom: 50px;
     font-weight: bold;
+
+}
+
+.row {
+    flex-direction: row;
   }
   
-  .section p {
-    font-size: 16px;
-    line-height: 1.5;
+.rowReverse {
+    flex-direction: row-reverse;
   }
-
-.section h2,
-.section p {
-  opacity: 0;
-  animation: fadeIn 1s ease-in forwards;
-  /* Adjust the duration and easing as needed */
-}
-
-@keyframes fadeIn {
-  to {
-    opacity: 1;
+  
+.textContainer {
+    flex: 1;
+    font-size: 18px;
+    padding-bottom: 12%;
   }
-}
+  
+.imageContainer {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
