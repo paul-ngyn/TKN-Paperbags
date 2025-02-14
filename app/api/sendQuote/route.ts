@@ -102,7 +102,7 @@ export async function POST(request: Request): Promise<Response> {
           if (err) {
             console.error("Error sending email:", err);
             return resolve(
-              NextResponse.json({ message: "Error sending email." }, { status: 500 })
+              NextResponse.json({ message: "Error sending email." }, { status: 400 })
             );
           }
 
