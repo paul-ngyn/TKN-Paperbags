@@ -8,13 +8,17 @@
     "start": "next start -p 3001"
   },
   "dependencies": {
+    "formidable": "^3.5.2",
     "next": "^14.2.15",
+    "nodemailer": "^6.10.0",
     "npm": "^11.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@types/formidable": "^3.4.5",
     "@types/node": "^20.17.6",
+    "@types/nodemailer": "^6.4.17",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18",
     "eslint": "^8",
