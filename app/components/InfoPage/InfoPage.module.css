@@ -1,9 +1,9 @@
 .container {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    padding: 40px;
-    margin-top: 4%;
+    gap: 25px;
+    padding: 30px;
+    margin-top: 5%;
     margin-bottom: 100px;
   }
   
@@ -14,7 +14,7 @@
     gap: 5px;
     width: 75%;
     margin-bottom: 3%;
-    margin-left: 16%;
+    margin-left: 14.5%;
   }
 
 .sectionunder {
@@ -24,7 +24,7 @@
     gap: 20px;
     width: 75%;
     margin-bottom: 3%;
-    margin-left: 9.5%;
+    margin-left: 7%;
   }
  
 .section h2 {

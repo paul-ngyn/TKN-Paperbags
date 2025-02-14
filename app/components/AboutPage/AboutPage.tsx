@@ -3,7 +3,6 @@
 import React from "react";
 import Image from "next/image";
 import styles from "./AboutPage.module.css";
-import mtcLogo from "../../public/MTC-logo.png";
 import tknLogo from "../../public/tkn_products.png";
 import locationplaceholder from "../../public/locationplaceholder.png";
 
@@ -26,7 +25,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ handleNavigation }) => {
             />
           </div>
           <div className={`${styles.textContainer} `}>
-          <h2 style={{ fontSize: '30px', fontWeight: "bold", marginBottom: '20px' }}>MAPLE TRADE CORPORATION (MTC)</h2>
+          <h2 style={{ fontSize: '28px', fontWeight: "bold", marginBottom: '20px' }}>MAPLE TRADE CORPORATION (MTC)</h2>
             <p>
             MTC was founded in 2006 in the heart of San Francisco, expanding our operations and facilities to Hayward, California in 2019.
             </p>
@@ -45,7 +44,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ handleNavigation }) => {
       <div className={styles.section}>
         <div className={styles.logoTextRow}>
           <div className={`${styles.textContainer}`}>
-          <h2 style={{ fontSize: '30px',fontWeight: "bold", marginBottom: '20px' }}>TKN PRODUCTS - OUR BRAND</h2>
+          <h2 style={{ fontSize: '28px',fontWeight: "bold", marginBottom: '20px' }}>TKN PRODUCTS - OUR BRAND</h2>
             <p>
               Our TKN branded products feature high quality materials ensuring durability and strength.
             </p>
