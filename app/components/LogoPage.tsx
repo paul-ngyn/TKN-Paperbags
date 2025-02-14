@@ -16,6 +16,7 @@ interface LogoPageProps {
 
 const LogoPage: React.FC<LogoPageProps> = ({ handleNavigation }) => {
   const brandRef = useRef(null);
+  const contactRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -29,11 +30,12 @@ const LogoPage: React.FC<LogoPageProps> = ({ handleNavigation }) => {
       { threshold: 0.1 }
     );
 
-    const brandElements = document.querySelectorAll('.brand');
-    brandElements.forEach((el) => observer.observe(el));
+    const elements = document.querySelectorAll(".brand, .contact-info");
+
+    elements.forEach((el) => observer.observe(el));
 
     return () => {
-      brandElements.forEach((el) => observer.unobserve(el));
+      elements.forEach((el) => observer.unobserve(el));
     };
   }, []);
 
@@ -87,20 +89,24 @@ const LogoPage: React.FC<LogoPageProps> = ({ handleNavigation }) => {
         <div className="learn-buttoncontainer">
           <button className="learn-button" onClick={() => handleNavigation('about')}>Learn More</button>
         </div>
-        <div className="contact-info" style={{ backgroundImage: `url(${paperbagheader.src})` }}>
+        <div
+          className="contact-info"
+          ref={contactRef}
+          style={{ backgroundImage: `url(${paperbagheader.src})` }}
+        >
           <div className="Contact-Title">
             <p>Any Questions?</p>
           </div>
           <div className="Contact-Description">
-          <p>
-            Please use our{" "}
-            <Link href="/contact" style={{ textDecoration: 'underline' }}>
-              contact form
-            </Link>
-            <br />
-            We may also be reached at 777-777-777 or admin@mapletradecorp.com
-          </p>
-        </div>
+            <p>
+              Please use our{" "}
+              <Link href="/contact" style={{ textDecoration: "underline" }}>
+                contact form
+              </Link>
+              <br />
+              We may also be reached at 777-777-777 or admin@mapletradecorp.com
+            </p>
+          </div>
         </div>
       </section>
       <hr className="section-divider" />

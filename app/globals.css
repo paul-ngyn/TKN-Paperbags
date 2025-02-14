@@ -225,7 +225,16 @@ html, body {
   transition: opacity 1s ease-out, transform 1s ease-out; /* Animation */
 }
 
-.brand.visible { /* Class to apply when the element is in view */
+.brand,
+.contact-info {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 1s ease-out, transform 1s ease-out;
+}
+
+/* Visible state */
+.brand.visible,
+.contact-info.visible {
   opacity: 1;
   transform: translateY(0);
 }
@@ -336,8 +345,6 @@ html, body {
   margin-bottom: 25px; /* Add space below the logos */
   max-height: 90px;
 }
-
-
 
 @layer utilities {
   .text-balance {
