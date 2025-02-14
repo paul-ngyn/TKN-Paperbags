@@ -39,11 +39,36 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Quote Request Submitted:', formData);
-    alert('Your quote request has been submitted!');
-    onClose();
+
+    const data = new FormData();
+    data.append('firstName', formData.firstName);
+    data.append('lastName', formData.lastName);
+    data.append('email', formData.email);
+    data.append('phone', formData.phone);
+    data.append('dimensions', formData.dimensions);
+    data.append('handletype', formData.handletype);
+    data.append('details', formData.details);
+    if (formData.pdf) {
+      data.append('pdf', formData.pdf);
+    }
+
+    try {
+      const response = await fetch('/api/sendQuote', {
+        method: 'POST',
+        body: data,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send quote request');
+      }
+
+      alert('Your quote request has been submitted!');
+      onClose();
+    } catch (error) {
+      console.error('Error submitting quote:', error);
+    }
   };
 
   return (
