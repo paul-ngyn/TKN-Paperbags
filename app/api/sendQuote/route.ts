@@ -83,7 +83,7 @@ export async function POST(request: Request): Promise<Response> {
         // 4. Compose mail:
         const mailOptions = {
           from: process.env.SMTP_USER,
-          to: "DESTINATION_EMAIL@example.com",
+          to: email,
           subject: "New Quote Request",
           text: `New quote request:
           First Name: ${firstName}
