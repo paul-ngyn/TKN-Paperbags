@@ -4,7 +4,7 @@ import React from "react";
 import Image from "next/image";
 import styles from "./AboutPage.module.css";
 import tknLogo from "../../public/tkn_products.png";
-import locationplaceholder from "../../public/locationplaceholder.png";
+import locationplaceholda from "../../public/locationplaceholder.png";
 
 interface AboutPageProps {
   handleNavigation?: (page: string) => void;
@@ -18,7 +18,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ handleNavigation }) => {
         <div className={styles.logoTextRow}>
           <div className={styles.logoContainer}>
             <Image
-              src={locationplaceholder}
+              src={locationplaceholda}
               alt="MTC Logo"
               width={600}
               height={600}
