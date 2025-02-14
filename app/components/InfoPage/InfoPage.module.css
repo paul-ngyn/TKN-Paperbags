@@ -3,8 +3,8 @@
     flex-direction: column;
     gap: 20px;
     padding: 20px;
-    margin-top: 7.5%;
-    margin-bottom: 200px;
+    margin-top: 5.5%;
+    margin-bottom: 100px;
   }
   
 .section {
@@ -14,12 +14,12 @@
     gap: 20px;
     width: 75%;
     margin-left: 13.5%;
-    margin-bottom: 4%;
+    margin-bottom: 3%;
   }
   
 .section h2 {
-    font-size: 32px;
-    margin-bottom: 50px;
+    font-size: 28px;
+    margin-bottom: 5%;
     font-weight: bold;
 
 }

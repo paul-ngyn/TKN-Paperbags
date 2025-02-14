@@ -13,7 +13,7 @@ interface InfoPageProps {
 const InfoPage: React.FC<InfoPageProps> = ({ handleNavigation }) => {
   return (
     <div className={styles.container}>
-      {/* Section 1: Text on the left, image on the right */}
+      {/* Section 1: Text on the left, image on the right make sure to put burma bag or other custom here*/}
       <div className={`${styles.section} ${styles.row}`}>
         <div className={styles.textContainer}>
           <h2>Image Upload Details</h2>
@@ -38,15 +38,18 @@ const InfoPage: React.FC<InfoPageProps> = ({ handleNavigation }) => {
           <Image
             src={servicepic}
             alt="Service"
-            width={500}
-            height={500}
+            width={450}
+            height={450}
           />
         </div>
         <div className={styles.textContainer}>
           <h2>Order Process</h2>
           <p>
-            Learn about our order process, from placing an order to delivery.
-            We ensure a smooth and efficient process to meet your needs promptly.
+            Our order process all starts with you requesting a quote! After a quote is received with all the necessary details including customization, we will contact you directly with the contact information provided. 
+          </p>
+          <br />
+          <p>
+            Once the quote is approved by both parties, design and production will begin. We will keep you updated on the progress of your order and provide tracking information once your order is shipped.
           </p>
         </div>
       </div>
