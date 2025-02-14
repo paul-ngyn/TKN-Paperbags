@@ -18,8 +18,11 @@ const InfoPage: React.FC<InfoPageProps> = ({ handleNavigation }) => {
         <div className={styles.textContainer}>
           <h2>Image Upload Details</h2>
           <p>
-            Here you can find the details on how to upload images for your orders.
-            Make sure your images meet the required specifications for the best results.
+            When uploading an image for customization, please ensure that the image meets the formats of either .AI, .PSD, or .PNG
+          </p>
+          <br />
+          <p>
+            Images must also meet the minimum resolution of 300 DPI to ensure the highest quality of customization with a resolution of 500x500.
           </p>
         </div>
         <div className={styles.imageContainer}>
@@ -33,7 +36,7 @@ const InfoPage: React.FC<InfoPageProps> = ({ handleNavigation }) => {
       </div>
 
       {/* Section 2: Image on the left, text on the right */}
-      <div className={`${styles.section} ${styles.rowreverse}`}>
+      <div className={`${styles.sectionunder} ${styles.rowreverse}`}>
         <div className={styles.imageContainer}>
           <Image
             src={servicepic}
@@ -45,7 +48,7 @@ const InfoPage: React.FC<InfoPageProps> = ({ handleNavigation }) => {
         <div className={styles.textContainer}>
           <h2>Order Process</h2>
           <p>
-            Our order process all starts with you requesting a quote! After a quote is received with all the necessary details including customization, we will contact you directly with the contact information provided. 
+            Our order process all starts with you requesting a quote! After a quote is received with all details and customization we will contact you directly with the information provided. 
           </p>
           <br />
           <p>

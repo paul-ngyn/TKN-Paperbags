@@ -2,8 +2,8 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
-    padding: 20px;
-    margin-top: 5.5%;
+    padding: 40px;
+    margin-top: 6.5%;
     margin-bottom: 100px;
   }
   
@@ -13,12 +13,28 @@
     justify-content: space-between;
     gap: 20px;
     width: 75%;
-    margin-left: 13.5%;
     margin-bottom: 3%;
+    margin-left: 16%;
   }
-  
+
+.sectionunder {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    width: 75%;
+    margin-bottom: 3%;
+    margin-left: 9.5%;
+  }
+ 
 .section h2 {
-    font-size: 28px;
+    font-size: 32px;
+    margin-bottom: 5%;
+    font-weight: bold;
+
+}  
+.sectionunder h2 {
+    font-size: 32px;
     margin-bottom: 5%;
     font-weight: bold;
 
@@ -35,7 +51,7 @@
 .textContainer {
     flex: 1;
     font-size: 18px;
-    padding-bottom: 12%;
+    padding-bottom: 8%;
   }
   
 .imageContainer {
