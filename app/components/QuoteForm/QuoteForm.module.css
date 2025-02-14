@@ -88,4 +88,9 @@
   .cancelButton:hover {
     background-color: #999;
   }
+
+  .formGroup input[type="file"] {
+    margin-left: 10px;
+  }
+
   

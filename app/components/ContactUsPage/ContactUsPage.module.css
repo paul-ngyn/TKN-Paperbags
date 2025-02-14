@@ -40,7 +40,8 @@
   .formGroup textarea {
     padding: 8px;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 7px;
+    max-height: 450px;
   }
   
   .submitButton {
@@ -62,3 +63,4 @@
     margin-bottom: 30px;
     margin-left: 55px;
   }
+  
