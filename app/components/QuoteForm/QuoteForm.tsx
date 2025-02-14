@@ -12,7 +12,9 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
     lastName: '',
     email: '',
     phone: '',
-    dimensions: '',
+    dimension1: '',
+    dimension2: '',
+    dimension3: '',
     handletype: '',
     details: '',
     pdf: null as File | null,
@@ -47,7 +49,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
     data.append('lastName', formData.lastName);
     data.append('email', formData.email);
     data.append('phone', formData.phone);
-    data.append('dimensions', formData.dimensions);
+    data.append('dimensions', `${formData.dimension1} x ${formData.dimension2} x ${formData.dimension3}`);
     data.append('handletype', formData.handletype);
     data.append('details', formData.details);
     if (formData.pdf) {
@@ -128,15 +130,37 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
         </div>
         <div className={styles.formGroup}>
           <label htmlFor="dimensions">Bag Dimensions</label>
-          <input
-            className={styles.inputField}
-            type="text"
-            id="dimensions"
-            name="dimensions"
-            value={formData.dimensions}
-            onChange={handleChange}
-            required
-          />
+          <div className={styles.dimensionsGroup}>
+            <input
+              className={styles.dimensioninputField}
+              type="text"
+              id="dimension1"
+              name="dimension1"
+              value={formData.dimension1}
+              onChange={handleChange}
+              required
+            />
+            <span className={styles.dimensionSeparator}>x</span>
+            <input
+              className={styles.dimensioninputField}
+              type="text"
+              id="dimension2"
+              name="dimension2"
+              value={formData.dimension2}
+              onChange={handleChange}
+              required
+            />
+            <span className={styles.dimensionSeparator}>x</span>
+            <input
+              className={styles.dimensioninputField}
+              type="text"
+              id="dimension3"
+              name="dimension3"
+              value={formData.dimension3}
+              onChange={handleChange}
+              required
+            />
+          </div>
         </div>
         <div className={styles.formGroup}>
         <label htmlFor="handletype">Handle Type</label>

@@ -54,6 +54,25 @@
     max-height: 310px;
   }
   
+.dimensioninputField {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #000000;
+  max-height: 310px;
+}
+
+  .dimensionsGroup {
+    display: flex;
+    align-items: center;
+  }
+  
+  .dimensionSeparator {
+    margin: 0 0.5rem;
+  }
+  
   .textarea {
     resize: none;
   }
