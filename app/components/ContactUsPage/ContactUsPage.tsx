@@ -24,12 +24,31 @@ const ContactPage: React.FC<ContactPageProps> = ({ handleNavigation }) => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Contact Form Submitted:', formData);
-    alert('Thank you for contacting us!');
-    // Optionally navigate or reset form
-    // if (handleNavigation) handleNavigation('somePage');
+
+    const data = new FormData();
+    data.append('name', formData.name);
+    data.append('email', formData.email);
+    data.append('company', formData.company);
+    data.append('details', formData.details);
+
+    try {
+      const response = await fetch('/api/sendHelp', {
+        method: 'POST',
+        body: data,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send contact request');
+      }
+
+      alert('Thank you for contacting us!');
+      // Optionally navigate or reset form
+      // if (handleNavigation) handleNavigation('somePage');
+    } catch (error) {
+      console.error('Error submitting contact form:', error);
+    }
   };
 
   return (
