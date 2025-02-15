@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import formidable, { Fields, Files } from "formidable";
-import fs from "fs";
+import formidable, { Fields} from "formidable";
 import nodemailer from "nodemailer";
 import { Readable } from "stream";
 import { IncomingMessage } from "http";
@@ -37,7 +36,7 @@ export async function POST(request: Request): Promise<Response> {
     return new Promise((resolve) => {
       const form = formidable();
 
-      form.parse(req, async (err: Error, fields: Fields, files: Files) => {
+      form.parse(req, async (err: Error, fields: Fields) => {
         if (err) {
           console.error("Error parsing form:", err);
           return resolve(
@@ -63,18 +62,18 @@ export async function POST(request: Request): Promise<Response> {
               },
             });
             // 3. Compose mail:
-        const mailOptions = {
+        const mailOptionsHelp = {
             from: process.env.SMTP_USER,
             to: email,
-            subject: "New Contact Request",
-            text: `New contact request:
+            subject: "New Help Request",
+            text: `New help request:
             Name: ${name}
             Email: ${email}
             Company: ${company}
             Details: ${details}`,
         };
 
-        transporter.sendMail(mailOptions, (err, info) => {
+        transporter.sendMail(mailOptionsHelp, (err, info) => {
             if (err) {
               console.error("Error sending email:", err);
               return resolve(
