@@ -84,7 +84,7 @@ export async function POST(request: Request): Promise<Response> {
         const mailOptions = {
           from: process.env.SMTP_USER,
           to: email,
-          subject: "New Quote Request",
+          subject: `New Quote Request from ${firstName} ${lastName}`,
           text: `New quote request:
           First Name: ${firstName}
           Last Name: ${lastName}

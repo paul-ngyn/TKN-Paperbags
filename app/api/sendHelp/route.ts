@@ -65,7 +65,7 @@ export async function POST(request: Request): Promise<Response> {
         const mailOptionsHelp = {
             from: process.env.SMTP_USER,
             to: email,
-            subject: "New Help Request",
+            subject: `New Help Request from ${name}`,
             text: `New help request:
             Name: ${name}
             Email: ${email}
