@@ -8,6 +8,7 @@
     "start": "next start -p 3001"
   },
   "dependencies": {
+    "@vercel/speed-insights": "^1.2.0",
     "formidable": "^3.5.2",
     "next": "^14.2.15",
     "nodemailer": "^6.10.0",

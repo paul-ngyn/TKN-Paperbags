@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import '../app/globals.css';
+import { SpeedInsights } from "@vercel/speed-insights/next"
+
 
 // Add these two imports
 import NavBar from './components/NavBar/NavBar';
@@ -38,6 +40,7 @@ export default function RootLayout({
           {children}
         </div>
         <Footer />
+        <SpeedInsights/>
       </body>
     </html>
   );
