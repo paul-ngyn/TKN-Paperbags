@@ -1,13 +1,13 @@
 .subHeader {
   background-color: #1c51a3;
-  width: 99.1vw;
+  width: 100%;
   height: 350px; /* Adjust height as needed */
   display: flex;
   justify-content: center;
   margin: 20px 0;
   align-items: center;
   flex-direction: column;
-  max-width: 100vw;
+  max-width: 100%;
 }
 
 .overlayText {

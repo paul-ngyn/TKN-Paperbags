@@ -11,7 +11,7 @@ const QuoteReqButton: React.FC = () => {
   return (
     <div>
       <button onClick={handleOpenModal} className={styles.navButton}>
-        Get A Quote
+        Get a Quote
       </button>
       {showModal && (
         <div className={styles.modalOverlay}>
