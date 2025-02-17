@@ -58,8 +58,8 @@ const ProductImageCarousel: React.FC<ProductImageCarouselProps> = ({ images }) =
           <Image
             src={images[currentIndex]}
             alt={`Product image ${currentIndex + 1}`}
-            width={1000}
-            height={1200}
+            width={800}
+            height={1000}
             className={styles.productImage}
           />
         </div>
