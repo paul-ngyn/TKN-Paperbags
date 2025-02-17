@@ -10,12 +10,13 @@
 }
 
 
-.nav-list {
+.navlist {
   list-style: none;
   display: flex;
-  gap: 1rem;
+  gap: 6rem;
   padding: 0;
   margin: 0;
+  justify-content: space-between; /* Distribute space evenly between items */
 }
 
 .nav-item button {
@@ -23,6 +24,12 @@
   background: none;
   border: none;
   cursor: pointer;
+}
+
+.navItem {
+  flex: 1; /* Each item takes equal space */
+  display: flex;
+  justify-content: center; /* Center the button within the item */
 }
 
 .nav-item button:hover {

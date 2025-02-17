@@ -11,3 +11,9 @@
   .navButton:hover {
     text-decoration: underline;
   }
+
+  @media (max-width: 950px) {
+    .button {
+      left: 27%; /* Decrease margin for smaller screens */
+    }
+  }
