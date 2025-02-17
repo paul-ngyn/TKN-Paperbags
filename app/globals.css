@@ -47,18 +47,20 @@ html, body {
 
 .section-title {
   display: flex;
-  align-items: center;
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
   text-align: center;
   margin-top: 3.5%;
-  padding-left: 38%;
+  width: 100%; /* Ensure the container takes full width */
 }
+
 
 .section-title2 {
   display: flex;
-  align-items: center;
   text-align: center;
   margin: 30px 0;
-  padding-left: 41.4%;
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
 }
 
 .section-title::before,
@@ -143,7 +145,6 @@ html, body {
   border-radius: 14px; /* Add border radius */
   cursor: pointer;
   margin-top: 30px; /* Add space above the button */
-  margin-left: 44.3%;
   font-weight: bold;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4); /* Add button shadow */
 }
@@ -248,13 +249,18 @@ html, body {
   margin-bottom: 2%;
 }
 
+.center-button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%; /* Ensure the container takes full width */
+}
+
 .learn-buttoncontainer {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 0.25%;
-  margin-bottom: 20px;
-  padding-right: 9px;
+  width: 100%; /* Ensure the container takes full width */
 }
 .learn-button {
   background-color: #1c51a3; /* Blue background color */
