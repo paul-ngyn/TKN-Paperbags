@@ -50,7 +50,7 @@ html, body {
   justify-content: center; /* Center horizontally */
   align-items: center; /* Center vertically */
   text-align: center;
-  margin-top: 3.5%;
+  margin-top: 2.5%;
   width: 100%; /* Ensure the container takes full width */
 }
 
@@ -93,7 +93,7 @@ html, body {
   width: 80%;
   flex-wrap: nowrap; /* Optional: allows wrapping if there are too many items */
   margin-bottom:10px;
-  margin-top: 30px; 
+  margin-top: 50px; 
   margin-left: 10%;
 }
 
@@ -153,7 +153,7 @@ html, body {
   background-color: #1c51a3; /* Blue background color */
   color: white;
   border: none;
-  padding: 12px 285px;
+  padding: 12px 312px;
   border-radius: 8px; /* Add border radius */
   cursor: pointer;
   margin-top: 16px; 
@@ -193,7 +193,7 @@ html, body {
 .logoContainer {
   display: flex;
   gap: 8px; /* Add space between logos */
-  margin-bottom: 32px; /* Add space below the logos */
+  margin-bottom: 22px; /* Add space below the logos */
   max-height: 40px;
   margin-top: 1px;
 }
@@ -302,8 +302,8 @@ html, body {
   padding: 20px;
   border-radius: 8px; /* Optional: Add border radius */
   flex: 1; /* Allow the details container to take up available space */
-  margin-left: 100px; /* Add space between the image and details */
-  margin-top: 58px;
+  padding-left: 132px; /* Add space between the image and details */
+  margin-top: 65px;
   margin-bottom: 30px;
 }
 
@@ -316,7 +316,7 @@ html, body {
 .productDescription {
   font-size: 16px;
   font-weight: bold;
-  max-width: 81%;
+  max-width: 72%;
 }
 
 .productGuidelines {
@@ -324,7 +324,7 @@ html, body {
   margin-bottom: 10px;
   margin-top: 2px;
   font-weight: bold;
-  max-width: 81%;
+  max-width: 74%;
 }
 
 .productSubject {
@@ -353,7 +353,7 @@ html, body {
   margin-top: 20px;
   margin-bottom: 25px; /* Add space below the logos */
   max-height: 90px;
-  padding-left: 20px;
+  padding-left: 28px;
 }
 
 @layer utilities {
