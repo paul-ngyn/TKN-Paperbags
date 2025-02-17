@@ -6,7 +6,7 @@
     position: relative;
     width: 680px; /* Adjust to include arrow button spacing */
     margin-top: 100px;
-    margin-left: 120px;
+    margin-left: 80px;
   }
   
   /* Vertical preview container on the left */
@@ -65,17 +65,17 @@
     transform: translateY(-50%);
     z-index: 1;
     padding: 3px;
-    margin-top: 370px;
+    margin-top: 320px;
     margin-left: 5px;
     margin-right: -10px;
   }
   
   /* Position left arrow */
   .arrowButton:first-of-type {
-    left: 100px;
+    left: 150px;
   }
   
   /* Position right arrow */
   .arrowButton:last-of-type {
-    right: 200px;
+    right: 150px;
   }

@@ -152,13 +152,12 @@ html, body {
   background-color: #1c51a3; /* Blue background color */
   color: white;
   border: none;
-  padding: 12px 280px;
+  padding: 12px 285px;
   border-radius: 8px; /* Add border radius */
   cursor: pointer;
   margin-top: 16px; 
   font-weight: bold;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Add button shadow */
-  margin-right: 15px;
   margin-bottom: 15px;
   display: flex;
 }
@@ -298,7 +297,8 @@ html, body {
   border-radius: 8px; /* Optional: Add border radius */
   flex: 1; /* Allow the details container to take up available space */
   margin-left: 100px; /* Add space between the image and details */
-  margin-top: 64px;
+  margin-top: 58px;
+  margin-bottom: 60px;
 }
 
 .productName {
@@ -344,9 +344,10 @@ html, body {
 .processlogoContainer {
   display: flex;
   gap: 5px; /* Add space between logos */
-  margin-top: 26px;
+  margin-top: 20px;
   margin-bottom: 25px; /* Add space below the logos */
   max-height: 90px;
+  padding-left: 20px;
 }
 
 @layer utilities {
