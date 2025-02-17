@@ -20,7 +20,9 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
     pdf: null as File | null,
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement |  HTMLSelectElement>) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -43,6 +45,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
     const data = new FormData();
     data.append('firstName', formData.firstName);
@@ -70,6 +73,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
       onClose();
     } catch (error) {
       console.error('Error submitting quote:', error);
+      setIsSubmitting(false);
     }
   };
 
@@ -200,8 +204,8 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
           />
         </div>
         <div className={styles.formActions}>
-          <button type="submit" className={styles.submitButton}>
-            Submit
+          <button type="submit" className={styles.submitButton} disabled={isSubmitting}>
+            {isSubmitting ? 'Submitting...' : 'Submit'}
           </button>
           <button type="button" onClick={onClose} className={styles.cancelButton}>
             Cancel

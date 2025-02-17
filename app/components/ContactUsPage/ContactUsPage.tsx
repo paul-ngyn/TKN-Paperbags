@@ -15,6 +15,8 @@ const ContactPage: React.FC<ContactPageProps> = ({ handleNavigation }) => {
     details: '',
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -26,6 +28,7 @@ const ContactPage: React.FC<ContactPageProps> = ({ handleNavigation }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
     const data = new FormData();
     data.append('name', formData.name);
@@ -48,6 +51,7 @@ const ContactPage: React.FC<ContactPageProps> = ({ handleNavigation }) => {
       // if (handleNavigation) handleNavigation('somePage');
     } catch (error) {
       console.error('Error submitting contact form:', error);
+      setIsSubmitting(false);
     }
   };
 
@@ -107,7 +111,9 @@ const ContactPage: React.FC<ContactPageProps> = ({ handleNavigation }) => {
             />
           </div>
 
-          <button className={styles.submitButton} type="submit">Submit</button>
+          <button className={styles.submitButton} type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Submitting...' : 'Submit'}
+          </button>
         </form>
       </div>
     </div>
