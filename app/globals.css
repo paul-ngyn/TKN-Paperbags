@@ -298,7 +298,7 @@ html, body {
   flex: 1; /* Allow the details container to take up available space */
   margin-left: 100px; /* Add space between the image and details */
   margin-top: 58px;
-  margin-bottom: 60px;
+  margin-bottom: 30px;
 }
 
 .productName {
@@ -337,7 +337,7 @@ html, body {
   padding: 6px; /* Padding inside the dropdown */
   background-color: white; /* Background color of the dropdown */
   border-radius: 6px; /* Optional: Rounded corners */
-  width: 11%; /* Optional: Full width */
+  width: 13%; /* Optional: Full width */
   box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
 }
 

@@ -1,16 +1,20 @@
 .navButton {
-    color: black;
-    background: none;
-    border: none;
-    cursor: pointer;
-    position:absolute;
-    top: 2vh;
-    left: 92%;
-  }
+  color: white; /* White text */
+  background-color: #1c51a3; /* Filled background color */
+  border: none;
+  cursor: pointer;
+  position: fixed;
+  top: 1.5vh;
+  left: 92.2%;
+  padding: 10px 15px; /* Add padding for better appearance */
+  border-radius: 8px; /* Border radius */
+  transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
   
 .navButton:hover {
-    text-decoration: underline;
-  }
+  background-color: #163d7f; /* Darker shade for hover effect */
+  text-decoration: none; /* Remove underline on hover */
+}
 
   .modalOverlay {
     position: fixed;
