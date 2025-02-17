@@ -6,7 +6,7 @@
   position: fixed;
   top: 1.5vh;
   left: 92.2%;
-  padding: 10px 15px; /* Add padding for better appearance */
+  padding: 8px 11px; /* Add padding for better appearance */
   border-radius: 8px; /* Border radius */
   transition: background-color 0.3s ease; /* Smooth transition for hover effect */
 }
