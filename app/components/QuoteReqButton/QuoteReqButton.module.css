@@ -5,7 +5,8 @@
     cursor: pointer;
     position:absolute;
     top: 2vh;
-    left: 32%;
+    left: 30%;
+    margin-left: 2%
   }
   
 .navButton:hover {
