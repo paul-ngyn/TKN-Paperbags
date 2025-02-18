@@ -4,7 +4,7 @@ import React, { useRef, useEffect } from 'react';
 import Image from 'next/image';
 import ImageSubHeader from './ImageSubHeader/ImageSubHeader';
 import baglogo from '../public/baglogo.jpg';
-import timelogo from '../public/timelogo.jpg';
+import timelogo from '../public/fastclock.jpg';
 import biodegradable from '../public/biodegradablelogo.jpg';
 import tknlogo from '../public/tkn_products.png';
 import paperbagheader from '../public/paperbagfullheader2.jpg';
@@ -107,6 +107,10 @@ const LogoPage: React.FC<LogoPageProps> = ({ handleNavigation }) => {
               We may also be reached at 777-777-777 or admin@mapletradecorp.com
             </p>
           </div>
+        </div>
+        <div className = "attributionLink">
+        <a href="https://www.vecteezy.com/free-vector/fast-clock">Fast Clock Vectors by Vecteezy</a> 
+        <a href="https://designbundles.net/kant-store/1188504-shopping-bag-icon-in-black-eco-paper-bag-handbag-i">Shopping Bag Icon</a> 
         </div>
       </section>
       <hr className="section-divider" />

@@ -47,7 +47,15 @@ const ContactPage: React.FC<ContactPageProps> = ({ handleNavigation }) => {
       }
 
       alert('Thank you for contacting us!');
-      // Optionally navigate or reset form
+
+      // Clear the form
+      setFormData({
+        name: '',
+        email: '',
+        company: '',
+        details: '',
+      });
+      setIsSubmitting(false);
       // if (handleNavigation) handleNavigation('somePage');
     } catch (error) {
       console.error('Error submitting contact form:', error);

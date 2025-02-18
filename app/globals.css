@@ -107,19 +107,24 @@ html, body {
 
 
 .feature-image {
-  width: 46%; /* Adjust width as needed */
+  width: 47%; /* Adjust width as needed */
   height: auto;
 }
 
 .feature-image2 {
-  width: 50%; /* Adjust width as needed */
+  width: 51%; /* Adjust width as needed */
   height: auto;
 
 }
 
 .feature-image3 {
-  width: 51%; /* Adjust width as needed */
+  width: 63.5%; /* Adjust width as needed */
   height: auto;
+}
+
+.attributionLink {
+  color: white;
+  font-size: 4px;
 }
 
 .feature-text {
@@ -299,11 +304,10 @@ html, body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 20px;
   border-radius: 8px; /* Optional: Add border radius */
   flex: 1; /* Allow the details container to take up available space */
-  padding-left: 132px; /* Add space between the image and details */
-  margin-top: 65px;
+  padding-left: 122px; /* Add space between the image and details */
+  margin-top: 85px;
   margin-bottom: 30px;
 }
 

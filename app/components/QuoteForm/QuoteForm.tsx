@@ -69,7 +69,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
         throw new Error('Failed to send quote request');
       }
 
-      alert('Your quote request has been submitted!');
+      alert('Your quote request has been submitted! You should receive a copy of your quote shortly.');
       onClose();
     } catch (error) {
       console.error('Error submitting quote:', error);
