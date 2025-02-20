@@ -112,13 +112,15 @@ html, body {
 }
 
 .feature-image2 {
-  width: 51%; /* Adjust width as needed */
+  padding-top: 2%;
+  width: 49%; /* Adjust width as needed */
   height: auto;
 
 }
 
 .feature-image3 {
-  width: 63.5%; /* Adjust width as needed */
+  padding-top: 3%;
+  width: 61.5%; /* Adjust width as needed */
   height: auto;
 }
 
