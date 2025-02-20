@@ -10,6 +10,7 @@ interface DesignPageProps {
   handleNavigation?: (page: string) => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
   const [logo, setLogo] = useState<string | null>(null);
 
@@ -49,7 +50,7 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
           objectFit="cover"
         />
         {logo && (
-          <img src={logo} alt="Uploaded Logo" className={styles.logoOverlay} />
+          <Image src={logo} alt="Uploaded Logo" className={styles.logoOverlay} />
         )}
       </div>
 
