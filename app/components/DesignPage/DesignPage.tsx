@@ -15,13 +15,18 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target) {
-          setLogo(event.target.result as string);
-        }
-      };
-      reader.readAsDataURL(e.target.files[0]);
+      const file = e.target.files[0];
+      if (file && file.type === 'image/png') {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          if (event.target) {
+            setLogo(event.target.result as string);
+          }
+        };
+        reader.readAsDataURL(file);
+      } else {
+        alert('Please upload a valid PNG file.');
+      }
     }
   };
 
@@ -52,12 +57,11 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
         <label htmlFor="logoUpload" className={styles.uploadLabel}>
           Upload Your Logo:
         </label>
-        <input type="file" id="logoUpload" accept="image/*" onChange={handleLogoUpload} />
+        <input type="file" id="logoUpload" accept="image/png" onChange={handleLogoUpload} />
       </div>
 
       <div className={styles.navigation}>
-        <Link href="/" className={styles.navButton}>Home</Link>
-        <Link href="/product" className={styles.navButton}>Back to Product</Link>
+        <button onClick={() => setLogo(null)} className={styles.navButton}>Clear</button>
       </div>
     </div>
   );
