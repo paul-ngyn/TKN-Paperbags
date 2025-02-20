@@ -1,0 +1,19 @@
+.navButton {
+    color: black;
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: fixed;
+    top: 2vh;
+    left: 34%;
+  }
+  
+  .navButton:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 950px) {
+  .navButton {
+      left: 27%; /* Decrease margin for smaller screens */
+    }
+  }

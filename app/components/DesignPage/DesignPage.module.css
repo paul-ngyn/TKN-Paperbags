@@ -1,0 +1,80 @@
+.pageContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  .navbar {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .navLink {
+    margin: 0 10px;
+    color: #1c51a3;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .heading {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    text-align: center;
+    margin-top: 2%;
+  }
+  
+  .bagContainer {
+    position: relative;
+    width: 300px;   /* Adjust width as needed */
+    height: 400px;  /* Adjust height as needed */
+    border: 1px solid #ccc;
+    margin-bottom: 20px;
+  }
+  
+  .bagImage {
+    border-radius: 8px;
+  }
+  
+  .logoOverlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 50%;
+    max-height: 50%;
+    opacity: 0.9;
+  }
+  
+  .controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 2%;
+  }
+  
+  .uploadLabel {
+    margin-bottom: 8px;
+    font-weight: bold;
+  }
+  
+  .navigation {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .navButton {
+    padding: 10px 15px;
+    background-color: #1c51a3;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .navButton:hover {
+    background-color: #163d7f;
+  }

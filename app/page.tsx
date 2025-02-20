@@ -9,6 +9,7 @@ import '../app/globals.css';
 import QuoteForm from './components/QuoteForm/QuoteForm';
 import ContactPage from './components/ContactUsPage/ContactUsPage';
 import InfoPage from './components/InfoPage/InfoPage';
+import DesignPage from './components/DesignPage/DesignPage';
 
 export default function Home() {
   const router = useRouter();
@@ -43,6 +44,7 @@ export default function Home() {
         {page === 'about' && <AboutPage handleNavigation={handleNavigation}  />}
         {page === 'contact' && <ContactPage handleNavigation={handleNavigation} />}
         {page === 'orderinfo' && <InfoPage handleNavigation={handleNavigation} />}
+        {page === 'design' && <DesignPage handleNavigation={handleNavigation} />}
         {page === 'quote' && (
           <div className={`quote-form-container ${showQuoteForm ? 'show' : ''}`}>
             <QuoteForm onClose={() => handleNavigation('logo')} /> {/* Render the form */}

@@ -20,7 +20,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ handleNavigation }) => {
             <Image
               src={locationplaceholda}
               alt="MTC Logo"
-              width={600}
+              width={520}
               height={600}
             />
           </div>
