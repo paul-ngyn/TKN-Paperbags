@@ -71,9 +71,26 @@ const LogoPage: React.FC<LogoPageProps> = ({ handleNavigation }) => {
         </div>
       </section>
       <div className="center-button-container">
-        <button className="feature-button" onClick={() => handleNavigation('product')}>Check Out Our Products</button>
+        <button className="feature-button" onClick={() => handleNavigation('product')}>
+          Check Out Our Products
+        </button>
       </div>
+
       <hr className="section-divider" />
+
+      <section className="design-instantly">
+        <div className="section-title2">
+          <h2>Design Instantly</h2>
+        </div>
+        <div className="learn-buttoncontainer">
+          <button className="learn-button" onClick={() => handleNavigation('design')}>
+            Design Your Bags
+          </button>
+        </div>
+      </section>
+
+      <hr className="section-divider" />
+
       <section className="brands">
         <div className="section-title2">
           <h2>Our Brand</h2>
@@ -82,12 +99,17 @@ const LogoPage: React.FC<LogoPageProps> = ({ handleNavigation }) => {
           <div className="brand" ref={brandRef}>
             <Image src={tknlogo} alt="TKN Logo" width={250} height={250} />
             <div className="brand-paragraph">
-              <p>We are the exclusive distributors of TKN products. If you want to learn more about MTC and TKN, please click &apos;Learn More&apos;.</p>
+              <p>
+                We are the exclusive distributors of TKN products. If you want to learn more about MTC and
+                TKN, please click &apos;Learn More&apos;.
+              </p>
             </div>
           </div>
         </div>
         <div className="learn-buttoncontainer">
-          <button className="learn-button" onClick={() => handleNavigation('about')}>Learn More</button>
+          <button className="learn-button" onClick={() => handleNavigation('about')}>
+            Learn More
+          </button>
         </div>
         <div
           className="contact-info"
@@ -108,12 +130,16 @@ const LogoPage: React.FC<LogoPageProps> = ({ handleNavigation }) => {
             </p>
           </div>
         </div>
-        <div className = "attributionLink">
-        <a href="https://www.vecteezy.com/free-vector/fast-clock">Fast Clock Vectors by Vecteezy</a> 
-        <a href="https://designbundles.net/kant-store/1188504-shopping-bag-icon-in-black-eco-paper-bag-handbag-i">Shopping Bag Icon</a> 
+        <div className="attributionLink">
+          <a href="https://www.vecteezy.com/free-vector/fast-clock">Fast Clock Vectors by Vecteezy</a>
+          <a href="https://designbundles.net/kant-store/1188504-shopping-bag-icon-in-black-eco-paper-bag-handbag-i">
+            Shopping Bag Icon
+          </a>
         </div>
       </section>
+
       <hr className="section-divider" />
+
     </>
   );
 };
