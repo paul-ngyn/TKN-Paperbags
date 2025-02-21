@@ -28,36 +28,41 @@
   
   .bagContainer {
     position: relative;
-    width: 450px;   /* Adjust width as needed */
-    height: 450px;  /* Adjust height as needed */
+    width: 450px;
+    height: 450px;
     border: 1px solid #ccc;
-    margin-bottom: 4%;
-    margin-top: 2%;
+    margin: 2% 0;
+    overflow: hidden; /* Ensures child elements cannot be seen outside */
   }
-  
-  .bagImage {
-    border-radius: 8px;
-  }
-  
-  .logoOverlay {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    max-width: 50%;
-    max-height: 50%;
-    opacity: 0.9;
-  }
-  
+    
   .controls {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 2%;
+    margin-bottom: 20px;
   }
   
+  .active {
+    border: 2px dashed #1c51a3; /* Adds a dashed border when active */
+  }
+
+  .resizeHandle {
+    width: 16px;
+    height: 16px;
+    background-color: #1c51a3; /* Or any color you like */
+    border-radius: 50%;
+    cursor: se-resize;
+    box-shadow: 0 0 2px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .resizeHandle::after {
+    content: "↘";
+    color: black;
+    font-size: 24px;
+  }
+
   .uploadLabel {
-    margin-bottom: 8px;
+    margin-right: 10px;
     font-weight: bold;
   }
   
@@ -74,7 +79,6 @@
     border-radius: 5px;
     cursor: pointer;
     font-weight: bold;
-    margin-bottom: 8vh
   }
   
   .navButton:hover {

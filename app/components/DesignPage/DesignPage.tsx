@@ -1,35 +1,57 @@
 "use client";
 
-import React, { useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import styles from './DesignPage.module.css';
-import paperbag from '../../public/paperbagproduct.jpg';
+import React, { useState, useRef, useEffect } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { Rnd } from "react-rnd";
+import styles from "./DesignPage.module.css";
+import paperbag from "../../public/paperbagproduct.jpg";
 
 interface DesignPageProps {
   handleNavigation?: (page: string) => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
   const [logo, setLogo] = useState<string | null>(null);
+  const [draggable, setDraggable] = useState(false);
+  const [isActive, setIsActive] = useState(false);
+
+  const rndRef = useRef<Rnd>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      if (file && file.type === 'image/png') {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          if (event.target) {
-            setLogo(event.target.result as string);
-          }
-        };
-        reader.readAsDataURL(file);
-      } else {
-        alert('Please upload a valid PNG file.');
-      }
+    const file = e.target.files?.[0];
+    if (file?.type === "image/png") {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target) setLogo(event.target.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      alert("Please upload a valid PNG file.");
     }
   };
+
+  const toggleDragMode = () => {
+    const nextState = !draggable;
+    setDraggable(nextState);
+    setIsActive(nextState);
+  };
+
+  const disableDrag = () => {
+    setDraggable(false);
+    setIsActive(false);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (ev: MouseEvent) => {
+      if (isActive && imageRef.current && !imageRef.current.contains(ev.target as Node)) {
+        disableDrag();
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isActive]);
 
   return (
     <div className={styles.pageContainer}>
@@ -50,7 +72,23 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
           objectFit="cover"
         />
         {logo && (
-          <Image src={logo} alt="Uploaded Logo" className={styles.logoOverlay} />
+          <Rnd
+            default={{ x: 50, y: 50, width: 150, height: 150 }}
+            bounds="parent"
+            disableDragging={!draggable}
+            onDragStop={disableDrag}
+            onResizeStop={disableDrag}
+            ref={rndRef}
+          >
+            <img
+              src={logo}
+              alt="Uploaded Logo"
+              ref={imageRef}
+              style={{ width: "100%", height: "100%" }}
+              onClick={toggleDragMode}
+              className={`${styles.logoOverlay} ${isActive ? styles.active : ""}`}
+            />
+          </Rnd>
         )}
       </div>
 
@@ -62,7 +100,10 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
       </div>
 
       <div className={styles.navigation}>
-        <button onClick={() => setLogo(null)} className={styles.navButton}>Clear</button>
+        <button onClick={() => { setLogo(null); disableDrag(); }} className={styles.navButton}>
+          Clear
+        </button>
+        <Link href="/product" className={styles.navButton}>Back to Product</Link>
       </div>
     </div>
   );
