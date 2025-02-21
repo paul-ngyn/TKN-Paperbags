@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Rnd } from "react-rnd";
 import styles from "./DesignPage.module.css";
 import paperbag from "../../public/paperbagproduct.jpg";
+import resizeIcon from "../../public/resize.png"; // Import the resize icon
 
 interface DesignPageProps {
   handleNavigation?: (page: string) => void;
@@ -89,18 +90,28 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
             default={{ x: 50, y: 50, width: 150, height: 150 }}
             bounds="parent"
             disableDragging={!draggable}
+            enableResizing={{ bottomRight: true }}
             onDragStop={disableDrag}
             onResizeStop={disableDrag}
             ref={rndRef}
           >
-            <img
-              src={logo}
-              alt="Uploaded Logo"
-              ref={imageRef}
-              style={{ width: "100%", height: "100%" }}
+            <div
+              style={{ width: "100%", height: "100%", position: "relative" }}
               onClick={toggleDragMode}
               className={`${styles.logoOverlay} ${isActive ? styles.active : ""}`}
-            />
+            >
+              <img
+                src={logo}
+                alt="Uploaded Logo"
+                ref={imageRef}
+                style={{ width: "100%", height: "100%" }}
+              />
+              {isActive && (
+                <div className={styles.customResizeHandle}>
+                  <Image src={resizeIcon} alt="Resize Handle" layout="fill" objectFit="contain" />
+                </div>
+              )}
+            </div>
           </Rnd>
         )}
       </div>

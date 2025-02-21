@@ -177,7 +177,7 @@ html, body {
   height: 100%;
 }
 
-.feature-button:hover, .product-button:hover, .learn-button:hover {
+.feature-button:hover, .product-button:hover, .learn-button:hover, .design-button:hover {
   background-color: #016ca5; /* lighter blue on hover */
 }
 
@@ -261,6 +261,25 @@ html, body {
   justify-content: center;
   align-items: center;
   width: 100%; /* Ensure the container takes full width */
+}
+
+.design-buttoncontainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%; /* Ensure the container takes full width */
+}
+
+.design-button {
+  background-color: #1c51a3; /* Blue background color */
+  color: white;
+  border: none;
+  padding: 15px 15px;
+  border-radius: 12px; /* Add border radius */
+  cursor: pointer;
+  font-weight: bold;
+  display: flex;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Add button shadow */
 }
 
 .learn-buttoncontainer {

@@ -40,26 +40,28 @@
   }
   
   .active {
-    border: 2px dashed #1c51a3; /* Adds a dashed border when active */
+    border: 2px dashed rgb(97, 94, 94); /* Adds a dashed border when active */
   }
 
   .resizeHandle {
-    width: 16px;
-    height: 16px;
-    background-color: #1c51a3; /* Or any color you like */
-    border-radius: 50%;
+    position: absolute;
+    user-select: none;
+    width: 30px; /* Increased width */
+    height: 30px; /* Increased height */
+    right: -15px; /* Adjusted position */
+    bottom: -15px; /* Adjusted position */
     cursor: se-resize;
-    box-shadow: 0 0 2px rgba(0,0,0,0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
   
-  .resizeHandle::after {
-    content: "↘";
-    color: black;
-    font-size: 24px;
+  .customResizeHandle {
+    position: absolute;
+    width: 30px; /* Increased width */
+    height: 30px; /* Increased height */
+    right: -15px; /* Adjusted position */
+    bottom: -15px; /* Adjusted position */
+    cursor: se-resize;
   }
+  
 
   .uploadLabel {
     margin-right: 10px;

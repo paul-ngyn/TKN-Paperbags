@@ -82,8 +82,8 @@ const LogoPage: React.FC<LogoPageProps> = ({ handleNavigation }) => {
         <div className="section-title2">
           <h2>Design Instantly</h2>
         </div>
-        <div className="learn-buttoncontainer">
-          <button className="learn-button" onClick={() => handleNavigation('design')}>
+        <div className="design-buttoncontainer">
+          <button className="design-button" onClick={() => handleNavigation('design')}>
             Design Your Bags
           </button>
         </div>
