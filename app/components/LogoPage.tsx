@@ -97,7 +97,7 @@ const LogoPage: React.FC<LogoPageProps> = ({ handleNavigation }) => {
         </div>
         <div className="brand-container">
           <div className="brand" ref={brandRef}>
-            <Image src={tknlogo} alt="TKN Logo" width={250} height={250} />
+          <Image src={tknlogo} alt="TKN Logo" width={250} height={250} />
             <div className="brand-paragraph">
               <p>
                 We are the exclusive distributors of TKN products. If you want to learn more about MTC and

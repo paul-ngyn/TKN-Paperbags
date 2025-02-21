@@ -13,19 +13,12 @@ interface AboutPageProps {
 const AboutPage: React.FC<AboutPageProps> = ({ handleNavigation }) => {
   return (
     <div className={styles.container}>
+      <h2 style={{ fontSize: '34px', fontWeight: "bold", marginBottom: '3%', textAlign: 'center' }}> About Us</h2>
       {/* MTC logo on the left, text on the right */}
       <div className={styles.section}>
         <div className={styles.logoTextRow}>
-          <div className={styles.logoContainer}>
-            <Image
-              src={locationplaceholda}
-              alt="MTC Logo"
-              width={520}
-              height={600}
-            />
-          </div>
           <div className={`${styles.textContainer} `}>
-          <h2 style={{ fontSize: '28px', fontWeight: "bold", marginBottom: '20px' }}>MAPLE TRADE CORPORATION (MTC)</h2>
+          <h2 style={{ fontSize: '28px', fontWeight: "bold", marginBottom: '20px' }}> Maple Trade Corporation (MTC)</h2>
             <p>
             MTC was founded in 2006 in the heart of San Francisco, expanding our operations and facilities to Hayward, California in 2019.
             </p>
@@ -38,13 +31,30 @@ const AboutPage: React.FC<AboutPageProps> = ({ handleNavigation }) => {
             With over 15+ years of experience in the distribution business, we take pride in our products and service and are honored to provide solutions for food service professionals across America. 
             </p>
           </div>
+          <div className={styles.logoContainer}>
+            <Image
+              src={locationplaceholda}
+              alt="MTC Logo"
+              width={520}
+              height={600}
+            />
+          </div>
         </div>
       </div>
       {/* logo on the right, text on the left */}
+      <h2 style={{ fontSize: '34px',fontWeight: "bold", textAlign: 'center' }}>Our Brand</h2>
       <div className={styles.section}>
         <div className={styles.logoTextRow}>
+        <div className={styles.logoContainer2}>
+            <Image
+              src={tknLogo}
+              alt="TKN Logo"
+              width={250}
+              height={250}
+            />
+          </div>
           <div className={`${styles.textContainer}`}>
-          <h2 style={{ fontSize: '28px',fontWeight: "bold", marginBottom: '20px' }}>TKN PRODUCTS - OUR BRAND</h2>
+          <h2 style={{ fontSize: '28px',fontWeight: "bold", marginBottom: '20px' }}>TKN Products</h2>
             <p>
               Our TKN branded products feature high quality materials ensuring durability and strength.
             </p>
@@ -52,14 +62,6 @@ const AboutPage: React.FC<AboutPageProps> = ({ handleNavigation }) => {
             <p>
               Our products are environmentally friendly, biodegradable, recyclable and compostable.
             </p>
-          </div>
-          <div className={styles.logoContainer2}>
-            <Image
-              src={tknLogo}
-              alt="TKN Logo"
-              width={220}
-              height={220}
-            />
           </div>
         </div>
       </div>
