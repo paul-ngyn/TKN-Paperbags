@@ -69,11 +69,6 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
 
   return (
     <div className={styles.pageContainer}>
-      <nav className={styles.navbar}>
-        <Link href="/" className={styles.navLink}>Home</Link>
-        <Link href="/product" className={styles.navLink}>Product</Link>
-        <Link href="/design" className={styles.navLink}>Customize</Link>
-      </nav>
 
       <h1 className={styles.heading}>Customize Your Bag</h1>
 
@@ -128,12 +123,15 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
           ref={fileInputRef} // attach the ref
         />
       </div>
+      <Link href="/orderinfo" className={styles.navLink}>
+          Image Upload Details
+        </Link>
 
       <div className={styles.navigation}>
         <button onClick={handleClear} className={styles.navButton}>
           Clear
         </button>
-        <Link href="/product" className={styles.navButton}>Back to Product</Link>
+        <Link href="/product" className={styles.navButton}>Back to Bags</Link>
       </div>
     </div>
   );
