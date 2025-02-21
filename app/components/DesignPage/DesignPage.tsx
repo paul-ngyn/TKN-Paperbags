@@ -18,12 +18,13 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
 
   const rndRef = useRef<Rnd>(null);
   const imageRef = useRef<HTMLImageElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null); // NEW ref to access the file input
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file?.type === "image/png") {
       const reader = new FileReader();
-      reader.onload = (event) => {
+      reader.onload = event => {
         if (event.target) setLogo(event.target.result as string);
       };
       reader.readAsDataURL(file);
@@ -50,8 +51,19 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, [isActive]);
+
+  // Clears the logo and resets the file input
+  const handleClear = () => {
+    setLogo(null);
+    disableDrag();
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
   return (
     <div className={styles.pageContainer}>
@@ -96,11 +108,17 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
         <label htmlFor="logoUpload" className={styles.uploadLabel}>
           Upload Your Logo:
         </label>
-        <input type="file" id="logoUpload" accept="image/png" onChange={handleLogoUpload} />
+        <input
+          type="file"
+          id="logoUpload"
+          accept="image/png"
+          onChange={handleLogoUpload}
+          ref={fileInputRef} // attach the ref
+        />
       </div>
 
       <div className={styles.navigation}>
-        <button onClick={() => { setLogo(null); disableDrag(); }} className={styles.navButton}>
+        <button onClick={handleClear} className={styles.navButton}>
           Clear
         </button>
         <Link href="/product" className={styles.navButton}>Back to Product</Link>
