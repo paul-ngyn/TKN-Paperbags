@@ -28,7 +28,7 @@
   .formGroup {
     display: flex;
     flex-direction: column;
-    margin-bottom: 15px;
+    margin-bottom: 3%;
   }
   
   .formGroup label {
@@ -51,7 +51,8 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    margin-bottom: 28%;
+    margin-top: 4%;
+    margin-bottom: 20%;
   }
   
   .submitButton:hover {

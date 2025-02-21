@@ -68,15 +68,21 @@ const ProductPage: React.FC<ProductPageProps> = ({ handleNavigation }) => {
             <option value="flat">Flat</option>
           </select>
         </div>
+        <div className={styles.navigation}>
+        <a href="/design" className="product-button-link">
+          Design Your Bag
+        </a>
+        <span className={styles.separator}> - </span>
+        <a href="/orderinfo" className="product-button-link">
+          Image Upload Details
+        </a>
+      </div>
         <ProductTable selectedOption={selectedOption} selectedHandle={selectedHandle} />
         <p className="productSubject">
           *Pricing may vary based on customization and quantity. Please request a quote for more information.
         </p>
         <div className="buttonContainer">
           <button className="product-button" onClick={handleOpenModal}>Request a Quote</button>
-          <a href="/orderinfo" className="product-button-link">
-            Image Upload Details
-          </a>
         </div>
         <div className="processlogoContainer">
           <div className={styles.logoWithDescription}>

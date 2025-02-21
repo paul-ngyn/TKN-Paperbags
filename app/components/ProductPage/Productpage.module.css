@@ -34,3 +34,10 @@
     position: relative;
   }
 
+  .separator {
+    font-weight: bold;
+    font-size: 1.5rem; /* Increases the size of the hyphen */
+    margin: 0 5px;
+    color: #000;
+  }
+

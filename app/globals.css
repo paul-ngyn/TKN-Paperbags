@@ -160,10 +160,10 @@ html, body {
   background-color: #1c51a3; /* Blue background color */
   color: white;
   border: none;
-  padding: 12px 312px;
+  padding: 12px 300px;
   border-radius: 8px; /* Add border radius */
   cursor: pointer;
-  margin-top: 16px; 
+  margin-top: 20px; 
   font-weight: bold;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Add button shadow */
   margin-bottom: 15px;
@@ -200,7 +200,7 @@ html, body {
 .logoContainer {
   display: flex;
   gap: 8px; /* Add space between logos */
-  margin-bottom: 22px; /* Add space below the logos */
+  margin-bottom: 12px; /* Add space below the logos */
   max-height: 40px;
   margin-top: 1px;
 }
@@ -340,15 +340,13 @@ html, body {
 
 .productDescription {
   font-size: 16px;
-  font-weight: bold;
   max-width: 72%;
 }
 
 .productGuidelines {
   font-size: 16px;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   margin-top: 2px;
-  font-weight: bold;
   max-width: 74%;
 }
 
@@ -375,7 +373,7 @@ html, body {
 .processlogoContainer {
   display: flex;
   gap: 5px; /* Add space between logos */
-  margin-top: 20px;
+  margin-top: 15px;
   margin-bottom: 25px; /* Add space below the logos */
   max-height: 90px;
   padding-left: 28px;
