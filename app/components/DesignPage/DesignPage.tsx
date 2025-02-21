@@ -11,6 +11,7 @@ interface DesignPageProps {
   handleNavigation?: (page: string) => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
   const [logo, setLogo] = useState<string | null>(null);
   const [draggable, setDraggable] = useState(false);
