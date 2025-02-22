@@ -82,6 +82,11 @@ const LogoPage: React.FC<LogoPageProps> = ({ handleNavigation }) => {
         <div className="section-title2">
           <h2>Design Instantly</h2>
         </div>
+        <div className="design-paragraph">
+              <p>
+                Instantly create your own custom bags using our design studio. Choose your bag type and upload your logo to get started. You can easily download your blueprint and send it to us in your quote!
+              </p>
+            </div>
         <div className="design-buttoncontainer">
           <button className="design-button" onClick={() => handleNavigation('design')}>
             Design Your Bags
@@ -97,7 +102,7 @@ const LogoPage: React.FC<LogoPageProps> = ({ handleNavigation }) => {
         </div>
         <div className="brand-container">
           <div className="brand" ref={brandRef}>
-          <Image src={tknlogo} alt="TKN Logo" width={250} height={250} />
+            <Image src={tknlogo} alt="TKN Logo" width={250} height={250} />
             <div className="brand-paragraph">
               <p>
                 We are the exclusive distributors of TKN products. If you want to learn more about MTC and
