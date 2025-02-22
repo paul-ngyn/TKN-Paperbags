@@ -2,11 +2,11 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { Rnd } from "react-rnd";
 import styles from "./DesignPage.module.css";
 import paperbag from "../../public/paperbagproduct.jpg";
 import resizeIcon from "../../public/resize.png"; // Import the resize icon
+import Sidebar from "../Sidebar/Sidebar"; // Import your new Sidebar component
 
 interface DesignPageProps {
   handleNavigation?: (page: string) => void;
@@ -17,13 +17,14 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
   const [logo, setLogo] = useState<string | null>(null);
   const [draggable, setDraggable] = useState(false);
   const [isActive, setIsActive] = useState(false);
+  const [selectedBag, setSelectedBag] = useState<string>("paperbag"); // State for selected bag
 
   const rndRef = useRef<Rnd>(null);
   const imageRef = useRef<HTMLImageElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null); // NEW ref to access the file input
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const handleLogoUpload = (files: FileList) => {
+    const file = files[0];
     if (file?.type === "image/png") {
       const reader = new FileReader();
       reader.onload = event => {
@@ -46,6 +47,18 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
     setIsActive(false);
   };
 
+  const handleBagChange = (bag: string) => {
+    setSelectedBag(bag);
+  };
+
+  const getBagImage = () => {
+    switch (selectedBag) {
+      case "paperbag":
+      default:
+        return paperbag;
+    }
+  };
+
   useEffect(() => {
     const handleClickOutside = (ev: MouseEvent) => {
       if (isActive && imageRef.current && !imageRef.current.contains(ev.target as Node)) {
@@ -58,7 +71,7 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
     };
   }, [isActive]);
 
-  // Clears the logo and resets the file input
+  // Clear the logo and reset the file input
   const handleClear = () => {
     setLogo(null);
     disableDrag();
@@ -69,12 +82,16 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
 
   return (
     <div className={styles.pageContainer}>
-
-      <h1 className={styles.heading}>Customize Your Bag</h1>
-
+      <Sidebar
+        handleLogoUpload={handleLogoUpload}
+        handleClear={handleClear}
+        fileInputRef={fileInputRef}
+        handleBagChange={handleBagChange} // Pass the handleBagChange function
+      />
+      {/* Bag and draggable/resizable logo */}
       <div className={styles.bagContainer}>
         <Image
-          src={paperbag}
+          src={getBagImage()}
           alt="Customizable Paper Bag"
           className={styles.bagImage}
           layout="fill"
@@ -103,35 +120,17 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
               />
               {isActive && (
                 <div className={styles.customResizeHandle}>
-                  <Image src={resizeIcon} alt="Resize Handle" layout="fill" objectFit="contain" />
+                  <Image
+                    src={resizeIcon}
+                    alt="Resize Handle"
+                    layout="fill"
+                    objectFit="contain"
+                  />
                 </div>
               )}
             </div>
           </Rnd>
         )}
-      </div>
-
-      <div className={styles.controls}>
-        <label htmlFor="logoUpload" className={styles.uploadLabel}>
-          Upload Your Logo:
-        </label>
-        <input
-          type="file"
-          id="logoUpload"
-          accept="image/png"
-          onChange={handleLogoUpload}
-          ref={fileInputRef} // attach the ref
-        />
-      </div>
-      <Link href="/orderinfo" className={styles.navLink}>
-          Image Upload Details
-        </Link>
-
-      <div className={styles.navigation}>
-        <button onClick={handleClear} className={styles.navButton}>
-          Clear
-        </button>
-        <Link href="/product" className={styles.navButton}>Back to Bags</Link>
       </div>
     </div>
   );

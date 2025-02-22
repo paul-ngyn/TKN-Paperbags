@@ -1,0 +1,101 @@
+.sidebarContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 8%;
+    margin-left: 12%;
+    border: 2px solid rgb(245, 240, 240); /* Light gray border for the sidebar */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.35); /* Add a subtle shadow for the floating effect */
+    border-radius: 8px;
+    height: auto;
+    padding: 20px;
+  }
+  .sidebarTitle {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  
+  .dropZone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed lightgray;  /* Dashed border, light gray */
+    border-radius: 5px;
+    padding: 30px;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.2s ease;
+    min-height: 150px;            /* Ensure visible zone even with no text */
+  }
+  
+  .dropZone p {
+    margin: 10px 0 0 0;
+  }
+  
+  .dropIcon {
+    width: 40px;    /* Adjust icon size as needed */
+    height: 40px;
+    opacity: 0.7;
+  }
+  
+  /* Highlight on drag over */
+  .dragOver {
+    background-color: #f0f8ff; /* Light background to indicate drag over */
+  }
+  
+  /* Filename styling */
+.fileName {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #333;
+  }
+  /* Navigation styling */
+  .navigation {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+  }
+  
+  .navButton {
+    background-color: #1c51a3;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+  }
+  
+  .navButton:hover {
+    background-color: #163d7f;
+  }
+
+  .navLink {
+    color: #0070f3;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-top: 2px; /* Add some space above the link */
+    text-align: right;
+  }
+
+  .dropdownContainer {
+    margin-top: 10%;
+    margin-bottom: 10%;
+  }
+  
+  .dropdownLabel {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+  
+  .dropdown {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }

@@ -35,7 +35,12 @@ const Footer: React.FC = () => {
         <Link href="/contact" className={styles.footerLink}>Contact Us</Link>
         <Link href="/orderinfo" className={styles.footerLink}>Ordering Information</Link>
       </div>
-      <p className={styles.footerText}>© 2025 Maple Trade Corporation. All rights reserved.</p>
+      <div className={styles.footerTextContainer}>
+        <p className={styles.footerText}>© 2025 Maple Trade Corporation. All rights reserved.</p>
+        <p className={styles.iconCredit}>
+          <a target="_blank" href="https://icons8.com/icon/41fUjXXm7338/download">Download</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+        </p>
+      </div>
     </footer>
   );
 };
