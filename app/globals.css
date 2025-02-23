@@ -58,7 +58,7 @@ html, body {
 .section-title2 {
   display: flex;
   text-align: center;
-  margin: 30px 0;
+  margin: 15px 0;
   justify-content: center; /* Center horizontally */
   align-items: center; /* Center vertically */
 }
@@ -82,7 +82,7 @@ html, body {
   border: 0;
   height: 1px;
   background: white; /*set to white for now as we are using title headers */
-  margin: 45px 0;
+  margin: 35px 0;
   width: 100%;
 }
 
@@ -282,7 +282,7 @@ html, body {
 }
 
 .design-instantly {
-  padding: 20px;
+  padding: 15px;
   border-radius: 10px;
 }
 
