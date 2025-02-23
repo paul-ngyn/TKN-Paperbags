@@ -18,6 +18,7 @@ interface LogoPageProps {
 const LogoPage: React.FC<LogoPageProps> = ({ handleNavigation }) => {
   const brandRef = useRef(null);
   const contactRef = useRef<HTMLDivElement | null>(null);
+  const designRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -31,7 +32,7 @@ const LogoPage: React.FC<LogoPageProps> = ({ handleNavigation }) => {
       { threshold: 0.1 }
     );
 
-    const elements = document.querySelectorAll(".brand, .contact-info");
+    const elements = document.querySelectorAll(".brand, .contact-info, .design-content");
 
     elements.forEach((el) => observer.observe(el));
 
@@ -83,14 +84,14 @@ const LogoPage: React.FC<LogoPageProps> = ({ handleNavigation }) => {
         <div className="section-title2">
           <h2>Design Instantly</h2>
         </div>
-        <div className="design-content">
+        <div className="design-content" ref={designRef}> 
           <div className="design-paragraph">
             <p>
               Instantly create your own custom bags using our design studio. Choose your bag type and upload your logo to get started. You can easily download your blueprint and send it to us in your quote!
             </p>
           </div>
           <div className="design-image">
-            <Image src={custombag} alt="Custom Bag" width={400} height={400} />
+            <Image src={custombag} alt="Custom Bag" width={350} height={350} />
           </div>
         </div>
         <div className="design-buttoncontainer">

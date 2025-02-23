@@ -235,7 +235,7 @@ html, body {
 }
 
 .brand,
-.contact-info {
+.contact-info, .design-content {
   opacity: 0;
   transform: translateY(20px);
   transition: opacity 1s ease-out, transform 1s ease-out;
@@ -243,7 +243,7 @@ html, body {
 
 /* Visible state */
 .brand.visible,
-.contact-info.visible {
+.contact-info.visible, .design-content.visible {
   opacity: 1;
   transform: translateY(0);
 }
@@ -290,7 +290,7 @@ html, body {
   display: flex;
   justify-content: normal;
   align-items: center;
-  gap: 150px;
+  gap: 140px;
 }
 
 .design-button {
