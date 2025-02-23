@@ -8,6 +8,7 @@ import timelogo from '../public/fastclock.jpg';
 import biodegradable from '../public/biodegradablelogo.jpg';
 import tknlogo from '../public/tkn_products.png';
 import paperbagheader from '../public/paperbagfullheader2.jpg';
+import custombag from '../public/paperbagproduct.jpg';
 import Link from 'next/link';
 
 interface LogoPageProps {
@@ -82,11 +83,16 @@ const LogoPage: React.FC<LogoPageProps> = ({ handleNavigation }) => {
         <div className="section-title2">
           <h2>Design Instantly</h2>
         </div>
-        <div className="design-paragraph">
-              <p>
-                Instantly create your own custom bags using our design studio. Choose your bag type and upload your logo to get started. You can easily download your blueprint and send it to us in your quote!
-              </p>
-            </div>
+        <div className="design-content">
+          <div className="design-paragraph">
+            <p>
+              Instantly create your own custom bags using our design studio. Choose your bag type and upload your logo to get started. You can easily download your blueprint and send it to us in your quote!
+            </p>
+          </div>
+          <div className="design-image">
+            <Image src={custombag} alt="Custom Bag" width={400} height={400} />
+          </div>
+        </div>
         <div className="design-buttoncontainer">
           <button className="design-button" onClick={() => handleNavigation('design')}>
             Design Your Bags

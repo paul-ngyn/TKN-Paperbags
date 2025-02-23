@@ -221,7 +221,7 @@ html, body {
   gap: 20px; /* Add space between brand logos */
   width: 100%;
   margin-top: 10px;
-  padding-left: 20.5%;
+  padding-left: 15%;
 }
 
 .brand { /* brand logo */
@@ -251,11 +251,11 @@ html, body {
 .design-paragraph {
   font-size: 18px;
   text-align: center; /* Align text to the left */
-  margin-left: 15%; /* Add space between the logo and the paragraph */
+  margin-left: 16%; /* Add space between the logo and the paragraph */
   color: #766; /* Optional: Lighter color for the description */
   width: 33%;
   margin-bottom: 5%;
-  margin-top: 5%;
+  margin-top: 2.5%;
 }
 
 .brand-paragraph {
@@ -279,6 +279,18 @@ html, body {
   justify-content: center;
   align-items: center;
   width: 100%; /* Ensure the container takes full width */
+}
+
+.design-instantly {
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.design-content {
+  display: flex;
+  justify-content: normal;
+  align-items: center;
+  gap: 150px;
 }
 
 .design-button {
