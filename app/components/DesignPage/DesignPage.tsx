@@ -11,6 +11,7 @@ interface DesignPageProps {
   handleNavigation?: (page: string) => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
   const [logo, setLogo] = useState<string | null>(null);
   const [draggable, setDraggable] = useState(false);
@@ -83,7 +84,7 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
           <line x1="265" y1="50" x2="265" y2="650" stroke="#000" strokeWidth="1" />  
           <line x1="575" y1="50" x2="575" y2="650" stroke="#000" strokeWidth="1" /> 
           <line x1="750" y1="50" x2="750" y2="650" stroke="#000" strokeWidth="1" />
-          <line x1="50" y1="500" x2="1050" y2="500" stroke="#000" strokeWidth="1" /> // line across 
+          <line x1="50" y1="500" x2="1050" y2="500" stroke="#000" strokeWidth="1" /> {/*line across */}
 
           <line x1="185" y1="50" x2="185" y2="650" stroke="#000" strokeWidth="1" stroke-dasharray="3,2"  /> {/*bottom cross1 */}
           <line x1="185" y1="400" x2="385" y2="650" stroke="#000" strokeWidth="1" stroke-dasharray="3,2" /> {/*bottom cross 2*/}
