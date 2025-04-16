@@ -78,22 +78,22 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
           viewBox="0 0 1070 800"
           className={styles.bagBlueprint}
         >
-          <rect x="50" y="50" width="1000" height="600" fill="#f5f5f5" stroke="#000" strokeWidth="2" />
-          <line x1="100" y1="50" x2="100" y2="650" stroke="#000" strokeWidth="1" />  // tab set to 40mm in customization  
+          <rect x="50" y="50" width="1000" height="600" fill="#f5f5f5" stroke="#000" strokeWidth="2" /> 
+          <line x1="100" y1="50" x2="100" y2="650" stroke="#000" strokeWidth="1" />   {/*tab set to 40mm in customization */}
           <line x1="265" y1="50" x2="265" y2="650" stroke="#000" strokeWidth="1" />  
           <line x1="575" y1="50" x2="575" y2="650" stroke="#000" strokeWidth="1" /> 
           <line x1="750" y1="50" x2="750" y2="650" stroke="#000" strokeWidth="1" />
           <line x1="50" y1="500" x2="1050" y2="500" stroke="#000" strokeWidth="1" /> // line across 
 
-          <line x1="185" y1="50" x2="185" y2="650" stroke="#000" strokeWidth="1" stroke-dasharray="3,2"  /> // height break 
-          <line x1="185" y1="400" x2="385" y2="650" stroke="#000" strokeWidth="1" stroke-dasharray="3,2" /> // bottom cross 1
-          <line x1="665" y1="400" x2="450" y2="650" stroke="#000" strokeWidth="1" stroke-dasharray="3,2"/> / bottom cross 2 
-          <line x1="665" y1="50" x2="665" y2="650" stroke="#000" strokeWidth="1" stroke-dasharray="3,2"  /> // height break 
-          <line x1="665" y1="400" x2="875" y2="650" stroke="#000" strokeWidth="1" stroke-dasharray="3,2" /> // bottom cross 1
-          <line x1="1050" y1="500" x2="950" y2="650" stroke="#000" strokeWidth="1" stroke-dasharray="3,2" /> / bottom cross 2 
-          <line x1="100" y1="400" x2="185" y2="400" stroke="#000" strokeWidth="1" stroke-dasharray="3,2"/> // dotted line tab to section1 
-          <line x1="100" y1="500" x2="185" y2="400" stroke="#000" strokeWidth="1" stroke-dasharray="3,2"/> // dotted crossing line tab to section1
-          <line x1="665" y1="400" x2="1055" y2="400" stroke="#000" strokeWidth="1" stroke-dasharray="3,2"/> // dotted line tab across
+          <line x1="185" y1="50" x2="185" y2="650" stroke="#000" strokeWidth="1" stroke-dasharray="3,2"  /> {/*bottom cross1 */}
+          <line x1="185" y1="400" x2="385" y2="650" stroke="#000" strokeWidth="1" stroke-dasharray="3,2" /> {/*bottom cross 2*/}
+          <line x1="665" y1="400" x2="450" y2="650" stroke="#000" strokeWidth="1" stroke-dasharray="3,2"/> {/*height break*/}
+          <line x1="665" y1="50" x2="665" y2="650" stroke="#000" strokeWidth="1" stroke-dasharray="3,2"  /> {/*height break */}
+          <line x1="665" y1="400" x2="875" y2="650" stroke="#000" strokeWidth="1" stroke-dasharray="3,2" /> {/*bottom cross1B */}
+          <line x1="1050" y1="500" x2="950" y2="650" stroke="#000" strokeWidth="1" stroke-dasharray="3,2" /> {/*bottom cross 2B */}
+          <line x1="100" y1="400" x2="185" y2="400" stroke="#000" strokeWidth="1" stroke-dasharray="3,2"/> {/*dotted line to section 1 */} 
+          <line x1="100" y1="500" x2="185" y2="400" stroke="#000" strokeWidth="1" stroke-dasharray="3,2"/> {/*dotted crosser line to section 1 */}
+          <line x1="665" y1="400" x2="1055" y2="400" stroke="#000" strokeWidth="1" stroke-dasharray="3,2"/> {/*dotted line qcross sectiion 3&4 */}
 
   
           <text x="500" y="30" textAnchor="middle" fontSize="16" fill="#000"> 
