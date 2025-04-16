@@ -3,7 +3,7 @@
     flex-direction: column;
     gap: 1rem;
     margin-top: 8%;
-    margin-left: 12%;
+    margin-left: 6%;
     border: 2px solid rgb(245, 240, 240); /* Light gray border for the sidebar */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.35); /* Add a subtle shadow for the floating effect */
     border-radius: 8px;
@@ -98,4 +98,29 @@
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 5px;
+  }
+
+  .dimensionInputContainer {
+    margin-top: 20px;
+  }
+  
+  .dimensionTitle {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .dimensionInputs {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .dimensionInput {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: #000000;
+    max-height: 310px;
   }

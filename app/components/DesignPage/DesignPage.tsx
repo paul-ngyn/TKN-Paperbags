@@ -1,23 +1,20 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import Image from "next/image";
 import { Rnd } from "react-rnd";
 import styles from "./DesignPage.module.css";
-import paperbag from "../../public/paperbagproduct.jpg";
+import Sidebar from "../Sidebar/Sidebar";
 import resizeIcon from "../../public/resize.png"; // Import the resize icon
-import Sidebar from "../Sidebar/Sidebar"; // Import your new Sidebar component
+import Image from "next/image";
 
 interface DesignPageProps {
   handleNavigation?: (page: string) => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
   const [logo, setLogo] = useState<string | null>(null);
   const [draggable, setDraggable] = useState(false);
   const [isActive, setIsActive] = useState(false);
-  const [selectedBag, setSelectedBag] = useState<string>("paperbag"); // State for selected bag
 
   const rndRef = useRef<Rnd>(null);
   const imageRef = useRef<HTMLImageElement>(null);
@@ -47,18 +44,6 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
     setIsActive(false);
   };
 
-  const handleBagChange = (bag: string) => {
-    setSelectedBag(bag);
-  };
-
-  const getBagImage = () => {
-    switch (selectedBag) {
-      case "paperbag":
-      default:
-        return paperbag;
-    }
-  };
-
   useEffect(() => {
     const handleClickOutside = (ev: MouseEvent) => {
       if (isActive && imageRef.current && !imageRef.current.contains(ev.target as Node)) {
@@ -71,7 +56,6 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
     };
   }, [isActive]);
 
-  // Clear the logo and reset the file input
   const handleClear = () => {
     setLogo(null);
     disableDrag();
@@ -86,17 +70,36 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
         handleLogoUpload={handleLogoUpload}
         handleClear={handleClear}
         fileInputRef={fileInputRef}
-        handleBagChange={handleBagChange} // Pass the handleBagChange function
       />
-      {/* Bag and draggable/resizable logo */}
       <div className={styles.bagContainer}>
-        <Image
-          src={getBagImage()}
-          alt="Customizable Paper Bag"
-          className={styles.bagImage}
-          layout="fill"
-          objectFit="cover"
-        />
+        {/* Single Scalable Blueprint */}
+         < svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 1070 800"
+          className={styles.bagBlueprint}
+        >
+          <rect x="50" y="50" width="1000" height="600" fill="#f5f5f5" stroke="#000" strokeWidth="2" />
+          <line x1="100" y1="50" x2="100" y2="650" stroke="#000" strokeWidth="1" />  // tab set to 40mm in customization  
+          <line x1="265" y1="50" x2="265" y2="650" stroke="#000" strokeWidth="1" />  
+          <line x1="575" y1="50" x2="575" y2="650" stroke="#000" strokeWidth="1" /> 
+          <line x1="750" y1="50" x2="750" y2="650" stroke="#000" strokeWidth="1" />
+          <line x1="50" y1="500" x2="1050" y2="500" stroke="#000" strokeWidth="1" /> // line across 
+
+          <line x1="185" y1="50" x2="185" y2="650" stroke="#000" strokeWidth="1" stroke-dasharray="3,2"  /> // height break 
+          <line x1="185" y1="400" x2="385" y2="650" stroke="#000" strokeWidth="1" stroke-dasharray="3,2" /> // bottom cross 1
+          <line x1="665" y1="400" x2="450" y2="650" stroke="#000" strokeWidth="1" stroke-dasharray="3,2"/> / bottom cross 2 
+          <line x1="665" y1="50" x2="665" y2="650" stroke="#000" strokeWidth="1" stroke-dasharray="3,2"  /> // height break 
+          <line x1="665" y1="400" x2="875" y2="650" stroke="#000" strokeWidth="1" stroke-dasharray="3,2" /> // bottom cross 1
+          <line x1="1050" y1="500" x2="950" y2="650" stroke="#000" strokeWidth="1" stroke-dasharray="3,2" /> / bottom cross 2 
+          <line x1="100" y1="400" x2="185" y2="400" stroke="#000" strokeWidth="1" stroke-dasharray="3,2"/> // dotted line tab to section1 
+          <line x1="100" y1="500" x2="185" y2="400" stroke="#000" strokeWidth="1" stroke-dasharray="3,2"/> // dotted crossing line tab to section1
+          <line x1="665" y1="400" x2="1055" y2="400" stroke="#000" strokeWidth="1" stroke-dasharray="3,2"/> // dotted line tab across
+
+  
+          <text x="500" y="30" textAnchor="middle" fontSize="16" fill="#000"> 
+            Scalable Bag Blueprint (5 Sections)
+          </text>
+        </svg>
         {logo && (
           <Rnd
             default={{ x: 50, y: 50, width: 150, height: 150 }}
@@ -118,7 +121,7 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
                 ref={imageRef}
                 style={{ width: "100%", height: "100%" }}
               />
-              {isActive && (
+                {isActive && (
                 <div className={styles.customResizeHandle}>
                   <Image
                     src={resizeIcon}

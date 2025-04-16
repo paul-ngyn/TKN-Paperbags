@@ -9,17 +9,20 @@ interface SidebarProps {
   handleLogoUpload: (files: FileList) => void;
   handleClear: () => void;
   fileInputRef: React.RefObject<HTMLInputElement>;
-  handleBagChange: (bag: string) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
   handleLogoUpload,
   handleClear,
   fileInputRef,
-  handleBagChange
 }) => {
   const [dragActive, setDragActive] = useState(false);
   const [fileName, setFileName] = useState<string | null>(null);
+  const [dimensions, setDimensions] = useState({
+    length: "",
+    width: "",
+    height: "",
+  });
 
   // Wrapper for the file input change event
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,13 +62,18 @@ const Sidebar: React.FC<SidebarProps> = ({
     handleClear(); // Call the parent handleClear function
   };
 
-  const handleBagSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    handleBagChange(e.target.value);
+  // Handle dimension input changes
+  const handleDimensionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setDimensions((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   return (
     <div className={styles.sidebarContainer}>
-        <h1 className={styles.sidebarTitle}>Upload Your Logo</h1>
+      <h1 className={styles.sidebarTitle}>Upload Your Logo</h1>
       <div
         className={`${styles.dropZone} ${dragActive ? styles.dragOver : ""}`}
         onClick={handleClick}
@@ -85,22 +93,49 @@ const Sidebar: React.FC<SidebarProps> = ({
           type="file"
           id="logoUpload"
           accept="image/png"
-          onChange={handleFileInputChange}   // call our wrapper
+          onChange={handleFileInputChange} // call our wrapper
           ref={fileInputRef}
           style={{ display: "none" }}
         />
       </div>
+
+      {/* Dimension Input Section */}
+      <div className={styles.dimensionInputContainer}>
+        <h2 className={styles.dimensionTitle}>Enter Dimensions (L x W x H)</h2>
+        <div className={styles.dimensionInputs}>
+          <input
+            type="number"
+            name="length"
+            placeholder="Length"
+            value={dimensions.length}
+            onChange={handleDimensionChange}
+            className={styles.dimensionInput}
+          />
+          <input
+            type="number"
+            name="width"
+            placeholder="Width"
+            value={dimensions.width}
+            onChange={handleDimensionChange}
+            className={styles.dimensionInput}
+          />
+          <input
+            type="number"
+            name="height"
+            placeholder="Height"
+            value={dimensions.height}
+            onChange={handleDimensionChange}
+            className={styles.dimensionInput}
+          />
+        </div>
+      </div>
+
       <Link href="/orderinfo" className={styles.navLink}>
         Image Upload Details
       </Link>
-      <div className={styles.dropdownContainer}>
-        <label htmlFor="bagSelect" className={styles.dropdownLabel}>Select Bag:</label>
-        <select id="bagSelect" className={styles.dropdown} onChange={handleBagSelect}>
-          <option value="ropehandle">Rope Handle</option>
-          <option value="flathandle">Flat Handle</option>
-          <option value="nohandle">No Handle</option>
-        </select>
-      </div>
+      <Link href="/public/BlueprintExample.pdf" className={styles.navLink} target="_blank" rel="noopener noreferrer">
+        Blueprint Design Example
+      </Link>
       <div className={styles.navigation}>
         <button onClick={handleClearClick} className={styles.navButton}>
           Clear
