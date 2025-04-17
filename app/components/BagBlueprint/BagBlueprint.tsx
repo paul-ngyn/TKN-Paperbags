@@ -35,7 +35,7 @@ const BagBlueprint: React.FC = () => {
       {/* 1. Total Width (Top) */}
       <text
         x="562.5" /* Center of the rectangle (50 + 1025 / 2) */
-        y="40" /* Slightly above the rectangle */
+        y="5" /* Slightly above the rectangle */
         textAnchor="middle"
         fontSize="22"
         fill="#000"
