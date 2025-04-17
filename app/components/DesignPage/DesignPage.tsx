@@ -148,6 +148,23 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
   <polygon points="10,70 20,70 15,55" fill="#000" /> {/* Top arrowhead */}
   <polygon points="10,500 20,500 15,515" fill="#000" /> {/* Bottom arrowhead */}
 
+  {/* Tab Length */}
+  <text
+  x="0"  /* Position text centered below the tab */
+  y="142"  /* Position text below the tab area */
+  textAnchor="middle"
+  fontSize="20"
+  fill="#000"
+  transform="rotate(-90, 220, 350)" /* Rotate for vertical text */
+>
+    150 mm
+  </text>
+  {/* Arrow for Tab Length */}
+  {/* Arrow for Tab Length */}
+<line x1="35" y1="520" x2="35" y2="630" stroke="#000" strokeWidth="1" />
+<polygon points="30,520 40,520 35,505" fill="#000" /> {/* Top arrowhead */}
+<polygon points="30,630 40,630 35,645" fill="#000" /> {/* Bottom arrowhead */}
+
   {/* 3. Section 1 Width */}
   <text
     x="182.5" /* Midpoint between x1=100 and x1=265 */

@@ -80,13 +80,27 @@
     background-color: #163d7f;
   }
 
+
+
   .bagBlueprint {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    right: 4%;
+    position: contain;
+    max-width: 100%;
+    max-height: 100%;
     background-color: rgba(255, 255, 255, 0.5);
     border-radius: 10px;
     pointer-events: none; /* Prevents interaction with the blueprint */
+  }
+
+  .bagContainer {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    background-color: #f8f8f8;
+    padding: 10px;
+    right: 4%;
   }
