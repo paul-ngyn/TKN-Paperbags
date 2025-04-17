@@ -5,7 +5,6 @@ import Link from "next/link";
 import styles from "./Sidebar.module.css";
 import downloadIcon from "../../public/downloadicon.png";
 
-
 interface SidebarProps {
   handleLogoUpload: (files: FileList) => void;
   handleClear: () => void;
