@@ -80,8 +80,6 @@
     background-color: #163d7f;
   }
 
-
-
   .bagBlueprint {
     position: contain;
     max-width: 100%;
@@ -101,6 +99,6 @@
     overflow: hidden;
     position: relative;
     background-color: #f8f8f8;
-    padding: 10px;
+    padding: 5px;
     right: 7%;
   }
