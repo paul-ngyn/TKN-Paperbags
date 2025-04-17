@@ -133,7 +133,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       <Link href="/orderinfo" className={styles.navLink}>
         Image Upload Details
       </Link>
-      <Link href="/BlueprintExample.png" className={styles.navLink} target="_blank" rel="noopener noreferrer">
+      <Link href="/BlueprintExample.pdf" className={styles.navLink} target="_blank" rel="noopener noreferrer">
         Blueprint Design Example
       </Link>
       <div className={styles.navigation}>
