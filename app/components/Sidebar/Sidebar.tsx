@@ -5,6 +5,7 @@ import Link from "next/link";
 import styles from "./Sidebar.module.css";
 import downloadIcon from "../../public/downloadicon.png";
 
+
 interface SidebarProps {
   handleLogoUpload: (files: FileList) => void;
   handleClear: () => void;
@@ -133,7 +134,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       <Link href="/orderinfo" className={styles.navLink}>
         Image Upload Details
       </Link>
-      <Link href="BlueprintExample.pdf" className={styles.navLink} target="_blank" rel="noopener noreferrer">
+      <Link href="/BlueprintExample" className={styles.navLink} target="_blank" rel="noopener noreferrer">
         Blueprint Design Example
       </Link>
       <div className={styles.navigation}>
