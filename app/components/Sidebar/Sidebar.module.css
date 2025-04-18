@@ -1,126 +1,158 @@
 .sidebarContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-top: 8%;
-    margin-left: 6%;
-    border: 2px solid rgb(245, 240, 240); /* Light gray border for the sidebar */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.35); /* Add a subtle shadow for the floating effect */
-    border-radius: 8px;
-    height: auto;
-    padding: 20px;
-  }
-  .sidebarTitle {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    text-align: center;
-  }
-  
-  .dropZone {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border: 2px dashed lightgray;  /* Dashed border, light gray */
-    border-radius: 5px;
-    padding: 30px;
-    cursor: pointer;
-    text-align: center;
-    transition: background-color 0.2s ease;
-    min-height: 150px;            /* Ensure visible zone even with no text */
-  }
-  
-  .dropZone p {
-    margin: 10px 0 0 0;
-  }
-  
-  .dropIcon {
-    width: 40px;    /* Adjust icon size as needed */
-    height: 40px;
-    opacity: 0.7;
-  }
-  
-  /* Highlight on drag over */
-  .dragOver {
-    background-color: #f0f8ff; /* Light background to indicate drag over */
-  }
-  
-  /* Filename styling */
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  border: 2px solid rgb(245, 240, 240);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.35);
+  height: auto;
+  width: 25%;
+  max-width: 30%;
+  margin-left: 2.5%;
+  margin-top: 3.5%;
+}
+
+.sidebarTitle {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  text-align: center;
+}
+
+.sectionTitle {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Dimension section */
+.dimensionContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dimensionInputs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.inputGroup label {
+  font-size: 14px;
+}
+
+.dimensionInput {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Button styles */
+.buttonGroup {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.applyButton, .resetButton, .clearButton {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.applyButton {
+  background-color: #1c51a3;
+  color: white;
+  flex: 2;
+}
+
+.applyButton:hover {
+  background-color: #163d7f;
+}
+
+.resetButton {
+  background-color: #f2f2f2;
+  color: #333;
+  flex: 1;
+}
+
+.resetButton:hover {
+  background-color: #e2e2e2;
+}
+
+.clearButton {
+  background-color: #f44336;
+  color: white;
+  margin-top: 10px;
+}
+
+.clearButton:hover {
+  background-color: #d32f2f;
+}
+
+.applyButton:disabled, .resetButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Upload section */
+.uploadSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dropZone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #ccc;
+  border-radius: 5px;
+  padding: 1.5rem;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.2s ease;
+  min-height: 150px;
+}
+
+.dropZone p {
+  margin: 10px 0 0 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.dropIcon {
+  width: 40px;
+  height: 40px;
+  opacity: 0.7;
+}
+
+.dragOver {
+  background-color: #f0f8ff;
+  border-color: #1c51a3;
+}
+
 .fileName {
-    margin-top: 10px;
-    font-size: 0.9rem;
-    color: #333;
-  }
-  /* Navigation styling */
-  .navigation {
-    display: flex;
-    flex-direction: row;
-    gap: 1rem;
-  }
-  
-  .navButton {
-    background-color: #1c51a3;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    text-decoration: none;
-    border-radius: 5px;
-    font-weight: bold;
-  }
-  
-  .navButton:hover {
-    background-color: #163d7f;
-  }
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #333;
+  word-break: break-all;
+}
 
-  .navLink {
-    color: #0070f3;
-    text-decoration: underline;
-    cursor: pointer;
-    margin-top: 2px; /* Add some space above the link */
-    text-align: right;
-  }
-
-  .dropdownContainer {
-    margin-top: 10%;
-    margin-bottom: 10%;
-  }
-  
-  .dropdownLabel {
-    display: block;
-    margin-bottom: 10px;
-    font-weight: bold;
-  }
-  
-  .dropdown {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-
-  .dimensionInputContainer {
-    margin-top: 20px;
-  }
-  
-  .dimensionTitle {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 10px;
-  }
-  
-  .dimensionInputs {
-    display: flex;
-    gap: 10px;
-  }
-  
-  .dimensionInput {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background-color: #ffffff;
-    color: #000000;
-    max-height: 310px;
-  }
+/* File input */
+.fileInput {
+  display: none;
+}

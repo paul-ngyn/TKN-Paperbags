@@ -7,7 +7,6 @@ import BagBlueprint from "../BagBlueprint/BagBlueprint";
 import styles from "./DesignPage.module.css";
 import resizeIcon from "../../public/resize.png";
 
-
 interface DesignPageProps {
   handleNavigation: (page: string) => void;
 }
@@ -29,10 +28,14 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
   
   // Add state for bag dimensions
   const [dimensions, setDimensions] = useState<BagDimensions>({
-    length: 990,
-    width: 310,
+    length: 310,
+    width: 165,
     height: 428
   });
+  
+  // Add state to track if dimensions are being edited
+  const [isEditingDimensions, setIsEditingDimensions] = useState(false);
+  const [currentEditValues, setCurrentEditValues] = useState<Partial<BagDimensions>>({});
 
   const handleLogoUpload = (files: FileList) => {
     if (files && files.length > 0) {
@@ -64,11 +67,27 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
     setIsActive(false);
   };
   
-  // Add handler for dimension changes
+  // Start editing dimensions
+  const startEditingDimensions = () => {
+    // Initialize current edit values with the existing dimensions
+    setCurrentEditValues({ ...dimensions });
+    setIsEditingDimensions(true);
+  };
+  
+  // Track changes to dimensions as user edits them
+  const handleDimensionFieldChange = (field: keyof BagDimensions, value: number) => {
+    setCurrentEditValues(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+  
+  // Confirm dimension changes
   const handleDimensionChange = (newDimensions: BagDimensions) => {
     setDimensions(newDimensions);
+    setIsEditingDimensions(false); // Mark editing as complete
+    setCurrentEditValues({}); // Clear edit values
   };
-
   return (
     <div className={styles.pageContainer}>
       <Sidebar
@@ -77,10 +96,15 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
         fileInputRef={fileInputRef}
         dimensions={dimensions}
         handleDimensionChange={handleDimensionChange}
+        startEditingDimensions={startEditingDimensions}
       />
       
       <div className={styles.bagContainer}>
-        <BagBlueprint dimensions={dimensions} />
+        <BagBlueprint 
+          dimensions={dimensions} 
+          isEditing={isEditingDimensions}
+          
+        />
 
         {logo && (
           <Rnd
