@@ -18,6 +18,7 @@ interface BagDimensions {
   height: number;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
   const [logo, setLogo] = useState<string | null>(null);
   const [draggable, setDraggable] = useState(false);
@@ -35,8 +36,6 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
   
   // Add state to track if dimensions are being edited
   const [isEditingDimensions, setIsEditingDimensions] = useState(false);
-  const [currentEditValues, setCurrentEditValues] = useState<Partial<BagDimensions>>({});
-
   const handleLogoUpload = (files: FileList) => {
     if (files && files.length > 0) {
       const file = files[0];
@@ -70,23 +69,13 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
   // Start editing dimensions
   const startEditingDimensions = () => {
     // Initialize current edit values with the existing dimensions
-    setCurrentEditValues({ ...dimensions });
     setIsEditingDimensions(true);
   };
-  
-  // Track changes to dimensions as user edits them
-  const handleDimensionFieldChange = (field: keyof BagDimensions, value: number) => {
-    setCurrentEditValues(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-  
+    
   // Confirm dimension changes
   const handleDimensionChange = (newDimensions: BagDimensions) => {
     setDimensions(newDimensions);
     setIsEditingDimensions(false); // Mark editing as complete
-    setCurrentEditValues({}); // Clear edit values
   };
   return (
     <div className={styles.pageContainer}>
@@ -103,7 +92,6 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
         <BagBlueprint 
           dimensions={dimensions} 
           isEditing={isEditingDimensions}
-          
         />
 
         {logo && (
@@ -121,7 +109,7 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
               onClick={toggleDragMode}
               className={`${styles.logoOverlay} ${isActive ? styles.active : ""}`}
             >
-              <img
+              <Image
                 src={logo}
                 alt="Uploaded Logo"
                 ref={imageRef}

@@ -18,6 +18,8 @@ interface SidebarProps {
   dimensions: BagDimensions;
   handleDimensionChange: (dimensions: BagDimensions) => void;
   startEditingDimensions?: () => void;
+  currentEditValues?: Partial<BagDimensions>;
+  handleDimensionFieldChange?: (field: keyof BagDimensions, value: number) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({

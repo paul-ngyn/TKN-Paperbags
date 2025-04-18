@@ -49,20 +49,20 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
   const section4Width = section2Width; // Keep equal to section2
   
   // Calculate positions
-  const leftMargin = 50;
   const section1Start = 100;
   const section1End = section1Start + section1Width;
   const section2End = section1End + section2Width;
   const section3End = section2End + section3Width;
-  const section4End = section3End + section4Width;
   
   // Calculate heights - use a fixed ratio to height
   const tabsideHeight = Math.round(activeDimensions.height * 0.75);
   const tabLength = Math.round(activeDimensions.height * 0.2);
   
+  {/* fold lines 
   // Calculate fold line positions
   const foldLine1 = Math.round(section1Start + section1Width/2 + 35);
   const foldLine2 = Math.round(section2End - section2Width/2 - 35);
+  */}
 
   // Position for height measurement arrow - always 30px to the right of the blueprint
   const heightArrowX = 50 + totalWidth + 30;
