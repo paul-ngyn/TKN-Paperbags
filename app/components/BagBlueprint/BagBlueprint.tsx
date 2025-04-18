@@ -21,6 +21,9 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
   isEditing = false,
   currentEditValues = {} // Values currently being edited
 }) => {
+  // Conversion factor from mm to inches (1 mm = 0.03937 inches)
+  const mmToInches = (mm: number) => (mm * 0.03937).toFixed(2);
+
   // For edit preview, use current edit values if available, otherwise use the saved dimensions
   const activeDimensions = useMemo(() => {
     if (!isEditing) return dimensions;
@@ -157,7 +160,7 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
         fontSize="22"
         fill="#000"
       >
-        {calculatedTotalLength} mm
+        {mmToInches(calculatedTotalLength)} in
       </text>
       {/* Arrow for Total Width */}
       <line x1="60" y1="30" x2={50 + totalWidth - 10} y2="30" stroke="#000" strokeWidth="1" />
@@ -173,7 +176,7 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
         fill="#000"
         transform={`rotate(-270, ${heightArrowX + 20}, ${50 + totalHeight / 2})`}
       >
-        {activeDimensions.height} mm
+        {mmToInches(activeDimensions.height)} in
       </text>
       {/* Arrow for Total Height - positioned relative to the right edge of rectangle */}
       <line x1={heightArrowX} y1="50" x2={heightArrowX} y2={50 + totalHeight} stroke="#000" strokeWidth="1" />
@@ -189,7 +192,7 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
         fill="#000"
         transform={`rotate(-90, 30, ${50 + tabsideHeight / 2})`}
       >
-        {tabsideHeight} mm
+        {mmToInches(tabsideHeight)} in
       </text>
       {/* Arrow for Tabside Height */}
       <line x1="35" y1="70" x2="35" y2={50 + tabsideHeight} stroke="#000" strokeWidth="1" />
@@ -205,7 +208,7 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
         fill="#000"
         transform={`rotate(-90, 20, ${50 + tabsideHeight + tabLength / 2})`}
       >
-        {tabLength} mm
+        {mmToInches(tabLength)} in
       </text>
       {/* Arrow for Tab Length */}
       <line x1="35" y1={50 + tabsideHeight + 20} x2="35" y2={50 + tabsideHeight + tabLength} stroke="#000" strokeWidth="1" />
@@ -220,7 +223,7 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
         fontSize="18"
         fill="#000"
       >
-        40 mm
+        {mmToInches(40)} in
       </text>
       {/* Arrow for 40mm measurement - fixed */}
       <line x1="55" y1={measurementLineY} x2="95" y2={measurementLineY} stroke="#000" strokeWidth="1" />
@@ -235,7 +238,7 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
         fontSize="18"
         fill="#000"
       >
-        {activeDimensions.width} mm
+        {mmToInches(activeDimensions.width)} in
       </text>
       {/* Arrow for Section 1 */}
       <line x1={section1Start} y1={measurementLineY} x2={section1End} y2={measurementLineY} stroke="#000" strokeWidth="1" />
@@ -250,7 +253,7 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
         fontSize="18"
         fill="#000"
       >
-        {activeDimensions.length} mm
+        {mmToInches(activeDimensions.length)} in
       </text>
       {/* Arrow for Section 2 */}
       <line x1={section1End} y1={measurementLineY} x2={section2End} y2={measurementLineY} stroke="#000" strokeWidth="1" />
@@ -265,7 +268,7 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
         fontSize="18"
         fill="#000"
       >
-        {activeDimensions.width} mm
+        {mmToInches(activeDimensions.width)} in
       </text>
       {/* Arrow for Section 3 */}
       <line x1={section2End} y1={measurementLineY} x2={section3End} y2={measurementLineY} stroke="#000" strokeWidth="1" />
@@ -280,7 +283,7 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
         fontSize="18"
         fill="#000"
       >
-        {activeDimensions.length} mm
+        {mmToInches(activeDimensions.length)} in
       </text>
       {/* Arrow for Section 4 */}
       <line x1={section3End} y1={measurementLineY} x2={50 + totalWidth} y2={measurementLineY} stroke="#000" strokeWidth="1" />
