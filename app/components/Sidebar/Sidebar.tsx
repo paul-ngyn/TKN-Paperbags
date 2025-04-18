@@ -28,9 +28,34 @@ const Sidebar: React.FC<SidebarProps> = ({
   handleDimensionChange,
   startEditingDimensions = () => {} // Default empty function if prop not provided
 }) => {
-  // Conversion factors
-  const mmToInches = (mm: number) => +(mm * 0.0393701).toFixed(2);
-  const inchesToMm = (inches: number) => Math.round(inches * 25.4);
+  // Improved conversion factors with precise handling
+  const mmToInches = (mm: number) => {
+    // Exact conversion
+    const exactInches = mm / 25.4;
+    
+    // Common inch values for checking - these are values we want to show as clean numbers
+    const commonInches = [
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 
+      19, 20, 24, 30, 36, 42, 48
+    ];
+    
+    // Check if we're very close to a common inch value
+    for (const value of commonInches) {
+      // If within 0.05 inches (about 1.27mm), treat as the clean value
+      if (Math.abs(exactInches - value) < 0.05) {
+        return value;
+      }
+    }
+    
+    // Otherwise return the precise conversion with 2 decimal places
+    return Math.round(exactInches * 100) / 100;
+  };
+  
+  // Precise conversion from inches to mm
+  const inchesToMm = (inches: number) => {
+    // Exact conversion - use decimal precision for millimeters
+    return +(inches * 25.4).toFixed(2);
+  };
   
   // Store current input values as strings to preserve what user types exactly
   const [inputValues, setInputValues] = useState({
@@ -71,11 +96,25 @@ const Sidebar: React.FC<SidebarProps> = ({
       width: formatDisplayValue(widthInches),
       height: formatDisplayValue(heightInches)
     });
+    
+    // Debug info to help diagnose issues
+    console.log("Dimensions from props (mm):", dimensions);
+    console.log("Converted to inches:", { lengthInches, widthInches, heightInches });
+    console.log("Formatted for display:", { 
+      length: formatDisplayValue(lengthInches),
+      width: formatDisplayValue(widthInches),
+      height: formatDisplayValue(heightInches)
+    });
   }, [dimensions]);
   
   // Format display values - show whole numbers as integers
   const formatDisplayValue = (value: number): string => {
-    return Number.isInteger(value) ? value.toString() : value.toFixed(2);
+    // If very close to an integer (within 0.001), display as integer
+    if (Math.abs(Math.round(value) - value) < 0.001) {
+      return Math.round(value).toString();
+    }
+    // Otherwise display with 2 decimal places, removing trailing zeros
+    return value.toFixed(2).replace(/\.?0+$/, '');
   };
   
   // Handler for dimension changes
@@ -106,11 +145,17 @@ const Sidebar: React.FC<SidebarProps> = ({
   // Apply dimension changes when button is clicked
   const applyDimensions = () => {
     // Convert inches back to mm when sending to parent component
-    handleDimensionChange({
+    // Use precise conversion to maintain accuracy
+    const newDimensions = {
       length: inchesToMm(tempDimensionsInches.length),
       width: inchesToMm(tempDimensionsInches.width),
       height: inchesToMm(tempDimensionsInches.height)
-    });
+    };
+    
+    console.log("Applying new dimensions (inches):", tempDimensionsInches);
+    console.log("Converted to mm for storage:", newDimensions);
+    
+    handleDimensionChange(newDimensions);
   };
   
   // Reset to the original dimensions
