@@ -246,7 +246,7 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
         fontSize="18"
         fill="#000"
       >
-        1.58 in
+        1.57 in
       </text>
       {/* Arrow for 40mm measurement - fixed */}
       <line x1="55" y1={measurementLineY} x2="95" y2={measurementLineY} stroke="#000" strokeWidth="1" />
