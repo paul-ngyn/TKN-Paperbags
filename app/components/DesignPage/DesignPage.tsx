@@ -30,7 +30,7 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
   // Add state for bag dimensions
   const [dimensions, setDimensions] = useState<BagDimensions>({
     length: 310,
-    width: 165,
+    width: 155,
     height: 428
   });
   
