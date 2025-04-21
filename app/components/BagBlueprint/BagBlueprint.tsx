@@ -153,7 +153,7 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
       width: requiredWidth,
       height: requiredHeight
     };
-  }, [totalWidth, totalHeight, measurementTextY]);
+  }, [totalWidth, measurementTextY]);
 
   return (
     <svg
@@ -221,10 +221,10 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
 
       {/* 3. Tabside Height (left) - Now calculated as totalHeight - tabLength */}
       <text
-        x="30"
-        y={50 + tabsideHeight / 2}
+        x="20"
+        y={40 + tabsideHeight / 2}
         textAnchor="middle"
-        fontSize="20"
+        fontSize="16"
         fill="#000"
         transform={`rotate(-90, 30, ${50 + tabsideHeight / 2})`}
       >

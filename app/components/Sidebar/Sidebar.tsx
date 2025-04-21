@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link"; // Import Link from next/link
 import styles from "./Sidebar.module.css";
 import downloadicon from "../../public/downloadicon.png";
 
@@ -28,6 +29,20 @@ const Sidebar: React.FC<SidebarProps> = ({
   handleDimensionChange,
   startEditingDimensions = () => {} // Default empty function if prop not provided
 }) => {
+  // Define max dimensions in inches
+  
+  const MAX_DIMENSIONS = {
+    length: 21.65, 
+    width: 11.81,
+    height: 25.98
+  };
+
+  const MIN_DIMENSIONS = {
+    length: 6,
+    width: 2,
+    height: 6
+  };
+  
   // Improved conversion factors with precise handling
   const mmToInches = (mm: number) => {
     // Exact conversion
@@ -41,8 +56,8 @@ const Sidebar: React.FC<SidebarProps> = ({
     
     // Check if we're very close to a common inch value
     for (const value of commonInches) {
-      // If within 0.05 inches (about 1.27mm), treat as the clean value
-      if (Math.abs(exactInches - value) < 0.05) {
+      // If within 0.005 inches treat as the clean value
+      if (Math.abs(exactInches - value) < 0.005) {
         return value;
       }
     }
@@ -96,15 +111,6 @@ const Sidebar: React.FC<SidebarProps> = ({
       width: formatDisplayValue(widthInches),
       height: formatDisplayValue(heightInches)
     });
-    
-    // Debug info to help diagnose issues
-    console.log("Dimensions from props (mm):", dimensions);
-    console.log("Converted to inches:", { lengthInches, widthInches, heightInches });
-    console.log("Formatted for display:", { 
-      length: formatDisplayValue(lengthInches),
-      width: formatDisplayValue(widthInches),
-      height: formatDisplayValue(heightInches)
-    });
   }, [dimensions]);
   
   // Format display values - show whole numbers as integers
@@ -131,7 +137,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     if (value && !isNaN(parseFloat(value))) {
       const numValue = parseFloat(value);
       
-      // Update the numeric state as well
+      // Store the user's value without enforcing limits
       setTempDimensionsInches({
         ...tempDimensionsInches,
         [name]: numValue
@@ -144,16 +150,29 @@ const Sidebar: React.FC<SidebarProps> = ({
   
   // Apply dimension changes when button is clicked
   const applyDimensions = () => {
-    // Convert inches back to mm when sending to parent component
-    // Use precise conversion to maintain accuracy
-    const newDimensions = {
-      length: inchesToMm(tempDimensionsInches.length),
-      width: inchesToMm(tempDimensionsInches.width),
-      height: inchesToMm(tempDimensionsInches.height)
+    // First, enforce min/max limits before applying
+    const clampedDimensions = {
+      length: Math.min(Math.max(tempDimensionsInches.length, MIN_DIMENSIONS.length), MAX_DIMENSIONS.length),
+      width: Math.min(Math.max(tempDimensionsInches.width, MIN_DIMENSIONS.width), MAX_DIMENSIONS.width),
+      height: Math.min(Math.max(tempDimensionsInches.height, MIN_DIMENSIONS.height), MAX_DIMENSIONS.height)
     };
     
-    console.log("Applying new dimensions (inches):", tempDimensionsInches);
-    console.log("Converted to mm for storage:", newDimensions);
+    // Update the input values to reflect any clamping
+    setInputValues({
+      length: formatDisplayValue(clampedDimensions.length),
+      width: formatDisplayValue(clampedDimensions.width),
+      height: formatDisplayValue(clampedDimensions.height)
+    });
+    
+    // Update the temp dimensions with clamped values
+    setTempDimensionsInches(clampedDimensions);
+    
+    // Convert inches back to mm when sending to parent component
+    const newDimensions = {
+      length: inchesToMm(clampedDimensions.length),
+      width: inchesToMm(clampedDimensions.width),
+      height: inchesToMm(clampedDimensions.height)
+    };
     
     handleDimensionChange(newDimensions);
   };
@@ -234,6 +253,26 @@ const Sidebar: React.FC<SidebarProps> = ({
     );
   };
 
+  // Check if values are outside min/max limits
+  const dimensionOutOfRange = (name: string, value: number): boolean => {
+    if (name === 'length') {
+      return value < MIN_DIMENSIONS.length || value > MAX_DIMENSIONS.length;
+    } else if (name === 'width') {
+      return value < MIN_DIMENSIONS.width || value > MAX_DIMENSIONS.width;
+    } else if (name === 'height') {
+      return value < MIN_DIMENSIONS.height || value > MAX_DIMENSIONS.height;
+    }
+    return false;
+  };
+
+  // Visual feedback if value is outside limits
+  const getInputClass = (name: string): string => {
+    const value = tempDimensionsInches[name as keyof typeof tempDimensionsInches];
+    return dimensionOutOfRange(name, value) 
+      ? `${styles.dimensionInput} ${styles.outOfRange}` 
+      : styles.dimensionInput;
+  };
+
   return (
     <div className={styles.sidebarContainer}>
       <h2 className={styles.sidebarTitle}>Design Your Bag</h2>
@@ -263,9 +302,26 @@ const Sidebar: React.FC<SidebarProps> = ({
             style={{ display: "none" }}
           />
         </div>
-        <button onClick={handleClearClick} className={styles.clearButton}>
-          Clear Logo
-        </button>
+        <div className={styles.buttonInfoGroup}>
+          <button onClick={handleClearClick} className={styles.clearButton}>
+            Clear Logo
+          </button>
+        </div>
+      </div>
+
+      <div className={styles.infoLinkContainer}>
+        <Link href="/orderinfo" className={styles.infoLink}>
+          Image Upload Details
+        </Link>
+        <span className={styles.linkSeparator}>-</span>
+        <Link 
+          href="/blueprintexample.png" 
+          className={styles.infoLink} 
+          target="_blank" 
+          rel="noopener noreferrer"
+        >
+          Blueprint Example
+        </Link>
       </div>
       
       <div className={styles.dimensionContainer}>
@@ -279,11 +335,15 @@ const Sidebar: React.FC<SidebarProps> = ({
               name="length"
               value={inputValues.length}
               onChange={onDimensionChange}
-              min="4"
-              max="80"
+              min={MIN_DIMENSIONS.length}
+              max={MAX_DIMENSIONS.length}
               step="0.01"
-              className={styles.dimensionInput}
+              className={getInputClass('length')}
             />
+            <div className={styles.dimensionLimits}>
+              <span className={styles.minDimension}>Min: {MIN_DIMENSIONS.length}&quot;</span>
+              <span className={styles.maxDimension}>Max: {MAX_DIMENSIONS.length}&quot;</span>
+            </div>
           </div>
           
           <div className={styles.inputGroup}>
@@ -294,11 +354,15 @@ const Sidebar: React.FC<SidebarProps> = ({
               name="width"
               value={inputValues.width}
               onChange={onDimensionChange}
-              min="2"
-              max="20"
+              min={MIN_DIMENSIONS.width}
+              max={MAX_DIMENSIONS.width}
               step="0.01"
-              className={styles.dimensionInput}
+              className={getInputClass('width')}
             />
+            <div className={styles.dimensionLimits}>
+              <span className={styles.minDimension}>Min: {MIN_DIMENSIONS.width}&quot;</span>
+              <span className={styles.maxDimension}>Max: {MAX_DIMENSIONS.width}&quot;</span>
+            </div>
           </div>
           
           <div className={styles.inputGroup}>
@@ -309,11 +373,15 @@ const Sidebar: React.FC<SidebarProps> = ({
               name="height"
               value={inputValues.height}
               onChange={onDimensionChange}
-              min="4"
-              max="40"
+              min={MIN_DIMENSIONS.height}
+              max={MAX_DIMENSIONS.height}
               step="0.01"
-              className={styles.dimensionInput}
+              className={getInputClass('height')}
             />
+            <div className={styles.dimensionLimits}>
+              <span className={styles.minDimension}>Min: {MIN_DIMENSIONS.height}&quot;</span>
+              <span className={styles.maxDimension}>Max: {MAX_DIMENSIONS.height}&quot;</span>
+            </div>
           </div>
         </div>
         
