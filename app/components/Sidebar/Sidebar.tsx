@@ -39,7 +39,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   const MIN_DIMENSIONS = {
     length: 6,
-    width: 2,
+    width: 4,
     height: 6
   };
   
@@ -51,7 +51,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     // Common inch values for checking - these are values we want to show as clean numbers
     const commonInches = [
       1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 
-      19, 20, 24, 30, 36, 42, 48
+      19, 20, 24
     ];
     
     // Check if we're very close to a common inch value

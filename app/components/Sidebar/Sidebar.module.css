@@ -116,8 +116,8 @@
 }
 
 .outOfRange {
-  border-color: #ff6b6b;
-  background-color: rgba(255, 107, 107, 0.05);
+  border-color: #e70707;
+  background-color: rgba(136, 10, 10, 0.05);
 }
 
 .dimensionInput {
