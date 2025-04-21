@@ -75,13 +75,10 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
   // This ensures it's exactly half the width plus 20mm
   const tabLengthMm = (activeDimensions.width / 2) + 20;
   
-  // Convert to exact inches for display
-  const tabLengthInches = tabLengthMm / 25.4;
   
   // Calculate tabside height precisely as totalHeight - tabLength
   // Don't round here to preserve exact measurements
   const tabsideHeight = activeDimensions.height - tabLengthMm;
-  const tabsideHeightInches = tabsideHeight / 25.4;
   
   // For rendering purposes only (not for calculations)
   const tabLength = Math.round(tabLengthMm);
@@ -109,6 +106,21 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
     return mmToInches(mm);
   };
   
+
+  console.log("Dimensions:", dimensions);
+  console.log("Active dimensions:", activeDimensions);
+  console.log("Width in inches:", activeDimensions.width / 25.4);
+  console.log("Length in inches:", activeDimensions.length / 25.4);
+  console.log("Height in inches:", activeDimensions.height / 25.4);
+  console.log("Tab length (mm):", tabLengthMm);
+  console.log("Tab length (formatted):", mmToInches(tabLengthMm));
+  console.log("Total height (mm):", activeDimensions.height);
+  console.log("Tabside height (mm):", tabsideHeight);
+  console.log("Tabside + Tab length (mm):", tabsideHeight + tabLengthMm, "should equal", activeDimensions.height);
+  console.log("Calculated total length (mm):", calculatedTotalLength);
+  console.log("Calculated total length (inches):", calculatedTotalLength / 25.4);
+  console.log("Total length display:", formatTotalLength(calculatedTotalLength));
+
   // Check if we're using default dimensions
   const isUsingDefaults = 
     Math.abs(activeDimensions.width - 155) < 0.1 && 

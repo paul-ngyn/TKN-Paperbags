@@ -239,7 +239,6 @@ const Sidebar: React.FC<SidebarProps> = ({
       <h2 className={styles.sidebarTitle}>Design Your Bag</h2>
 
       <div className={styles.uploadSection}>
-        <h3 className={styles.sectionTitle}>Add Logo</h3>
         <div 
           className={`${styles.dropZone} ${dragActive ? styles.dragOver : ""}`}
           onClick={handleClick}
