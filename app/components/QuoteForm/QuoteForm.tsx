@@ -248,7 +248,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
                 required
               />
               <div className={styles.dimensionInfo}>
-                <small>Length: {MIN_DIMENSIONS.length}"-{MAX_DIMENSIONS.length}"</small>
+                <small>Length: {MIN_DIMENSIONS.length}&quot;-{MAX_DIMENSIONS.length}&quot;</small>
               </div>
             </div>
             <span className={styles.dimensionSeparator}>x</span>
@@ -266,7 +266,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
                 required
               />
               <div className={styles.dimensionInfo}>
-                <small>Width: {MIN_DIMENSIONS.width}"-{MAX_DIMENSIONS.width}"</small>
+                <small>Width: {MIN_DIMENSIONS.width}&quot;-{MAX_DIMENSIONS.width}&quot;</small>
               </div>
             </div>
             <span className={styles.dimensionSeparator}>x</span>
@@ -284,7 +284,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
                 required
               />
               <div className={styles.dimensionInfo}>
-                <small>Height: {MIN_DIMENSIONS.height}"-{MAX_DIMENSIONS.height}"</small>
+                <small>Height: {MIN_DIMENSIONS.height}&quot;-{MAX_DIMENSIONS.height}&quot;</small>
               </div>
             </div>
           </div>

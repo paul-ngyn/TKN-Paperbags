@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useRef } from "react";
 import { Rnd } from "react-rnd";
-import Image from "next/image";
 import Sidebar from "../Sidebar/Sidebar";
 import BagBlueprint from "../BagBlueprint/BagBlueprint";
 import styles from "./DesignPage.module.css";
