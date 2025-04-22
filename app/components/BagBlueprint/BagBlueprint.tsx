@@ -178,13 +178,13 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
       {/* Base Rectangle */}
       <rect x="50" y="50" width={totalWidth} height={totalHeight} fill="#f5f5f5" stroke="#000" strokeWidth="2" />
 
-      {/* Vertical Lines */}
+      {/* four section Vertical Lines */}
       <line x1={section1Start} y1="50" x2={section1Start} y2={50 + totalHeight} stroke="#000" strokeWidth="1" />
       <line x1={section1End} y1="50" x2={section1End} y2={50 + totalHeight} stroke="#000" strokeWidth="1" />
       <line x1={section2End} y1="50" x2={section2End} y2={50 + totalHeight} stroke="#000" strokeWidth="1" />
       <line x1={section3End} y1="50" x2={section3End} y2={50 + totalHeight} stroke="#000" strokeWidth="1" />
 
-      {/* Horizontal Lines */}
+      {/* Horizontal Line */}
       <line x1="50" y1={50 + tabsideHeight} x2={50 + totalWidth} y2={50 + tabsideHeight} stroke="#000" strokeWidth="1" />
 
       {/* Measurements */}
@@ -224,39 +224,39 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
         x="20"
         y={40 + tabsideHeight / 2}
         textAnchor="middle"
-        fontSize="16"
+        fontSize="20"
         fill="#000"
         transform={`rotate(-90, 30, ${50 + tabsideHeight / 2})`}
       >
         {formatTabsideHeight(tabsideHeight)} in
       </text>
       {/* Arrow for Tabside Height */}
-      <line x1="35" y1="70" x2="35" y2={50 + tabsideHeight} stroke="#000" strokeWidth="1" />
+      <line x1="35" y1="70" x2="35" y2={40 + tabsideHeight} stroke="#000" strokeWidth="1" />
       <polygon points="30,70 40,70 35,55" fill="#000" />
-      <polygon points={`30,${50 + tabsideHeight} 40,${50 + tabsideHeight} 35,${50 + tabsideHeight + 15}`} fill="#000" />
+      <polygon points={`30,${35 + tabsideHeight} 40,${35 + tabsideHeight} 35,${35 + tabsideHeight + 15}`} fill="#000" />
 
       {/* 4. Tab Length - now calculated as 1/2 section1Width + 20mm */}
       <text
         x="20"
         y={50 + tabsideHeight + tabLength / 2}
         textAnchor="middle"
-        fontSize="16"
+        fontSize="18"
         fill="#000"
         transform={`rotate(-90, 20, ${50 + tabsideHeight + tabLength / 2})`}
       >
         {mmToInches(tabLengthMm)} in
       </text>
       {/* Arrow for Tab Length */}
-      <line x1="35" y1={50 + tabsideHeight + 20} x2="35" y2={50 + tabsideHeight + tabLength} stroke="#000" strokeWidth="1" />
-      <polygon points={`30,${50 + tabsideHeight + 20} 40,${50 + tabsideHeight + 20} 35,${50 + tabsideHeight + 5}`} fill="#000" />
-      <polygon points={`30,${50 + tabsideHeight + tabLength} 40,${50 + tabsideHeight + tabLength} 35,${50 + tabsideHeight + tabLength + 15}`} fill="#000" />
+      <line x1="35" y1={50 + tabsideHeight + 10} x2="35" y2={40 + tabsideHeight + tabLength} stroke="#000" strokeWidth="1" />
+      <polygon points={`30,${45 + tabsideHeight + 20} 40,${45 + tabsideHeight + 20} 35,${45 + tabsideHeight + 5}`} fill="#000" />
+      <polygon points={`30,${35 + tabsideHeight + tabLength} 40,${35 + tabsideHeight + tabLength} 35,${35 + tabsideHeight + tabLength + 15}`} fill="#000" />
 
       {/* Small 40mm Arrow - Fixed at 1.57 inches */}
       <text
         x="75"
         y={measurementTextY}
         textAnchor="middle"
-        fontSize="18"
+        fontSize="16"
         fill="#000"
       >
         1.57 in
@@ -286,7 +286,7 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
         x={section1End + section2Width / 2}
         y={measurementTextY}
         textAnchor="middle"
-        fontSize="18"
+        fontSize="20"
         fill="#000"
       >
         {mmToInches(activeDimensions.length)} in
@@ -316,7 +316,7 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
         x={section3End + section4Width / 2}
         y={measurementTextY}
         textAnchor="middle"
-        fontSize="18"
+        fontSize="20"
         fill="#000"
       >
         {mmToInches(activeDimensions.length)} in
