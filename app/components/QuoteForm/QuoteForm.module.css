@@ -3,7 +3,7 @@
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    max-width: 600px;
+    max-width: 615px;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -41,7 +41,7 @@
   
   .nameGroup{
     display: flex;
-    gap: 20px;
+    gap: 40px;
   }
   
   .inputField {
@@ -64,22 +64,51 @@
   max-height: 310px;
 }
 
+.dimensionInputContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.dimensionInfo {
+  font-size: 12px;
+  color: #666;
+  margin-top: 2px;
+  text-align: center;
+}
+
+.dimensionError {
+  border: 1px solid #e74c3c;
+  background-color: #fdeaea;
+}
+
   .dimensionsGroup {
     display: flex;
     align-items: center;
+    width: 100%;
+    gap: 8px;
   }
-  
+    
   .dimensionSeparator {
-    margin: 0 0.5rem;
+    margin: 0 0.3rem;
+    align-self: flex-start;
+    margin-top: 8px;
+    position: relative;
   }
-  
+    
   .textarea {
     resize: none;
   }
-  
+    
   .formActions {
     display: flex;
     justify-content: space-between;
+  }
+
+  .fileName {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #333;
   }
   
   .submitButton {

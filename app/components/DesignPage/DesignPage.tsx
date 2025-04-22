@@ -94,40 +94,54 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
           isEditing={isEditingDimensions}
         />
 
-        {logo && (
-          <Rnd
-            default={{ x: 50, y: 50, width: 150, height: 150 }}
-            bounds="parent"
-            disableDragging={!draggable}
-            enableResizing={{ bottomRight: true }}
-            onDragStop={disableDrag}
-            onResizeStop={disableDrag}
-            ref={rndRef}
-          >
-            <div
-              style={{ width: "100%", height: "100%", position: "relative" }}
-              onClick={toggleDragMode}
-              className={`${styles.logoOverlay} ${isActive ? styles.active : ""}`}
-            >
-              <Image
-                src={logo}
-                alt="Uploaded Logo"
-                ref={imageRef}
-                style={{ width: "100%", height: "100%" }}
-              />
-              {isActive && (
-                <div className={styles.customResizeHandle}>
-                  <Image
-                    src={resizeIcon}
-                    alt="Resize Handle"
-                    layout="fill"
-                    objectFit="contain"
+            {logo && (
+              <Rnd
+                default={{ x: 50, y: 50, width: 150, height: 150 }}
+                bounds="parent"
+                disableDragging={!draggable}
+                enableResizing={{ 
+                  bottomRight: true,
+                  bottomLeft: true, 
+                  topRight: true, 
+                  topLeft: true 
+                }}
+                onDragStop={disableDrag}
+                onResizeStop={disableDrag}
+                ref={rndRef}
+              >
+                <div
+                  style={{ 
+                    width: "100%", 
+                    height: "100%", 
+                    position: "relative",
+                  }}
+                  onClick={toggleDragMode}
+                  className={`${styles.logoOverlay} ${isActive ? styles.active : ""}`}
+                >
+                  <img
+                    src={logo || ""}
+                    alt="Uploaded Logo"
+                    ref={imageRef as React.RefObject<HTMLImageElement>}
+                    style={{ 
+                      width: "100%", 
+                      height: "100%", 
+                      objectFit: "contain",
+                      pointerEvents: "none" // Prevents the image from intercepting mouse events
+                    }}
                   />
+                  {isActive && (
+                    <div className={styles.customResizeHandle}>
+                      <img
+                        src={resizeIcon.src}
+                        alt="Resize Handle"
+                        style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                      />
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          </Rnd>
-        )}
+              </Rnd>
+            )}
+       
       </div>
     </div>
   );
