@@ -44,7 +44,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   const MIN_DIMENSIONS = {
     length: 6,
-    width: 4,
+    width: 2,
     height: 6
   };
   
