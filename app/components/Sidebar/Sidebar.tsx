@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link"; // Import Link from next/link
 import styles from "./Sidebar.module.css";
 import downloadicon from "../../public/downloadicon.png";
+import BlueprintExample from "../../public/BlueprintExample.png"; // Import the blueprint example image
 
 // Import the BagDimensions interface or define it here
 interface BagDimensions {
@@ -19,6 +20,7 @@ interface SidebarProps {
   dimensions: BagDimensions;
   handleDimensionChange: (dimensions: BagDimensions) => void;
   startEditingDimensions?: () => void;
+  downloadDesign?: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -27,10 +29,13 @@ const Sidebar: React.FC<SidebarProps> = ({
   fileInputRef,
   dimensions,
   handleDimensionChange,
-  startEditingDimensions = () => {} // Default empty function if prop not provided
+  startEditingDimensions = () => {}, // Default empty function if prop not provided
+  downloadDesign = () => {}
 }) => {
-  // Define max dimensions in inches
+  // Add state for showing/hiding the blueprint example modal
+  const [showBlueprintExample, setShowBlueprintExample] = useState(false);
   
+  // Define max dimensions in inches
   const MAX_DIMENSIONS = {
     length: 21.65, 
     width: 11.81,
@@ -176,6 +181,12 @@ const Sidebar: React.FC<SidebarProps> = ({
     
     handleDimensionChange(newDimensions);
   };
+
+  const onDimensionKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      applyDimensions();
+    }
+  };
   
   // Reset to the original dimensions
   const resetDimensions = () => {
@@ -314,76 +325,77 @@ const Sidebar: React.FC<SidebarProps> = ({
           Image Upload Details
         </Link>
         <span className={styles.linkSeparator}>-</span>
-        <Link 
-          href="/blueprintexample.png" 
-          className={styles.infoLink} 
-          target="_blank" 
-          rel="noopener noreferrer"
+        <button 
+          onClick={() => setShowBlueprintExample(true)}
+          className={styles.infoLink}
         >
           Blueprint Example
-        </Link>
+        </button>
       </div>
       
       <div className={styles.dimensionContainer}>
-        <h3 className={styles.sectionTitle}>Bag Dimensions</h3>
+        <h3 className={styles.sectionTitle}>Customize Your Bag Dimensions</h3>
         <div className={styles.dimensionInputs}>
-          <div className={styles.inputGroup}>
-            <label htmlFor="length">Length (in)</label>
-            <input
-              type="number"
-              id="length"
-              name="length"
-              value={inputValues.length}
-              onChange={onDimensionChange}
-              min={MIN_DIMENSIONS.length}
-              max={MAX_DIMENSIONS.length}
-              step="0.01"
-              className={getInputClass('length')}
-            />
-            <div className={styles.dimensionLimits}>
-              <span className={styles.minDimension}>Min: {MIN_DIMENSIONS.length}&quot;</span>
-              <span className={styles.maxDimension}>Max: {MAX_DIMENSIONS.length}&quot;</span>
-            </div>
-          </div>
-          
-          <div className={styles.inputGroup}>
-            <label htmlFor="width">Width (in)</label>
-            <input
-              type="number"
-              id="width"
-              name="width"
-              value={inputValues.width}
-              onChange={onDimensionChange}
-              min={MIN_DIMENSIONS.width}
-              max={MAX_DIMENSIONS.width}
-              step="0.01"
-              className={getInputClass('width')}
-            />
-            <div className={styles.dimensionLimits}>
-              <span className={styles.minDimension}>Min: {MIN_DIMENSIONS.width}&quot;</span>
-              <span className={styles.maxDimension}>Max: {MAX_DIMENSIONS.width}&quot;</span>
-            </div>
-          </div>
-          
-          <div className={styles.inputGroup}>
-            <label htmlFor="height">Height (in)</label>
-            <input
-              type="number"
-              id="height"
-              name="height"
-              value={inputValues.height}
-              onChange={onDimensionChange}
-              min={MIN_DIMENSIONS.height}
-              max={MAX_DIMENSIONS.height}
-              step="0.01"
-              className={getInputClass('height')}
-            />
-            <div className={styles.dimensionLimits}>
-              <span className={styles.minDimension}>Min: {MIN_DIMENSIONS.height}&quot;</span>
-              <span className={styles.maxDimension}>Max: {MAX_DIMENSIONS.height}&quot;</span>
-            </div>
+        <div className={styles.inputGroup}>
+          <label htmlFor="length">Length (in)</label>
+          <input
+            type="number"
+            id="length"
+            name="length"
+            value={inputValues.length}
+            onChange={onDimensionChange}
+            onKeyDown={onDimensionKeyDown}
+            min={MIN_DIMENSIONS.length}
+            max={MAX_DIMENSIONS.length}
+            step="0.01"
+            className={getInputClass('length')}
+          />
+          <div className={styles.dimensionLimits}>
+            <span className={styles.minDimension}>Min: {MIN_DIMENSIONS.length}&quot;</span>
+            <span className={styles.maxDimension}>Max: {MAX_DIMENSIONS.length}&quot;</span>
           </div>
         </div>
+        
+        <div className={styles.inputGroup}>
+          <label htmlFor="width">Width (in)</label>
+          <input
+            type="number"
+            id="width"
+            name="width"
+            value={inputValues.width}
+            onChange={onDimensionChange}
+            onKeyDown={onDimensionKeyDown}
+            min={MIN_DIMENSIONS.width}
+            max={MAX_DIMENSIONS.width}
+            step="0.01"
+            className={getInputClass('width')}
+          />
+          <div className={styles.dimensionLimits}>
+            <span className={styles.minDimension}>Min: {MIN_DIMENSIONS.width}&quot;</span>
+            <span className={styles.maxDimension}>Max: {MAX_DIMENSIONS.width}&quot;</span>
+          </div>
+        </div>
+        
+        <div className={styles.inputGroup}>
+          <label htmlFor="height">Height (in)</label>
+          <input
+            type="number"
+            id="height"
+            name="height"
+            value={inputValues.height}
+            onChange={onDimensionChange}
+            onKeyDown={onDimensionKeyDown}
+            min={MIN_DIMENSIONS.height}
+            max={MAX_DIMENSIONS.height}
+            step="0.01"
+            className={getInputClass('height')}
+          />
+          <div className={styles.dimensionLimits}>
+            <span className={styles.minDimension}>Min: {MIN_DIMENSIONS.height}&quot;</span>
+            <span className={styles.maxDimension}>Max: {MAX_DIMENSIONS.height}&quot;</span>
+          </div>
+        </div>
+      </div>
         
         {/* Buttons to apply or reset dimensions */}
         <div className={styles.buttonGroup}>
@@ -402,7 +414,40 @@ const Sidebar: React.FC<SidebarProps> = ({
             Reset
           </button>
         </div>
+
+        {/* Download Design Button */}
+        <div className={styles.downloadButtonContainer}>
+          <button 
+            onClick={downloadDesign}
+            className={styles.downloadButton}
+          >
+            Download Design
+          </button>
+        </div>
       </div>
+      
+      {/* Blueprint Example Modal */}
+      {showBlueprintExample && (
+        <div className={styles.modal}>
+          <div className={styles.modalContent}>
+            <button 
+              className={styles.closeButton} 
+              onClick={() => setShowBlueprintExample(false)}
+            >
+              &times;
+            </button>
+            <div className={styles.blueprintImageContainer}>
+              <Image
+                src={BlueprintExample}
+                alt="Blueprint Example"
+                width={1400}
+                height={1200}
+                className={styles.blueprintImage}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

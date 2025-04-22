@@ -7,11 +7,12 @@
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.35);
   height: auto;
-  width: 22%;
+  width: 25%;
   max-width: 30%;
   margin-left: 3%;
-  margin-top: 3.5%;
-  margin-bottom: 5%;
+  margin-top: 4%;
+  margin-bottom: 15%;
+  padding-bottom: 2%;
 }
 
 .sidebarTitle {
@@ -60,7 +61,7 @@
 .buttonGroup {
   display: flex;
   gap: 10px;
-  margin-top: 15px;
+  margin-top: 0.2rem;
 }
 
 .buttonInfoGroup {
@@ -68,7 +69,6 @@
   flex-direction: column;
   gap: 10px;
   width: 100%;
-  margin-top: 5px;
 }
 
 .dimensionLimits {
@@ -157,6 +157,33 @@
   background-color: #e2e2e2;
 }
 
+.downloadButtonContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.4rem;
+}
+
+.downloadButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #1c51a3;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 16px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: 100%;
+}
+
+.downloadButton:hover {
+  background-color: #3a7bc8;
+}
+
+
 .clearButton {
   background-color: #f44336;
   color: white;
@@ -220,4 +247,67 @@
 /* File input */
 .fileInput {
   display: none;
+}
+
+/* Modal styles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background-color: white;
+  padding: 10px;
+  border-radius: 8px;
+  position: relative;
+  max-width: 90%;
+  max-height: 90%;
+  overflow: auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.closeButton {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 28px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #333;
+}
+
+.blueprintImageContainer {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.blueprintImage {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Make the blueprint link look like a button */
+.infoLink {
+  background: none;
+  border: none;
+  color: #4a90e2;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: inherit;
+  padding: 0;
+  font-family: inherit;
+}
+
+.infoLink:hover {
+  color: #3a7bc8;
 }
