@@ -233,7 +233,7 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
       {/* Arrow for Tabside Height */}
       <line x1="35" y1="70" x2="35" y2={40 + tabsideHeight} stroke="#000" strokeWidth="1" />
       <polygon points="30,70 40,70 35,55" fill="#000" />
-      <polygon points={`30,${35 + tabsideHeight} 40,${35 + tabsideHeight} 35,${35 + tabsideHeight + 15}`} fill="#000" />
+      <polygon points={`30,${37 + tabsideHeight} 40,${37 + tabsideHeight} 35,${37 + tabsideHeight + 15}`} fill="#000" />
 
       {/* 4. Tab Length - now calculated as 1/2 section1Width + 20mm */}
       <text
@@ -249,7 +249,7 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
       {/* Arrow for Tab Length */}
       <line x1="35" y1={50 + tabsideHeight + 10} x2="35" y2={40 + tabsideHeight + tabLength} stroke="#000" strokeWidth="1" />
       <polygon points={`30,${45 + tabsideHeight + 20} 40,${45 + tabsideHeight + 20} 35,${45 + tabsideHeight + 5}`} fill="#000" />
-      <polygon points={`30,${35 + tabsideHeight + tabLength} 40,${35 + tabsideHeight + tabLength} 35,${35 + tabsideHeight + tabLength + 15}`} fill="#000" />
+      <polygon points={`30,${37 + tabsideHeight + tabLength} 40,${37 + tabsideHeight + tabLength} 35,${37 + tabsideHeight + tabLength + 15}`} fill="#000" />
 
       {/* Small 40mm Arrow - Fixed at 1.57 inches */}
       <text

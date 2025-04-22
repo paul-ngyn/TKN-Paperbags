@@ -60,7 +60,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ handleNavigation }) => {
             </p>
             <br />
             <p>
-              Our products are environmentally friendly, biodegradable, recyclable and compostable.
+              Our sustainably-sourced products are environmentally friendly, biodegradable, recyclable, compostable and made right here in the U.S.
             </p>
           </div>
         </div>

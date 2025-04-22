@@ -61,14 +61,14 @@ const LogoPage: React.FC<LogoPageProps> = ({ handleNavigation }) => {
           <Image src={baglogo} alt="Feature 1" width={150} height={150} className="feature-image" />
           <p className="feature-text">High Quality Paper Bags</p>
           <div className="feature-description">
-            <p>Our paper bags are made from the highest quality materials, ensuring durability and strength.</p>
+            <p>Our paper bags are made in the U.S and sourced from the highest quality materials, ensuring durability and strength.</p>
           </div>
         </div>
         <div className="feature">
           <Image src={timelogo} alt="Feature 3" width={150} height={150} className="feature-image3" />
           <p className="feature-text">Swift and Efficient Service</p>
           <div className="feature-description">
-            <p>We provide fast and efficient service to meet your needs promptly.</p>
+            <p>We provide fast and efficient personalized service to meet your needs promptly.</p>
           </div>
         </div>
       </section>

@@ -107,21 +107,23 @@ html, body {
 
 
 .feature-image {
-  width: 47%; /* Adjust width as needed */
+  width: 54%; /* Adjust width as needed */
   height: auto;
+  max-width: 300px;
 }
 
 .feature-image2 {
   padding-top: 2%;
-  width: 49%; /* Adjust width as needed */
+  width: 52%; /* Adjust width as needed */
   height: auto;
-
+  max-width: 300px;
 }
 
 .feature-image3 {
   padding-top: 3%;
-  width: 61.5%; /* Adjust width as needed */
+  width: 65%; /* Adjust width as needed */
   height: auto;
+  max-width: 300px;
 }
 
 .attributionLink {

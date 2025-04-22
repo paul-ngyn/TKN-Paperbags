@@ -5,6 +5,9 @@ import Link from "next/link"; // Import Link from next/link
 import styles from "./Sidebar.module.css";
 import downloadicon from "../../public/downloadicon.png";
 import BlueprintExample from "../../public/BlueprintExample.png"; // Import the blueprint example image
+import jsPDF from "jspdf"; // Import jsPDF for PDF generation
+import html2canvas from "html2canvas"; // Import html2canvas for capturing HTML elements as images
+
 
 // Import the BagDimensions interface or define it here
 interface BagDimensions {
@@ -30,10 +33,38 @@ const Sidebar: React.FC<SidebarProps> = ({
   dimensions,
   handleDimensionChange,
   startEditingDimensions = () => {}, // Default empty function if prop not provided
-  downloadDesign = () => {}
+  downloadDesign
 }) => {
   // Add state for showing/hiding the blueprint example modal
   const [showBlueprintExample, setShowBlueprintExample] = useState(false);
+
+  // Function to generate the PDF
+  const generatePDF = async () => {
+    const pdf = new jsPDF("portrait", "px", "a4");
+
+    try {
+      // Capture the SVG (Bag Blueprint)
+      const svgElement = document.querySelector("svg"); // Select the SVG element
+      if (svgElement) {
+        const svgCanvas = await html2canvas(svgElement as unknown as HTMLElement);
+        const svgDataURL = svgCanvas.toDataURL("image/png");
+        pdf.addImage(svgDataURL, "PNG", 20, 20, 400, 300); // Add SVG to PDF
+      }
+
+      // Capture the uploaded logo
+      const uploadedLogo = document.querySelector(`.${styles.dropZone}`);
+      if (uploadedLogo) {
+        const logoCanvas = await html2canvas(uploadedLogo as HTMLElement);
+        const logoDataURL = logoCanvas.toDataURL("image/png");
+        pdf.addImage(logoDataURL, "PNG", 20, 350, 400, 300); // Add logo to PDF
+      }
+
+      // Save the PDF
+      pdf.save("Design.pdf");
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+    }
+  };
   
   // Define max dimensions in inches
   const MAX_DIMENSIONS = {
@@ -417,13 +448,19 @@ const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Download Design Button */}
         <div className={styles.downloadButtonContainer}>
-          <button 
-            onClick={downloadDesign}
-            className={styles.downloadButton}
-          >
-            Download Design
-          </button>
-        </div>
+        <button 
+          onClick={() => {
+            if (typeof downloadDesign === 'function') {
+              downloadDesign();
+            } else {
+              generatePDF();
+            }
+          }}
+          className={styles.downloadButton}
+        >
+          Download Design
+        </button>
+      </div>
       </div>
       
       {/* Blueprint Example Modal */}
