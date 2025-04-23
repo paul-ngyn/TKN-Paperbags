@@ -23,6 +23,8 @@ interface SidebarProps {
   handleDimensionChange: (dimensions: BagDimensions) => void;
   startEditingDimensions?: () => void;
   downloadDesign?: () => void;
+  logoCount?: number; // Add this new prop
+  
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -32,7 +34,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   dimensions,
   handleDimensionChange,
   startEditingDimensions = () => {}, // Default empty function if prop not provided
-  downloadDesign
+  downloadDesign,
+  logoCount = 0 
 }) => {
   // Add state for showing/hiding the blueprint example modal
   const [showBlueprintExample, setShowBlueprintExample] = useState(false);
@@ -306,8 +309,8 @@ const Sidebar: React.FC<SidebarProps> = ({
             height={40}
             className={styles.dropIcon}
           />
-          <p>Drag & drop your logo here, or click to browse</p>
-          {fileName && <p className={styles.fileName}>{fileName}</p>}
+          <p>Drag & drop your logos here, or click to browse</p>
+          {fileName && <p className={styles.fileName}>Selected: {fileName}</p>}
           <input
             type="file"
             accept="image/*"
@@ -317,9 +320,21 @@ const Sidebar: React.FC<SidebarProps> = ({
           />
         </div>
         <div className={styles.buttonInfoGroup}>
-          <button onClick={handleClearClick} className={styles.clearButton}>
-            Clear Logo
+          {/* Show logo count if there are any logos */}
+          {logoCount > 0 && (
+            <p className={styles.logoCount}>
+              {logoCount} logo{logoCount !== 1 ? 's' : ''} added
+            </p>
+          )}
+           {/* Add a button to explicitly add another logo */}
+           <button onClick={handleClick} className={styles.addLogoButton}>
+            Add {logoCount > 0 ? 'Another' : 'New'} Logo
           </button>
+          {/* Update button text to reflect multiple logos */}
+          <button onClick={handleClearClick} className={styles.clearButton}>
+            {logoCount > 1 ? 'Clear All Logos' : 'Clear Logos'}
+          </button>
+          
         </div>
       </div>
 

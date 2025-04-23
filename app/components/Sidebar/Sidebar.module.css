@@ -206,6 +206,29 @@
   gap: 12px;
 }
 
+.logoCount {
+  font-size: 14px;
+  color: #555;
+  margin: 5px 0;
+}
+
+.addLogoButton {
+  background-color: #1c51a3;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 8px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.addLogoButton:hover {
+  background-color: #3a80d2;
+}
+
+
 .dropZone {
   display: flex;
   flex-direction: column;

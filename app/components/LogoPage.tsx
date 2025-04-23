@@ -68,7 +68,7 @@ const LogoPage: React.FC<LogoPageProps> = ({ handleNavigation }) => {
           <Image src={timelogo} alt="Feature 3" width={150} height={150} className="feature-image3" />
           <p className="feature-text">Swift and Efficient Service</p>
           <div className="feature-description">
-            <p>We provide fast and efficient personalized service to meet your needs promptly.</p>
+            <p>We provide fast, efficient, and personalized service to meet your needs promptly.</p>
           </div>
         </div>
       </section>

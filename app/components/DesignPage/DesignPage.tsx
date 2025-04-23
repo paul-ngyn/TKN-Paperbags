@@ -9,7 +9,6 @@ import Image from "next/image";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
-
 interface DesignPageProps {
   handleNavigation: (page: string) => void;
 }
@@ -21,15 +20,24 @@ interface BagDimensions {
   height: number;
 }
 
+interface Logo {
+  id: string;
+  src: string;
+  position: { x: number, y: number };
+  size: { width: number, height: number };
+}
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
-  const [logo, setLogo] = useState<string | null>(null);
+  // Change to array of Logo objects
+  const [logos, setLogos] = useState<Logo[]>([]);
+  const [activeLogoId, setActiveLogoId] = useState<string | null>(null);
   const [draggable, setDraggable] = useState(false);
   const [isActive, setIsActive] = useState(false);
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const rndRef = useRef<Rnd>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
-  const bagContainerRef = useRef<HTMLDivElement>(null); // Add ref for the bag container
+  const logoRefs = useRef<Map<string, React.RefObject<Rnd>>>(new Map());
+  const bagContainerRef = useRef<HTMLDivElement>(null);
   
   // Add state for bag dimensions
   const [dimensions, setDimensions] = useState<BagDimensions>({
@@ -40,9 +48,8 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
   
   // Add state to track if dimensions are being edited
   const [isEditingDimensions, setIsEditingDimensions] = useState(false);
-
   
-  // NEW: Generate PDF function
+  // Generate PDF function
   const generatePDF = async () => {
     console.log("Starting PDF generation from DesignPage...");
     
@@ -66,9 +73,9 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
           const canvas = await html2canvas(element as HTMLElement, {
             scale: 2,
             logging: false,
-            useCORS: true, // Enable CORS for images
+            useCORS: true,
             allowTaint: true,
-            backgroundColor: null // Transparent background
+            backgroundColor: null
           });
           return canvas.toDataURL('image/png');
         } catch (err) {
@@ -77,7 +84,7 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
         }
       };
       
-      // First capture the entire design area (this has better chances of success)
+      // First capture the entire design area
       console.log("Capturing design area...");
       const designArea = bagContainerRef.current;
       const designImage = await elementToImage(designArea, "Design area");
@@ -89,11 +96,20 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
       const bagImage = bagBlueprintElement ? 
         await elementToImage(bagBlueprintElement, "Bag blueprint") : null;
       
-      // Then capture the logo if available
-      console.log("Capturing logo...");
-      const logoElement = rndRef.current?.resizableElement.current;
-      const logoImage = logo && logoElement ? 
-        await elementToImage(logoElement, "Logo") : null;
+      // Capture each logo individually
+      const logoImages = [];
+      
+      for (const logo of logos) {
+        const logoRef = logoRefs.current.get(logo.id);
+        if (logoRef && logoRef.current) {
+          const logoElement = logoRef.current.resizableElement.current;
+          const logoImage = await elementToImage(logoElement, `Logo ${logo.id}`);
+          
+          if (logoImage) {
+            logoImages.push({ id: logo.id, image: logoImage });
+          }
+        }
+      }
       
       // Calculate page dimensions
       const pageWidth = pdf.internal.pageSize.getWidth();
@@ -103,7 +119,7 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
       pdf.setFontSize(20);
       pdf.text("Your Bag Design", pageWidth / 2, 30, { align: "center" });
       
-      // Add the design image (which contains both bag and logo)
+      // Add the design image (which contains both bag and all logos)
       if (designImage) {
         pdf.addImage(designImage, "PNG", 20, 50, pageWidth - 40, 300);
         console.log("Added complete design to PDF");
@@ -113,10 +129,30 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
         pdf.addImage(bagImage, "PNG", 20, 50, pageWidth - 40, 250);
         console.log("Added bag blueprint to PDF");
         
-        // Add logo separately if available
-        if (logoImage) {
-          pdf.addImage(logoImage, "PNG", 20, 320, pageWidth - 40, 150);
-          console.log("Added logo to PDF");
+        // Add logos separately if available
+        if (logoImages.length > 0) {
+          // Add logos section header
+          pdf.setFontSize(14);
+          pdf.text("Applied Logos:", 20, 310);
+          
+          // Determine how to layout multiple logos
+          const logoHeight = 100;
+          const logoWidth = 100;
+          const logosPerRow = 3;
+          
+          logoImages.forEach((logoData, index) => {
+            // Calculate position
+            const row = Math.floor(index / logosPerRow);
+            const col = index % logosPerRow;
+            
+            const x = 20 + (col * (logoWidth + 20));
+            const y = 330 + (row * (logoHeight + 10));
+            
+            // Add logo with number label
+            pdf.addImage(logoData.image, "PNG", x, y, logoWidth, logoHeight);
+            pdf.setFontSize(10);
+            pdf.text(`Logo ${index + 1}`, x, y - 5);
+          });
         }
       } 
       else {
@@ -153,13 +189,29 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
       return false;
     }
   };
+  
   const handleLogoUpload = (files: FileList) => {
     if (files && files.length > 0) {
       const file = files[0];
       const reader = new FileReader();
       reader.onload = (e) => {
         if (e.target && typeof e.target.result === "string") {
-          setLogo(e.target.result);
+          const newLogo: Logo = {
+            id: `logo-${Date.now()}`,
+            src: e.target.result,
+            position: { x: 50, y: 50 }, // Default position
+            size: { width: 150, height: 150 } // Default size
+          };
+          
+          // Create a new ref for this logo
+          logoRefs.current.set(newLogo.id, React.createRef<Rnd>());
+          
+          // Add the new logo to the array
+          setLogos(prev => [...prev, newLogo]);
+          // Make it the active logo
+          setActiveLogoId(newLogo.id);
+          setDraggable(true);
+          setIsActive(true);
         }
       };
       reader.readAsDataURL(file);
@@ -167,15 +219,44 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
   };
 
   const handleClear = () => {
-    setLogo(null);
+    // Clear all logos
+    setLogos([]);
+    logoRefs.current = new Map();
+    setActiveLogoId(null);
+    setDraggable(false);
+    setIsActive(false);
+    
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
 
-  const toggleDragMode = () => {
-    setDraggable(!draggable);
-    setIsActive(!isActive);
+  const handleLogoDelete = (logoId: string, e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
+    }
+    
+    // Remove specific logo
+    setLogos(prev => prev.filter(logo => logo.id !== logoId));
+    // Clear the ref
+    logoRefs.current.delete(logoId);
+    
+    // Reset active logo if needed
+    if (activeLogoId === logoId) {
+      setActiveLogoId(null);
+      setDraggable(false);
+      setIsActive(false);
+    }
+  };
+
+  const toggleDragMode = (logoId: string) => {
+    // If it's already active, no need to change anything
+    if (activeLogoId === logoId && draggable) return;
+    
+    // Deactivate any previously active logo
+    setActiveLogoId(logoId);
+    setDraggable(true);
+    setIsActive(true);
   };
 
   const disableDrag = () => {
@@ -183,17 +264,41 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
     setIsActive(false);
   };
   
+  // Update logo position and size when moved or resized
+  const handleLogoMove = (logoId: string, position: {x: number, y: number}, size?: {width: number, height: number}) => {
+    setLogos(prev => prev.map(logo => {
+      if (logo.id === logoId) {
+        return {
+          ...logo,
+          position: position,
+          size: size || logo.size
+        };
+      }
+      return logo;
+    }));
+  };
+  
   // Start editing dimensions
   const startEditingDimensions = () => {
-    // Initialize current edit values with the existing dimensions
     setIsEditingDimensions(true);
   };
     
   // Confirm dimension changes
   const handleDimensionChange = (newDimensions: BagDimensions) => {
     setDimensions(newDimensions);
-    setIsEditingDimensions(false); // Mark editing as complete
+    setIsEditingDimensions(false);
   };
+  
+  // Handle clicking outside any logo (in the bag area)
+  const handleBagClick = (e: React.MouseEvent) => {
+    // Only handle the click if it's directly on the bag container (not on a logo)
+    if (e.currentTarget === e.target) {
+      setActiveLogoId(null);
+      setDraggable(false);
+      setIsActive(false);
+    }
+  };
+  
   return (
     <div className={styles.pageContainer}>
       <Sidebar
@@ -204,49 +309,98 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
         handleDimensionChange={handleDimensionChange}
         startEditingDimensions={startEditingDimensions}
         downloadDesign={generatePDF}
+        logoCount={logos.length}
       />
       
-      <div className={styles.bagContainer} ref={bagContainerRef}>
-      <BagBlueprint 
-        dimensions={dimensions} 
-        isEditing={isEditingDimensions}
-      />
-      
-      {logo && (
-          <Rnd
-            default={{ x: 50, y: 50, width: 150, height: 150 }}
-            bounds="parent"
-            disableDragging={!draggable}
-            enableResizing={{ bottomRight: true, bottomLeft: true, topRight: true, topLeft: true }}
-            onDragStop={disableDrag}
-            onResizeStop={disableDrag}
-            ref={rndRef}
-          >
-            <div
-              style={{ width: "100%", height: "100%", position: "relative" }}
-              onClick={toggleDragMode}
-              className={`${styles.logoOverlay} ${isActive ? styles.active : ""}`}
+      <div 
+        className={styles.bagContainer} 
+        ref={bagContainerRef}
+        onClick={handleBagClick}
+      >
+        <BagBlueprint 
+          dimensions={dimensions} 
+          isEditing={isEditingDimensions}
+        />
+        
+        {/* Render all logos using the original style from your working code */}
+        {logos.map((logo) => {
+          const isLogoActive = logo.id === activeLogoId;
+          return (
+            <Rnd
+              key={logo.id}
+              default={{ 
+                x: logo.position.x, 
+                y: logo.position.y, 
+                width: logo.size.width, 
+                height: logo.size.height 
+              }}
+              position={{ x: logo.position.x, y: logo.position.y }}
+              size={{ width: logo.size.width, height: logo.size.height }}
+              bounds="parent"
+              disableDragging={!(isLogoActive && draggable)}
+              enableResizing={isLogoActive && draggable ? { 
+                bottomRight: true, 
+                bottomLeft: true, 
+                topRight: true, 
+                topLeft: true 
+              } : false}
+              onDragStop={(e, d) => {
+                handleLogoMove(logo.id, {x: d.x, y: d.y});
+                disableDrag();
+              }}
+              onResizeStop={(e, direction, ref, delta, position) => {
+                handleLogoMove(
+                  logo.id, 
+                  position,
+                  { width: parseInt(ref.style.width), height: parseInt(ref.style.height) }
+                );
+                disableDrag();
+              }}
+              ref={logoRefs.current.get(logo.id)}
             >
-              <img
-                src={logo}
-                alt="Uploaded Logo"
-                ref={imageRef}
-                style={{ width: "100%", height: "100%" }}
-              />
-                {isActive && (
-                <div className={styles.customResizeHandle}>
-                  <Image
-                    src={resizeIcon}
-                    alt="Resize Handle"
-                    layout="fill"
-                    objectFit="contain"
-                  />
-                </div>
-              )}
-            </div>
-          </Rnd>
-        )}
-       
+              <div
+                style={{ width: "100%", height: "100%", position: "relative" }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleDragMode(logo.id);
+                }}
+                className={`${styles.logoOverlay} ${isLogoActive && isActive ? styles.active : ""}`}
+              >
+                <img
+                  src={logo.src}
+                  alt={`Logo ${logo.id}`}
+                  style={{ width: "100%", height: "100%" }}
+                />
+                {isLogoActive && isActive && (
+                  <>
+                    <div className={styles.customResizeHandle}>
+                      <Image
+                        src={resizeIcon}
+                        alt="Resize Handle"
+                        layout="fill"
+                        objectFit="contain"
+                      />
+                    </div>
+                    <button 
+                    className={styles.removeLogoButton}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      handleLogoDelete(logo.id, e);
+                      // Optional: Add visual feedback
+                      console.log(`Removed logo: ${logo.id}`);
+                    }}
+                    aria-label="Remove Logo"
+                    title="Remove Logo"
+                  >
+                    &times;
+                  </button>
+                  </>
+                )}
+              </div>
+            </Rnd>
+          );
+        })}
       </div>
     </div>
   );
