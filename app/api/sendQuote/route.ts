@@ -55,7 +55,7 @@ export async function POST(request: Request): Promise<Response> {
         const details = fields.details || "";
 
         // 2. Check for file (PDF):
-        let attachments = [];
+        const attachments = [];
 
         // Handle PDF design file
         if (files.pdf) {
