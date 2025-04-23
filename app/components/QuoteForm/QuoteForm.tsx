@@ -89,35 +89,26 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
+      const inputName = e.target.name;
+      
       if (file && file.type === 'application/pdf') {
         setFormData({
           ...formData,
-          pdf: file,
+          [inputName]: file,
         });
-        setPdfFileName(file.name);
+        
+        if (inputName === 'pdf') {
+          setPdfFileName(file.name);
+        } else if (inputName === 'blueprint') {
+          setBlueprintFileName(file.name);
+        }
       } else {
         alert('Please upload a valid PDF file.');
       }
     }
   };
 
-  const handleBlueprintChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      // Include all acceptable image formats
-      const allowedTypes = ['image/svg+xml', 'image/png', 'image/jpeg', 'image/jpg'];
-      
-      if (allowedTypes.includes(file.type)) {
-        setFormData({
-          ...formData,
-          blueprint: file,
-        });
-        setBlueprintFileName(file.name);
-      } else {
-        alert('Please upload a valid blueprint file (SVG, PNG, or JPEG).');
-      }
-    }
-  };
+ 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -324,8 +315,8 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
             type="file"
             id="blueprint"
             name="blueprint"
-            accept=".svg,.png,.jpg,.jpeg"
-            onChange={handleBlueprintChange}
+            accept="application/pdf"
+            onChange={handleFileChange}
           />
           {blueprintFileName && (
             <p className={styles.fileName}>Selected: {blueprintFileName}</p>

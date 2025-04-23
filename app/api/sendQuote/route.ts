@@ -55,16 +55,31 @@ export async function POST(request: Request): Promise<Response> {
         const details = fields.details || "";
 
         // 2. Check for file (PDF):
-        let attachment = null;
+        let attachments = [];
+
+        // Handle PDF design file
         if (files.pdf) {
           const pdfFile = Array.isArray(files.pdf) ? files.pdf[0] : files.pdf;
           if (pdfFile && pdfFile.filepath) {
             // Read file data
             const fileData = fs.readFileSync(pdfFile.filepath);
-            attachment = {
-              filename: pdfFile.originalFilename || "attachment.pdf",
+            attachments.push({
+              filename: pdfFile.originalFilename || "design.pdf",
               content: fileData,
-            };
+            });
+          }
+        }
+
+        // Handle blueprint file
+        if (files.blueprint) {
+          const blueprintFile = Array.isArray(files.blueprint) ? files.blueprint[0] : files.blueprint;
+          if (blueprintFile && blueprintFile.filepath) {
+            // Read file data
+            const fileData = fs.readFileSync(blueprintFile.filepath);
+            attachments.push({
+              filename: blueprintFile.originalFilename || "blueprint.pdf",
+              content: fileData,
+            });
           }
         }
 
@@ -83,7 +98,7 @@ export async function POST(request: Request): Promise<Response> {
         // 4. Compose mail:
         const mailOptions = {
           from: process.env.SMTP_USER,
-          to: email,
+          to: `${email}, ${process.env.SMTP_USER}`,
           subject: `New Quote Request from ${firstName} ${lastName}`,
           text: `New quote request:
           First Name: ${firstName}
@@ -94,7 +109,7 @@ export async function POST(request: Request): Promise<Response> {
           Handle Type: ${handletype}
           Details: ${details}
           `,
-          attachments: attachment ? [attachment] : [],
+          attachments: attachments,
         };
 
         // 5. Send mail:
