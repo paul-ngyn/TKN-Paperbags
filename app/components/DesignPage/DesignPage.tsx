@@ -321,8 +321,7 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
           dimensions={dimensions} 
           isEditing={isEditingDimensions}
         />
-        
-        {/* Render all logos using the original style from your working code */}
+
         {logos.map((logo) => {
           const isLogoActive = logo.id === activeLogoId;
           return (
