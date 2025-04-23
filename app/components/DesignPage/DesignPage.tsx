@@ -340,9 +340,6 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
               disableDragging={!(isLogoActive && draggable)}
               enableResizing={isLogoActive && draggable ? { 
                 bottomRight: true, 
-                bottomLeft: true, 
-                topRight: true, 
-                topLeft: true 
               } : false}
               onDragStop={(e, d) => {
                 handleLogoMove(logo.id, {x: d.x, y: d.y});
