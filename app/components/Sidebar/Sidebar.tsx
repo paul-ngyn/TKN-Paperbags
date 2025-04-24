@@ -237,7 +237,6 @@ const Sidebar: React.FC<SidebarProps> = ({
     const files = e.target.files;
     if (files?.length) {
       handleLogoUpload(files);
-      setFileName(files[0].name);
     }
   };
 

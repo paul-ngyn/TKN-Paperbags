@@ -54,9 +54,9 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
     console.log("Starting PDF generation from DesignPage...");
     
     try {
-      // Create a new jsPDF instance
+      // Create a new jsPDF instance with landscape orientation
       const pdf = new jsPDF({
-        orientation: "portrait",
+        orientation: "landscape", // Changed to landscape
         unit: "px",
         format: "a4"
       });
@@ -117,36 +117,49 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
       
       // Add a title
       pdf.setFontSize(20);
-      pdf.text("Your Bag Design", pageWidth / 2, 30, { align: "center" });
+      pdf.text("Your Bag Design", pageWidth / 2, 20, { align: "center" });
       
       // Add the design image (which contains both bag and all logos)
       if (designImage) {
-        pdf.addImage(designImage, "PNG", 20, 50, pageWidth - 40, 300);
+        // Make the image take up most of the page
+        // Leave margins of 20px on the sides and reserve space at the bottom for dimensions
+        const imageWidth = pageWidth - 40;
+        const imageHeight = pageHeight - 70; // Leave space for title and dimensions at bottom
+        const imageX = 20;
+        const imageY = 30;
+        
+        pdf.addImage(designImage, "PNG", imageX, imageY, imageWidth, imageHeight);
         console.log("Added complete design to PDF");
       }
       // If we couldn't get the full design but got individual components
       else if (bagImage) {
-        pdf.addImage(bagImage, "PNG", 20, 50, pageWidth - 40, 250);
+        // Make the bag blueprint take up most of the page
+        const imageWidth = pageWidth * 0.65; // 65% of the page width
+        const imageHeight = pageHeight - 70;
+        const imageX = 20;
+        const imageY = 30;
+        
+        pdf.addImage(bagImage, "PNG", imageX, imageY, imageWidth, imageHeight);
         console.log("Added bag blueprint to PDF");
         
         // Add logos separately if available
         if (logoImages.length > 0) {
           // Add logos section header
           pdf.setFontSize(14);
-          pdf.text("Applied Logos:", 20, 310);
+          pdf.text("Applied Logos:", imageWidth + 40, 40);
           
           // Determine how to layout multiple logos
-          const logoHeight = 100;
-          const logoWidth = 100;
-          const logosPerRow = 3;
+          const logoWidth = 80;
+          const logoHeight = 80;
+          const logosPerColumn = Math.floor((pageHeight - 80) / (logoHeight + 20));
           
           logoImages.forEach((logoData, index) => {
-            // Calculate position
-            const row = Math.floor(index / logosPerRow);
-            const col = index % logosPerRow;
+            // Calculate position (vertical layout on right side)
+            const col = Math.floor(index / logosPerColumn);
+            const row = index % logosPerColumn;
             
-            const x = 20 + (col * (logoWidth + 20));
-            const y = 330 + (row * (logoHeight + 10));
+            const x = imageWidth + 40 + (col * (logoWidth + 20));
+            const y = 60 + (row * (logoHeight + 20));
             
             // Add logo with number label
             pdf.addImage(logoData.image, "PNG", x, y, logoWidth, logoHeight);
@@ -157,25 +170,29 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
       } 
       else {
         pdf.setFontSize(12);
-        pdf.text("(Could not capture bag design)", pageWidth / 2, 150, { align: "center" });
+        pdf.text("(Could not capture bag design)", pageWidth / 2, pageHeight / 2, { align: "center" });
         console.log("No design elements captured");
       }
       
-      // Add dimensions information
+      // Add dimensions information at the bottom
       const lengthInches = (dimensions.length / 25.4).toFixed(2);
       const widthInches = (dimensions.width / 25.4).toFixed(2);
       const heightInches = (dimensions.height / 25.4).toFixed(2);
       
-      pdf.setFontSize(12);
-      pdf.text("Bag Dimensions:", 20, 380);
-      pdf.text(`Length: ${lengthInches} inches`, 30, 400);
-      pdf.text(`Width: ${widthInches} inches`, 30, 420);
-      pdf.text(`Height: ${heightInches} inches`, 30, 440);
+      // Create a compact dimensions section at the bottom
+      pdf.setFillColor(245, 245, 245);
+      pdf.rect(20, pageHeight - 30, pageWidth - 40, 20, 'F');
       
-      // Add a footer
-      const today = new Date().toLocaleDateString();
       pdf.setFontSize(10);
-      pdf.text(`Generated on ${today} - MTC Bags`, pageWidth / 2, pageHeight - 10, { align: "center" });
+      pdf.setTextColor(0, 0, 0);
+      const dimensionsText = `Bag Dimensions: Length: ${lengthInches}" × Width: ${widthInches}" × Height: ${heightInches}"`;
+      pdf.text(dimensionsText, pageWidth / 2, pageHeight - 18, { align: "center" });
+      
+      // Add a footer with date
+      const today = new Date().toLocaleDateString();
+      pdf.setFontSize(8);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text(`Generated on ${today} - MTC Bags`, pageWidth - 20, pageHeight - 5, { align: "right" });
       
       // Save the PDF
       console.log("Saving PDF...");
@@ -215,6 +232,11 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
         }
       };
       reader.readAsDataURL(file);
+      
+      // Reset file input to allow selecting the same file again
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   };
 
@@ -246,6 +268,40 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
       setActiveLogoId(null);
       setDraggable(false);
       setIsActive(false);
+    }
+  };
+
+  // Add new duplicate logo function
+  const handleDuplicateLogo = (logoId: string, e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
+    }
+    
+    // Find the logo to duplicate
+    const logoToDuplicate = logos.find(logo => logo.id === logoId);
+    
+    if (logoToDuplicate) {
+      // Create a new logo with the same image but slightly offset position
+      const newLogo: Logo = {
+        id: `logo-${Date.now()}`, // New unique ID
+        src: logoToDuplicate.src,
+        position: { 
+          x: logoToDuplicate.position.x + 20, 
+          y: logoToDuplicate.position.y + 20 
+        },
+        size: { ...logoToDuplicate.size }
+      };
+      
+      // Create a new ref for the duplicated logo
+      logoRefs.current.set(newLogo.id, React.createRef<Rnd>());
+      
+      // Add the new logo to the array
+      setLogos(prev => [...prev, newLogo]);
+      
+      // Make it the active logo
+      setActiveLogoId(newLogo.id);
+      setDraggable(true);
+      setIsActive(true);
     }
   };
 
@@ -377,20 +433,24 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
                         objectFit="contain"
                       />
                     </div>
-                    <button 
-                    className={styles.removeLogoButton}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      e.preventDefault();
-                      handleLogoDelete(logo.id, e);
-                      // Optional: Add visual feedback
-                      console.log(`Removed logo: ${logo.id}`);
-                    }}
-                    aria-label="Remove Logo"
-                    title="Remove Logo"
-                  >
-                    &times;
-                  </button>
+                    <div className={styles.logoControlButtons}>
+                      <button 
+                        className={styles.duplicateLogoButton}
+                        onClick={(e) => handleDuplicateLogo(logo.id, e)}
+                        aria-label="Duplicate Logo"
+                        title="Duplicate Logo"
+                      >
+                        <span role="img" aria-label="duplicate">📋</span>
+                      </button>
+                      <button 
+                        className={styles.removeLogoButton}
+                        onClick={(e) => handleLogoDelete(logo.id, e)}
+                        aria-label="Remove Logo"
+                        title="Remove Logo"
+                      >
+                        &times;
+                      </button>
+                    </div>
                   </>
                 )}
               </div>
