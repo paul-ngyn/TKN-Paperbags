@@ -185,7 +185,7 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
       
       pdf.setFontSize(10);
       pdf.setTextColor(0, 0, 0);
-      const dimensionsText = `Bag Dimensions: Length: ${lengthInches}" × Width: ${widthInches}" × Height: ${heightInches}"`;
+      const dimensionsText = `Bag Dimensions: Length: ${lengthInches}" x Width: ${widthInches}" x Height: ${heightInches}"`;
       pdf.text(dimensionsText, pageWidth / 2, pageHeight - 18, { align: "center" });
       
       // Add a footer with date
