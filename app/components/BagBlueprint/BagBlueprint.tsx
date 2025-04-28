@@ -106,14 +106,14 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
 
   const viewBox = useMemo(() => {
     // Calculate the content width including margin and height arrow
-    const contentWidth = 50 + totalWidth + 100; // Left margin + blueprint width + space for height arrow
+    const contentWidth = 80 + totalWidth + 30; // Left margin + blueprint width + space for height arrow
     
     // Calculate the content height including measurements
-    const contentHeight = measurementTextY + 60; // Include text and bottom padding
+    const contentHeight = measurementTextY + 100; // Include text and bottom padding
     
     // Add generous buffer around the content
-    const bufferX = Math.max(200, contentWidth * 0.1); // At least 200px or 10% of content
-    const bufferY = Math.max(150, contentHeight * 0.1); // At least 150px or 10% of content
+    const bufferX = Math.max(90, contentWidth * 0.05); // At least 200px or 10% of content
+    const bufferY = Math.max(120, contentHeight * 0.05); // At least 150px or 10% of content
     
     // Calculate total required dimensions
     const requiredWidth = contentWidth + bufferX;
