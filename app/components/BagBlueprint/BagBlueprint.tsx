@@ -75,7 +75,6 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
   // This ensures it's exactly half the width plus 20mm
   const tabLengthMm = (activeDimensions.width / 2) + 20;
   
-  
   // Calculate tabside height precisely as totalHeight - tabLength
   // Don't round here to preserve exact measurements
   const tabsideHeight = activeDimensions.height - tabLengthMm;
@@ -105,27 +104,6 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
     // Otherwise, use standard formatting
     return mmToInches(mm);
   };
-  
-
-  console.log("Dimensions:", dimensions);
-  console.log("Active dimensions:", activeDimensions);
-  console.log("Width in inches:", activeDimensions.width / 25.4);
-  console.log("Length in inches:", activeDimensions.length / 25.4);
-  console.log("Height in inches:", activeDimensions.height / 25.4);
-  console.log("Tab length (mm):", tabLengthMm);
-  console.log("Tab length (formatted):", mmToInches(tabLengthMm));
-  console.log("Total height (mm):", activeDimensions.height);
-  console.log("Tabside height (mm):", tabsideHeight);
-  console.log("Tabside + Tab length (mm):", tabsideHeight + tabLengthMm, "should equal", activeDimensions.height);
-  console.log("Calculated total length (mm):", calculatedTotalLength);
-  console.log("Calculated total length (inches):", calculatedTotalLength / 25.4);
-  console.log("Total length display:", formatTotalLength(calculatedTotalLength));
-
-  // Check if we're using default dimensions
-  const isUsingDefaults = 
-    Math.abs(activeDimensions.width - 155) < 0.1 && 
-    Math.abs(activeDimensions.length - 310) < 0.1;
-  console.log("Using default dimensions:", isUsingDefaults);
 
   const viewBox = useMemo(() => {
     // Calculate the content width including margin and height arrow
@@ -159,9 +137,19 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox={`${viewBox.minX} ${viewBox.minY} ${viewBox.width} ${viewBox.height}`}
-      className={styles.bagBlueprint}
+      className="bagBlueprint"
       preserveAspectRatio="xMidYMid meet"
+      version="1.1"
     >
+      {/* SVG Metadata for better PDF structure */}
+      <metadata>
+        {JSON.stringify({
+          title: "Bag Blueprint",
+          description: `Bag with dimensions: L=${mmToInches(activeDimensions.length)}in × W=${mmToInches(activeDimensions.width)}in × H=${mmToInches(activeDimensions.height)}in`,
+          creator: "MTC Bags Design Tool"
+        })}
+      </metadata>
+    
       {/* Show indication when editing */}
       {isEditing && (
         <text
@@ -175,156 +163,408 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
         </text>
       )}
       
-      {/* Base Rectangle */}
-      <rect x="50" y="50" width={totalWidth} height={totalHeight} fill="#f5f5f5" stroke="#000" strokeWidth="2" />
+      {/* Base Rectangle - now just serves as a background 
+      <rect 
+        x="50" 
+        y="50" 
+        width={totalWidth + 10} 
+        height={totalHeight} 
+        fill="#f5f5f5" 
+        stroke="#000" 
+        strokeWidth="2" 
+        id="bag-outline"
+        data-name="Bag Outline"
+      /> 
 
-      {/* four section Vertical Lines */}
-      <line x1={section1Start} y1="50" x2={section1Start} y2={50 + totalHeight} stroke="#000" strokeWidth="1" />
-      <line x1={section1End} y1="50" x2={section1End} y2={50 + totalHeight} stroke="#000" strokeWidth="1" />
-      <line x1={section2End} y1="50" x2={section2End} y2={50 + totalHeight} stroke="#000" strokeWidth="1" />
-      <line x1={section3End} y1="50" x2={section3End} y2={50 + totalHeight} stroke="#000" strokeWidth="1" />
+      {/* RECTANGLE 1: Left Small Section (40mm padding) */}
+        <g id="left-padding-upper" data-name="Left Padding Upper">
+        <rect
+          x="50"
+          y="50"
+          width="50"
+          height={tabsideHeight}
+          fill="none"
+          stroke="#000"
+          strokeWidth="1"
+          data-section="padding-left-upper"
+        />
+        <text
+          x="75"
+          y={50 + tabsideHeight / 2}
+          textAnchor="middle"
+          fontSize="12"
+          fill="#666"
+        >
+        </text>
+      </g>
 
-      {/* Horizontal Line */}
-      <line x1="50" y1={50 + tabsideHeight} x2={50 + totalWidth} y2={50 + tabsideHeight} stroke="#000" strokeWidth="1" />
+      {/* Left Padding Lower Section */}
+      <g id="left-padding-lower" data-name="Left Padding Lower">
+        <rect
+          x="50"
+          y={50 + tabsideHeight}
+          width="50"
+          height={tabLength}
+          fill="none"
+          stroke="#000"
+          strokeWidth="1"
+          data-section="padding-left-lower"
+        />
+      </g>
+
+      {/* Horizontal line at the tab intersection on left side */}
+      <line
+        x1="50"
+        y1={50 + tabsideHeight}
+        x2="100"
+        y2={50 + tabsideHeight}
+        stroke="#000"
+        strokeWidth="1"
+      />
+
+      {/* RECTANGLE 2: Section 1 (First Width) */}
+      <g id="section1-panel" data-name="Width Panel 1">
+        <rect
+          x={section1Start}
+          y="50"
+          width={section1Width}
+          height={tabsideHeight}
+          fill="none"
+          stroke="#000"
+          strokeWidth="1"
+          data-section="side1"
+        />
+        <text
+          x={section1Start + section1Width / 2}
+          y={50 + tabsideHeight / 2}
+          textAnchor="middle"
+          fontSize="14"
+          fill="#666"
+        >
+          Side 1
+        </text>
+      </g>
+
+      {/* RECTANGLE 3: Section 2 (First Length) */}
+      <g id="section2-panel" data-name="Length Panel 1">
+        <rect
+          x={section1End}
+          y="50"
+          width={section2Width}
+          height={tabsideHeight}
+          fill="none"
+          stroke="#000"
+          strokeWidth="1"
+          data-section="front1"
+        />
+        <text
+          x={section1End + section2Width / 2}
+          y={50 + tabsideHeight / 2}
+          textAnchor="middle"
+          fontSize="14"
+          fill="#666"
+        >
+          Front 1
+        </text>
+      </g>
+
+      {/* RECTANGLE 4: Section 3 (Second Width) */}
+      <g id="section3-panel" data-name="Width Panel 2">
+        <rect
+          x={section2End}
+          y="50"
+          width={section3Width}
+          height={tabsideHeight}
+          fill="none"
+          stroke="#000"
+          strokeWidth="1"
+          data-section="side2"
+        />
+        <text
+          x={section2End + section3Width / 2}
+          y={50 + tabsideHeight / 2}
+          textAnchor="middle"
+          fontSize="14"
+          fill="#666"
+        >
+          Side 2
+        </text>
+      </g>
+
+      {/* RECTANGLE 5: Section 4 (Second Length) */}
+      <g id="section4-panel" data-name="Length Panel 2">
+        <rect
+          x={section3End}
+          y="50"
+          width={section4Width}
+          height={tabsideHeight}
+          fill="none"
+          stroke="#000"
+          strokeWidth="1"
+          data-section="front2"
+        />
+        <text
+          x={section3End + section4Width / 2}
+          y={50 + tabsideHeight / 2}
+          textAnchor="middle"
+          fontSize="14"
+          fill="#666"
+        >
+          Front 2
+        </text>
+      </g>
+
+      {/* RECTANGLE 6: Tab 1 (Left Width) */}
+      <g id="tab1-panel" data-name="Tab 1">
+        <rect
+          x={section1Start}
+          y={50 + tabsideHeight}
+          width={section1Width}
+          height={tabLength}
+          fill="none"
+          stroke="#000"
+          strokeWidth="1"
+          data-section="tab1"
+        />
+        <text
+          x={section1Start + section1Width / 2}
+          y={50 + tabsideHeight + tabLength / 2}
+          textAnchor="middle"
+          fontSize="14"
+          fill="#666"
+        >
+          Tab 1
+        </text>
+      </g>
+
+      {/* RECTANGLE 7: Tab 2 (Right Width) */}
+      <g id="tab2-panel" data-name="Tab 2">
+        <rect
+          x={section2End}
+          y={50 + tabsideHeight}
+          width={section3Width}
+          height={tabLength}
+          fill="none"
+          stroke="#000"
+          strokeWidth="1"
+          data-section="tab2"
+        />
+        <text
+          x={section2End + section3Width / 2}
+          y={50 + tabsideHeight + tabLength / 2}
+          textAnchor="middle"
+          fontSize="14"
+          fill="#666"
+        >
+          Tab 2
+        </text>
+      </g>
+      {/* NEW RECTANGLE: Section under Front 1 */}
+<g id="front1-bottom-panel" data-name="Front 1 Bottom">
+  <rect
+    x={section1End}
+    y={50 + tabsideHeight}
+    width={section2Width}
+    height={tabLength}
+    fill="none"
+    stroke="#000"
+    strokeWidth="1"
+    data-section="front1-bottom"
+  />
+  <text
+    x={section1End + section2Width / 2}
+    y={50 + tabsideHeight + tabLength / 2}
+    textAnchor="middle"
+    fontSize="14"
+    fill="#666"
+  >
+    Base 1
+  </text>
+</g>
+
+{/* NEW RECTANGLE: Section under Front 2 */}
+<g id="front2-bottom-panel" data-name="Front 2 Bottom">
+  <rect
+    x={section3End}
+    y={50 + tabsideHeight}
+    width={section4Width}
+    height={tabLength}
+    fill="none"
+    stroke="#000"
+    strokeWidth="1"
+    data-section="front2-bottom"
+  />
+  <text
+    x={section3End + section4Width / 2}
+    y={50 + tabsideHeight + tabLength / 2}
+    textAnchor="middle"
+    fontSize="14"
+    fill="#666"
+  >
+    Base 2
+  </text>
+</g>
+
 
       {/* Measurements */}
       {/* 1. Total Width (Top) */}
-      <text
-        x={50 + totalWidth / 2}
-        y="15"
-        textAnchor="middle"
-        fontSize="22"
-        fill="#000"
-      >
-         {formatTotalLength(calculatedTotalLength)} in
-      </text>
-      {/* Arrow for Total Width */}
-      <line x1="60" y1="30" x2={50 + totalWidth - 10} y2="30" stroke="#000" strokeWidth="1" />
-      <polygon points={`${50 + totalWidth - 10},25 ${50 + totalWidth - 10},35 ${50 + totalWidth + 10},30`} fill="#000" />
-      <polygon points="60,25 60,35 45,30" fill="#000" />
+      <g id="total-width-measurement">
+        <text
+          x={50 + totalWidth / 2}
+          y="15"
+          textAnchor="middle"
+          fontSize="22"
+          fill="#000"
+        >
+          {formatTotalLength(calculatedTotalLength)} in
+        </text>
+        {/* Arrow for Total Width */}
+        <line x1="60" y1="30" x2={50 + totalWidth - 10} y2="30" stroke="#000" strokeWidth="1" />
+        <polygon points={`${50 + totalWidth - 10},25 ${50 + totalWidth - 10},35 ${50 + totalWidth + 10},30`} fill="#000" />
+        <polygon points="60,25 60,35 45,30" fill="#000" />
+      </g>
 
       {/* 2. Total Height (right) - FIXED at 30px right of the rectangle */}
-      <text
-        x={heightArrowX + 20}
-        y={50 + totalHeight / 2}
-        textAnchor="middle"
-        fontSize="20"
-        fill="#000"
-        transform={`rotate(-270, ${heightArrowX + 20}, ${50 + totalHeight / 2})`}
-      >
-        {mmToInches(activeDimensions.height)} in
-      </text>
-      {/* Arrow for Total Height - positioned relative to the right edge of rectangle */}
-      <line x1={heightArrowX} y1="50" x2={heightArrowX} y2={50 + totalHeight} stroke="#000" strokeWidth="1" />
-      <polygon points={`${heightArrowX - 5},65 ${heightArrowX + 5},65 ${heightArrowX},50`} fill="#000" />
-      <polygon points={`${heightArrowX - 5},${50 + totalHeight - 15} ${heightArrowX + 5},${50 + totalHeight - 15} ${heightArrowX},${50 + totalHeight}`} fill="#000" />
+      <g id="total-height-measurement">
+        <text
+          x={heightArrowX + 20}
+          y={50 + totalHeight / 2}
+          textAnchor="middle"
+          fontSize="20"
+          fill="#000"
+          transform={`rotate(-270, ${heightArrowX + 20}, ${50 + totalHeight / 2})`}
+        >
+          {mmToInches(activeDimensions.height)} in
+        </text>
+        {/* Arrow for Total Height - positioned relative to the right edge of rectangle */}
+        <line x1={heightArrowX} y1="50" x2={heightArrowX} y2={50 + totalHeight} stroke="#000" strokeWidth="1" />
+        <polygon points={`${heightArrowX - 5},65 ${heightArrowX + 5},65 ${heightArrowX},50`} fill="#000" />
+        <polygon points={`${heightArrowX - 5},${50 + totalHeight - 15} ${heightArrowX + 5},${50 + totalHeight - 15} ${heightArrowX},${50 + totalHeight}`} fill="#000" />
+      </g>
 
       {/* 3. Tabside Height (left) - Now calculated as totalHeight - tabLength */}
-      <text
-        x="20"
-        y={40 + tabsideHeight / 2}
-        textAnchor="middle"
-        fontSize="20"
-        fill="#000"
-        transform={`rotate(-90, 30, ${50 + tabsideHeight / 2})`}
-      >
-        {formatTabsideHeight(tabsideHeight)} in
-      </text>
-      {/* Arrow for Tabside Height */}
-      <line x1="35" y1="70" x2="35" y2={40 + tabsideHeight} stroke="#000" strokeWidth="1" />
-      <polygon points="30,70 40,70 35,55" fill="#000" />
-      <polygon points={`30,${37 + tabsideHeight} 40,${37 + tabsideHeight} 35,${37 + tabsideHeight + 15}`} fill="#000" />
+      <g id="tabside-height-measurement">
+        <text
+          x="20"
+          y={40 + tabsideHeight / 2}
+          textAnchor="middle"
+          fontSize="20"
+          fill="#000"
+          transform={`rotate(-90, 30, ${50 + tabsideHeight / 2})`}
+        >
+          {formatTabsideHeight(tabsideHeight)} in
+        </text>
+        {/* Arrow for Tabside Height */}
+        <line x1="35" y1="70" x2="35" y2={40 + tabsideHeight} stroke="#000" strokeWidth="1" />
+        <polygon points="30,70 40,70 35,55" fill="#000" />
+        <polygon points={`30,${37 + tabsideHeight} 40,${37 + tabsideHeight} 35,${37 + tabsideHeight + 15}`} fill="#000" />
+      </g>
 
       {/* 4. Tab Length - now calculated as 1/2 section1Width + 20mm */}
-      <text
-        x="20"
-        y={50 + tabsideHeight + tabLength / 2}
-        textAnchor="middle"
-        fontSize="18"
-        fill="#000"
-        transform={`rotate(-90, 20, ${50 + tabsideHeight + tabLength / 2})`}
-      >
-        {mmToInches(tabLengthMm)} in
-      </text>
-      {/* Arrow for Tab Length */}
-      <line x1="35" y1={50 + tabsideHeight + 10} x2="35" y2={40 + tabsideHeight + tabLength} stroke="#000" strokeWidth="1" />
-      <polygon points={`30,${45 + tabsideHeight + 20} 40,${45 + tabsideHeight + 20} 35,${45 + tabsideHeight + 5}`} fill="#000" />
-      <polygon points={`30,${37 + tabsideHeight + tabLength} 40,${37 + tabsideHeight + tabLength} 35,${37 + tabsideHeight + tabLength + 15}`} fill="#000" />
+      <g id="tab-length-measurement">
+        <text
+          x="20"
+          y={50 + tabsideHeight + tabLength / 2}
+          textAnchor="middle"
+          fontSize="18"
+          fill="#000"
+          transform={`rotate(-90, 20, ${50 + tabsideHeight + tabLength / 2})`}
+        >
+          {mmToInches(tabLengthMm)} in
+        </text>
+        {/* Arrow for Tab Length */}
+        <line x1="35" y1={50 + tabsideHeight + 10} x2="35" y2={40 + tabsideHeight + tabLength} stroke="#000" strokeWidth="1" />
+        <polygon points={`30,${45 + tabsideHeight + 20} 40,${45 + tabsideHeight + 20} 35,${45 + tabsideHeight + 5}`} fill="#000" />
+        <polygon points={`30,${37 + tabsideHeight + tabLength} 40,${37 + tabsideHeight + tabLength} 35,${37 + tabsideHeight + tabLength + 15}`} fill="#000" />
+      </g>
 
-      {/* Small 40mm Arrow - Fixed at 1.57 inches */}
-      <text
-        x="75"
-        y={measurementTextY}
-        textAnchor="middle"
-        fontSize="16"
-        fill="#000"
-      >
-        1.57 in
-      </text>
-      {/* Arrow for 40mm measurement - fixed */}
-      <line x1="55" y1={measurementLineY} x2="95" y2={measurementLineY} stroke="#000" strokeWidth="1" />
-      <polygon points={`90,${measurementLineY-5} 90,${measurementLineY+5} 105,${measurementLineY}`} fill="#000" />
-      <polygon points={`60,${measurementLineY-5} 60,${measurementLineY+5} 45,${measurementLineY}`} fill="#000" />
+      {/* Bottom Measurements */}
+      <g id="bottom-measurements">
+        {/* Small 40mm Arrow - Fixed at 1.57 inches */}
+        <g id="padding-measurement">
+          <text
+            x="75"
+            y={measurementTextY}
+            textAnchor="middle"
+            fontSize="16"
+            fill="#000"
+          >
+            1.57 in
+          </text>
+          {/* Arrow for 40mm measurement - fixed */}
+          <line x1="55" y1={measurementLineY} x2="95" y2={measurementLineY} stroke="#000" strokeWidth="1" />
+          <polygon points={`90,${measurementLineY-5} 90,${measurementLineY+5} 105,${measurementLineY}`} fill="#000" />
+          <polygon points={`60,${measurementLineY-5} 60,${measurementLineY+5} 45,${measurementLineY}`} fill="#000" />
+        </g>
 
-      {/* 5. Section 1 Width - Shows actual width value */}
-      <text
-        x={section1Start + section1Width / 2}
-        y={measurementTextY}
-        textAnchor="middle"
-        fontSize="18"
-        fill="#000"
-      >
-        {mmToInches(activeDimensions.width)} in
-      </text>
-      {/* Arrow for Section 1 */}
-      <line x1={section1Start} y1={measurementLineY} x2={section1End} y2={measurementLineY} stroke="#000" strokeWidth="1" />
-      <polygon points={`${section1End-10},${measurementLineY-5} ${section1End-10},${measurementLineY+5} ${section1End+5},${measurementLineY}`} fill="#000" />
-      <polygon points={`${section1Start+10},${measurementLineY-5} ${section1Start+10},${measurementLineY+5} ${section1Start-5},${measurementLineY}`} fill="#000" />
+        {/* 5. Section 1 Width - Shows actual width value */}
+        <g id="section1-width-measurement">
+          <text
+            x={section1Start + section1Width / 2}
+            y={measurementTextY}
+            textAnchor="middle"
+            fontSize="18"
+            fill="#000"
+          >
+            {mmToInches(activeDimensions.width)} in
+          </text>
+          {/* Arrow for Section 1 */}
+          <line x1={section1Start} y1={measurementLineY} x2={section1End} y2={measurementLineY} stroke="#000" strokeWidth="1" />
+          <polygon points={`${section1End-10},${measurementLineY-5} ${section1End-10},${measurementLineY+5} ${section1End+5},${measurementLineY}`} fill="#000" />
+          <polygon points={`${section1Start+10},${measurementLineY-5} ${section1Start+10},${measurementLineY+5} ${section1Start-5},${measurementLineY}`} fill="#000" />
+        </g>
 
-      {/* 6. Section 2 Width - Shows actual length value */}
-      <text
-        x={section1End + section2Width / 2}
-        y={measurementTextY}
-        textAnchor="middle"
-        fontSize="20"
-        fill="#000"
-      >
-        {mmToInches(activeDimensions.length)} in
-      </text>
-      {/* Arrow for Section 2 */}
-      <line x1={section1End} y1={measurementLineY} x2={section2End} y2={measurementLineY} stroke="#000" strokeWidth="1" />
-      <polygon points={`${section2End-10},${measurementLineY-5} ${section2End-10},${measurementLineY+5} ${section2End+5},${measurementLineY}`} fill="#000" />
-      <polygon points={`${section1End+10},${measurementLineY-5} ${section1End+10},${measurementLineY+5} ${section1End-5},${measurementLineY}`} fill="#000" />
+        {/* 6. Section 2 Width - Shows actual length value */}
+        <g id="section2-width-measurement">
+          <text
+            x={section1End + section2Width / 2}
+            y={measurementTextY}
+            textAnchor="middle"
+            fontSize="20"
+            fill="#000"
+          >
+            {mmToInches(activeDimensions.length)} in
+          </text>
+          {/* Arrow for Section 2 */}
+          <line x1={section1End} y1={measurementLineY} x2={section2End} y2={measurementLineY} stroke="#000" strokeWidth="1" />
+          <polygon points={`${section2End-10},${measurementLineY-5} ${section2End-10},${measurementLineY+5} ${section2End+5},${measurementLineY}`} fill="#000" />
+          <polygon points={`${section1End+10},${measurementLineY-5} ${section1End+10},${measurementLineY+5} ${section1End-5},${measurementLineY}`} fill="#000" />
+        </g>
 
-      {/* 7. Section 3 Width - Shows actual width value */}
-      <text
-        x={section2End + section3Width / 2}
-        y={measurementTextY}
-        textAnchor="middle"
-        fontSize="18"
-        fill="#000"
-      >
-        {mmToInches(activeDimensions.width)} in
-      </text>
-      {/* Arrow for Section 3 */}
-      <line x1={section2End} y1={measurementLineY} x2={section3End} y2={measurementLineY} stroke="#000" strokeWidth="1" />
-      <polygon points={`${section3End-10},${measurementLineY-5} ${section3End-10},${measurementLineY+5} ${section3End+5},${measurementLineY}`} fill="#000" />
-      <polygon points={`${section2End+10},${measurementLineY-5} ${section2End+10},${measurementLineY+5} ${section2End-5},${measurementLineY}`} fill="#000" />
+        {/* 7. Section 3 Width - Shows actual width value */}
+        <g id="section3-width-measurement">
+          <text
+            x={section2End + section3Width / 2}
+            y={measurementTextY}
+            textAnchor="middle"
+            fontSize="18"
+            fill="#000"
+          >
+            {mmToInches(activeDimensions.width)} in
+          </text>
+          {/* Arrow for Section 3 */}
+          <line x1={section2End} y1={measurementLineY} x2={section3End} y2={measurementLineY} stroke="#000" strokeWidth="1" />
+          <polygon points={`${section3End-10},${measurementLineY-5} ${section3End-10},${measurementLineY+5} ${section3End+5},${measurementLineY}`} fill="#000" />
+          <polygon points={`${section2End+10},${measurementLineY-5} ${section2End+10},${measurementLineY+5} ${section2End-5},${measurementLineY}`} fill="#000" />
+        </g>
 
-      {/* 8. Section 4 Width - Shows actual length value */}
-      <text
-        x={section3End + section4Width / 2}
-        y={measurementTextY}
-        textAnchor="middle"
-        fontSize="20"
-        fill="#000"
-      >
-        {mmToInches(activeDimensions.length)} in
-      </text>
-      {/* Arrow for Section 4 */}
-      <line x1={section3End} y1={measurementLineY} x2={50 + totalWidth} y2={measurementLineY} stroke="#000" strokeWidth="1" />
-      <polygon points={`${50 + totalWidth-15},${measurementLineY-5} ${50 + totalWidth-15},${measurementLineY+5} ${50 + totalWidth},${measurementLineY}`} fill="#000" />
-      <polygon points={`${section3End+10},${measurementLineY-5} ${section3End+10},${measurementLineY+5} ${section3End-5},${measurementLineY}`} fill="#000" />
+        {/* 8. Section 4 Width - Shows actual length value */}
+        <g id="section4-width-measurement">
+          <text
+            x={section3End + section4Width / 2}
+            y={measurementTextY}
+            textAnchor="middle"
+            fontSize="20"
+            fill="#000"
+          >
+            {mmToInches(activeDimensions.length)} in
+          </text>
+          {/* Arrow for Section 4 */}
+          <line x1={section3End} y1={measurementLineY} x2={50 + totalWidth} y2={measurementLineY} stroke="#000" strokeWidth="1" />
+          <polygon points={`${50 + totalWidth-15},${measurementLineY-5} ${50 + totalWidth-15},${measurementLineY+5} ${50 + totalWidth},${measurementLineY}`} fill="#000" />
+          <polygon points={`${section3End+10},${measurementLineY-5} ${section3End+10},${measurementLineY+5} ${section3End-5},${measurementLineY}`} fill="#000" />
+        </g>
+      </g>
     </svg>
   );
 };
