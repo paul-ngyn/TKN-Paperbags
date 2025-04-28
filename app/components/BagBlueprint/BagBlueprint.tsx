@@ -212,7 +212,6 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
       </g>
 
 
-
       {/* RECTANGLE 2: Section 1 (First Width) */}
       <g id="section1-panel" data-name="Width Panel 1">
         <rect
