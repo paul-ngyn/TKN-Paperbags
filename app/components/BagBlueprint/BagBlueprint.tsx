@@ -1,6 +1,5 @@
 "use client";
 import React, { useMemo } from "react";
-import styles from "./BagBlueprint.module.css";
 
 interface BagBlueprintProps {
   dimensions?: {
