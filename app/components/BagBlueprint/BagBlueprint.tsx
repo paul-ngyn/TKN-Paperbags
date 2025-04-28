@@ -211,15 +211,7 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
         />
       </g>
 
-      {/* Horizontal line at the tab intersection on left side */}
-      <line
-        x1="50"
-        y1={50 + tabsideHeight}
-        x2="100"
-        y2={50 + tabsideHeight}
-        stroke="#000"
-        strokeWidth="1"
-      />
+
 
       {/* RECTANGLE 2: Section 1 (First Width) */}
       <g id="section1-panel" data-name="Width Panel 1">
