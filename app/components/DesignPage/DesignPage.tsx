@@ -7,7 +7,7 @@ import styles from "./DesignPage.module.css";
 import resizeIcon from "../../public/resize.png";
 import Image from "next/image";
 import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+import {svg2pdf} from "svg2pdf.js";
 
 interface DesignPageProps {
   handleNavigation: (page: string) => void;
@@ -50,162 +50,160 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
   const [isEditingDimensions, setIsEditingDimensions] = useState(false);
   
   // Generate PDF function
-  const generatePDF = async () => {
-    console.log("Starting PDF generation from DesignPage...");
+  // Update the generatePDF function to preserve logo positions
+
+const generatePDF = async () => {
+  console.log("Starting PDF generation with preserved logo positioning...");
+  
+  try {
+    // Create a new jsPDF instance
+    const pdf = new jsPDF({
+      orientation: "landscape",
+      unit: "px",
+      format: "a4",
+      compress: false // Important for keeping vector quality
+    });
     
-    try {
-      // Create a new jsPDF instance with landscape orientation
-      const pdf = new jsPDF({
-        orientation: "landscape", // Changed to landscape
-        unit: "px",
-        format: "a4"
+    // Calculate page dimensions
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    
+    // Add a title
+    pdf.setFontSize(20);
+    pdf.text("Your Bag Design", pageWidth / 2, 20, { align: "center" });
+    
+    // Get the bag blueprint SVG
+    const bagBlueprintElement = document.querySelector(".bagBlueprint") || 
+                               document.querySelector("svg");
+    
+    if (bagBlueprintElement instanceof SVGElement) {
+      // Clone the SVG to avoid modifications to the original
+      const svgClone = bagBlueprintElement.cloneNode(true) as SVGElement;
+      
+      // Get the dimensions of the container and SVG for calculations
+      const bagContainerRect = bagContainerRef.current?.getBoundingClientRect() || 
+                              { width: 0, height: 0, left: 0, top: 0 };
+      const svgRect = bagBlueprintElement.getBoundingClientRect();
+      const svgAspect = svgRect.width / svgRect.height;
+      
+      // Calculate dimensions that fit on page
+      let svgWidth = pageWidth * 0.9; // 90% of page width
+      let svgHeight = svgWidth / svgAspect;
+      
+      if (svgHeight > pageHeight * 0.75) { // If too tall
+        svgHeight = pageHeight * 0.75;
+        svgWidth = svgHeight * svgAspect;
+      }
+      
+      // Calculate the positioning and scaling for the PDF
+      const xPos = (pageWidth - svgWidth) / 2; // Center horizontally
+      const yPos = 50; // Position below title
+      
+      // Scale factor to map container coordinates to PDF coordinates
+      const scaleX = svgWidth / bagContainerRect.width;
+      const scaleY = svgHeight / bagContainerRect.height;
+      
+      // Add SVG as vector (this is the key part)
+      await svg2pdf(svgClone, pdf, {
+        x: xPos,
+        y: yPos,
+        width: svgWidth,
+        height: svgHeight
       });
       
-      // Function to safely convert an element to image
-      const elementToImage = async (element: Element | null, fallbackText: string) => {
-        if (!element) {
-          console.warn(`${fallbackText} element not found`);
-          return null;
-        }
-        
-        try {
-          // Use a higher scale for better quality
-          const canvas = await html2canvas(element as HTMLElement, {
-            scale: 2,
-            logging: false,
-            useCORS: true,
-            allowTaint: true,
-            backgroundColor: null
-          });
-          return canvas.toDataURL('image/png');
-        } catch (err) {
-          console.error(`Failed to capture ${fallbackText}:`, err);
-          return null;
-        }
-      };
+      console.log("Added bag blueprint as vector SVG");
       
-      // First capture the entire design area
-      console.log("Capturing design area...");
-      const designArea = bagContainerRef.current;
-      const designImage = await elementToImage(designArea, "Design area");
-      
-      // Try to capture the bag blueprint specifically
-      console.log("Attempting to capture bag blueprint...");
-      const bagBlueprintElement = document.querySelector(".bagBlueprint") || 
-                                 document.querySelector("svg");
-      const bagImage = bagBlueprintElement ? 
-        await elementToImage(bagBlueprintElement, "Bag blueprint") : null;
-      
-      // Capture each logo individually
-      const logoImages = [];
-      
-      for (const logo of logos) {
-        const logoRef = logoRefs.current.get(logo.id);
-        if (logoRef && logoRef.current) {
-          const logoElement = logoRef.current.resizableElement.current;
-          const logoImage = await elementToImage(logoElement, `Logo ${logo.id}`);
-          
-          if (logoImage) {
-            logoImages.push({ id: logo.id, image: logoImage });
+      // Add logos at their relative positions on the bag
+      if (logos.length > 0) {
+        for (const logo of logos) {
+          try {
+            // Calculate logo position relative to the PDF canvas
+            // This translates from container coordinates to PDF coordinates
+            const pdfLogoX = xPos + (logo.position.x * scaleX);
+            const pdfLogoY = yPos + (logo.position.y * scaleY);
+            
+            // Calculate scaled size
+            const pdfLogoWidth = logo.size.width * scaleX;
+            const pdfLogoHeight = logo.size.height * scaleY;
+            
+            if (logo.src.startsWith('data:image/svg+xml')) {
+              // Handle SVG logos - add as vector for selectability
+              const svgString = atob(logo.src.split(',')[1]);
+              const parser = new DOMParser();
+              const svgDoc = parser.parseFromString(svgString, 'image/svg+xml');
+              
+              if (svgDoc.documentElement) {
+                // Add SVG logo while preserving its position
+                await svg2pdf(svgDoc.documentElement, pdf, {
+                  x: pdfLogoX,
+                  y: pdfLogoY,
+                  width: pdfLogoWidth,
+                  height: pdfLogoHeight
+                });
+              } else {
+                // Fallback to raster if parsing fails
+                pdf.addImage(
+                  logo.src, 
+                  'PNG', 
+                  pdfLogoX, 
+                  pdfLogoY, 
+                  pdfLogoWidth, 
+                  pdfLogoHeight
+                );
+              }
+            } else {
+              // Regular image - add as raster
+              pdf.addImage(
+                logo.src, 
+                'PNG', 
+                pdfLogoX, 
+                pdfLogoY, 
+                pdfLogoWidth, 
+                pdfLogoHeight
+              );
+            }
+            
+            console.log(`Added logo at position: (${pdfLogoX}, ${pdfLogoY})`);
+          } catch (err) {
+            console.error(`Failed to add logo ${logo.id}:`, err);
           }
         }
       }
       
-      // Calculate page dimensions
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      
-      // Add a title
-      pdf.setFontSize(20);
-      pdf.text("Your Bag Design", pageWidth / 2, 20, { align: "center" });
-      
-      // Add the design image (which contains both bag and all logos)
-      if (designImage) {
-        // Make the image take up most of the page
-        // Leave margins of 20px on the sides and reserve space at the bottom for dimensions
-        const imageWidth = pageWidth - 40;
-        const imageHeight = pageHeight - 70; // Leave space for title and dimensions at bottom
-        const imageX = 20;
-        const imageY = 30;
-        
-        pdf.addImage(designImage, "PNG", imageX, imageY, imageWidth, imageHeight);
-        console.log("Added complete design to PDF");
-      }
-      // If we couldn't get the full design but got individual components
-      else if (bagImage) {
-        // Make the bag blueprint take up most of the page
-        const imageWidth = pageWidth * 0.65; // 65% of the page width
-        const imageHeight = pageHeight - 70;
-        const imageX = 20;
-        const imageY = 30;
-        
-        pdf.addImage(bagImage, "PNG", imageX, imageY, imageWidth, imageHeight);
-        console.log("Added bag blueprint to PDF");
-        
-        // Add logos separately if available
-        if (logoImages.length > 0) {
-          // Add logos section header
-          pdf.setFontSize(14);
-          pdf.text("Applied Logos:", imageWidth + 40, 40);
-          
-          // Determine how to layout multiple logos
-          const logoWidth = 80;
-          const logoHeight = 80;
-          const logosPerColumn = Math.floor((pageHeight - 80) / (logoHeight + 20));
-          
-          logoImages.forEach((logoData, index) => {
-            // Calculate position (vertical layout on right side)
-            const col = Math.floor(index / logosPerColumn);
-            const row = index % logosPerColumn;
-            
-            const x = imageWidth + 40 + (col * (logoWidth + 20));
-            const y = 60 + (row * (logoHeight + 20));
-            
-            // Add logo with number label
-            pdf.addImage(logoData.image, "PNG", x, y, logoWidth, logoHeight);
-            pdf.setFontSize(10);
-            pdf.text(`Logo ${index + 1}`, x, y - 5);
-          });
-        }
-      } 
-      else {
-        pdf.setFontSize(12);
-        pdf.text("(Could not capture bag design)", pageWidth / 2, pageHeight / 2, { align: "center" });
-        console.log("No design elements captured");
-      }
-      
-      // Add dimensions information at the bottom
-      const lengthInches = (dimensions.length / 25.4).toFixed(2);
-      const widthInches = (dimensions.width / 25.4).toFixed(2);
-      const heightInches = (dimensions.height / 25.4).toFixed(2);
-      
-      // Create a compact dimensions section at the bottom
-      pdf.setFillColor(245, 245, 245);
-      pdf.rect(20, pageHeight - 30, pageWidth - 40, 20, 'F');
-      
-      pdf.setFontSize(10);
-      pdf.setTextColor(0, 0, 0);
-      const dimensionsText = `Bag Dimensions: Length: ${lengthInches}" x Width: ${widthInches}" x Height: ${heightInches}"`;
-      pdf.text(dimensionsText, pageWidth / 2, pageHeight - 18, { align: "center" });
-      
-      // Add a footer with date
-      const today = new Date().toLocaleDateString();
-      pdf.setFontSize(8);
-      pdf.setTextColor(100, 100, 100);
-      pdf.text(`Generated on ${today} - MTC Bags`, pageWidth - 20, pageHeight - 5, { align: "right" });
-      
-      // Save the PDF
-      console.log("Saving PDF...");
-      pdf.save("MTC-Bag-Design.pdf");
-      
-      console.log("PDF generation complete!");
-      return true;
-    } catch (error) {
-      console.error("Failed to generate PDF:", error);
-      alert("Sorry, we couldn't generate your PDF. Please try again or contact support.");
-      return false;
+    } else {
+      console.warn("SVG element not found, falling back to raster image");
+      // Fallback to raster if needed - implement if required
     }
-  };
+    
+    // Add dimensions and footer as before
+    const lengthInches = (dimensions.length / 25.4).toFixed(2);
+    const widthInches = (dimensions.width / 25.4).toFixed(2);
+    const heightInches = (dimensions.height / 25.4).toFixed(2);
+    
+    pdf.setFillColor(245, 245, 245);
+    pdf.rect(20, pageHeight - 30, pageWidth - 40, 20, 'F');
+    
+    pdf.setFontSize(10);
+    pdf.setTextColor(0, 0, 0);
+    const dimensionsText = `Bag Dimensions: Length: ${lengthInches}" × Width: ${widthInches}" × Height: ${heightInches}"`;
+    pdf.text(dimensionsText, pageWidth / 2, pageHeight - 18, { align: "center" });
+    
+    const today = new Date().toLocaleDateString();
+    pdf.setFontSize(8);
+    pdf.setTextColor(100, 100, 100);
+    pdf.text(`Generated on ${today} - MTC Bags`, pageWidth - 20, pageHeight - 5, { align: "right" });
+    
+    // Save the PDF
+    pdf.save("MTC-Bag-Design-Editable.pdf");
+    
+    console.log("PDF generation complete!");
+    return true;
+  } catch (error) {
+    console.error("Failed to generate PDF:", error);
+    alert("Sorry, we couldn't generate your PDF. Please try again or contact support.");
+    return false;
+  }
+};
   
   const handleLogoUpload = (files: FileList) => {
     if (files && files.length > 0) {
