@@ -56,7 +56,7 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
   console.log("Starting physically accurate PDF generation...");
 
   try {
-    const { length, width, height } = dimensions;
+    const { length, height } = dimensions;
 
     // Actual bag dimensions in mm (length = width of PDF)
     const pdf = new jsPDF({
