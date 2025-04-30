@@ -6,13 +6,11 @@ import styles from "./Sidebar.module.css";
 import downloadicon from "../../public/downloadicon.png";
 import BlueprintExample from "../../public/BlueprintExample.png"; // Import the blueprint example image
 
-
-
 // Import the BagDimensions interface or define it here
 interface BagDimensions {
   length: number;
   width: number;
-  height: number;
+  height: number; // This represents tabside height in mm, not total height
 }
 
 interface SidebarProps {
@@ -23,8 +21,7 @@ interface SidebarProps {
   handleDimensionChange: (dimensions: BagDimensions) => void;
   startEditingDimensions?: () => void;
   downloadDesign?: () => void;
-  logoCount?: number; // Add this new prop
-  
+  logoCount?: number;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -40,18 +37,17 @@ const Sidebar: React.FC<SidebarProps> = ({
   // Add state for showing/hiding the blueprint example modal
   const [showBlueprintExample, setShowBlueprintExample] = useState(false);
 
-  
   // Define max dimensions in inches
   const MAX_DIMENSIONS = {
     length: 21.65, 
     width: 11.81,
-    height: 25.98
+    height: 18 // Max tabside height (not total height)
   };
 
   const MIN_DIMENSIONS = {
     length: 6,
     width: 2,
-    height: 6
+    height: 6 // Min tabside height (not total height)
   };
   
   // Improved conversion factors with precise handling
@@ -87,18 +83,18 @@ const Sidebar: React.FC<SidebarProps> = ({
   const [inputValues, setInputValues] = useState({
     length: "",
     width: "",
-    height: ""
+    height: "" // This now represents tabside height
   });
   
   // Store the actual numeric values (in inches) for calculations
   const [tempDimensionsInches, setTempDimensionsInches] = useState<{
     length: number;
     width: number;
-    height: number;
+    height: number; // This now represents tabside height
   }>({
     length: mmToInches(dimensions.length),
     width: mmToInches(dimensions.width),
-    height: mmToInches(dimensions.height)
+    height: mmToInches(dimensions.height) // This is tabside height
   });
   
   const [dragActive, setDragActive] = useState(false);
@@ -108,31 +104,21 @@ const Sidebar: React.FC<SidebarProps> = ({
   useEffect(() => {
     const lengthInches = mmToInches(dimensions.length);
     const widthInches = mmToInches(dimensions.width);
-    const heightInches = mmToInches(dimensions.height);
+    const tabsideHeightInches = mmToInches(dimensions.height);
     
     setTempDimensionsInches({
       length: lengthInches,
       width: widthInches,
-      height: heightInches
+      height: tabsideHeightInches
     });
     
     // Format display values
     setInputValues({
-      length: formatDisplayValue(lengthInches),
-      width: formatDisplayValue(widthInches),
-      height: formatDisplayValue(heightInches)
+      length: lengthInches.toString(),
+      width: widthInches.toString(),
+      height: tabsideHeightInches.toString()
     });
   }, [dimensions]);
-  
-  // Format display values - show whole numbers as integers
-  const formatDisplayValue = (value: number): string => {
-    // If very close to an integer (within 0.001), display as integer
-    if (Math.abs(Math.round(value) - value) < 0.001) {
-      return Math.round(value).toString();
-    }
-    // Otherwise display with 2 decimal places, removing trailing zeros
-    return value.toFixed(2).replace(/\.?0+$/, '');
-  };
   
   // Handler for dimension changes
   const onDimensionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -170,9 +156,9 @@ const Sidebar: React.FC<SidebarProps> = ({
     
     // Update the input values to reflect any clamping
     setInputValues({
-      length: formatDisplayValue(clampedDimensions.length),
-      width: formatDisplayValue(clampedDimensions.width),
-      height: formatDisplayValue(clampedDimensions.height)
+      length: clampedDimensions.length.toString(),
+      width: clampedDimensions.width.toString(),
+      height: clampedDimensions.height.toString()
     });
     
     // Update the temp dimensions with clamped values
@@ -182,7 +168,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     const newDimensions = {
       length: inchesToMm(clampedDimensions.length),
       width: inchesToMm(clampedDimensions.width),
-      height: inchesToMm(clampedDimensions.height)
+      height: inchesToMm(clampedDimensions.height) // Sending tabside height
     };
     
     handleDimensionChange(newDimensions);
@@ -207,9 +193,9 @@ const Sidebar: React.FC<SidebarProps> = ({
     });
     
     setInputValues({
-      length: formatDisplayValue(lengthInches),
-      width: formatDisplayValue(widthInches),
-      height: formatDisplayValue(heightInches)
+      length: lengthInches.toString(),
+      width: widthInches.toString(),
+      height: heightInches.toString()
     });
   };
 
@@ -232,7 +218,6 @@ const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
-  // Handle file input change
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files?.length) {
@@ -240,12 +225,10 @@ const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
-  // Click the hidden file input
   const handleClick = () => {
     fileInputRef.current?.click();
   };
 
-  // Clear logo and filename
   const handleClearClick = () => {
     setFileName(null);
     handleClear();
@@ -319,21 +302,17 @@ const Sidebar: React.FC<SidebarProps> = ({
           />
         </div>
         <div className={styles.buttonInfoGroup}>
-          {/* Show logo count if there are any logos */}
           {logoCount > 0 && (
             <p className={styles.logoCount}>
               {logoCount} logo{logoCount !== 1 ? 's' : ''} added
             </p>
           )}
-           {/* Add a button to explicitly add another logo */}
-           <button onClick={handleClick} className={styles.addLogoButton}>
+          <button onClick={handleClick} className={styles.addLogoButton}>
             Add {logoCount > 0 ? 'Another' : 'New'} Logo
           </button>
-          {/* Update button text to reflect multiple logos */}
           <button onClick={handleClearClick} className={styles.clearButton}>
             {logoCount > 1 ? 'Clear All Logos' : 'Clear Logos'}
           </button>
-          
         </div>
       </div>
 
@@ -353,66 +332,66 @@ const Sidebar: React.FC<SidebarProps> = ({
       <div className={styles.dimensionContainer}>
         <h3 className={styles.sectionTitle}>Customize Your Bag Dimensions</h3>
         <div className={styles.dimensionInputs}>
-        <div className={styles.inputGroup}>
-          <label htmlFor="length">Length (in)</label>
-          <input
-            type="number"
-            id="length"
-            name="length"
-            value={inputValues.length}
-            onChange={onDimensionChange}
-            onKeyDown={onDimensionKeyDown}
-            min={MIN_DIMENSIONS.length}
-            max={MAX_DIMENSIONS.length}
-            step="0.01"
-            className={getInputClass('length')}
-          />
-          <div className={styles.dimensionLimits}>
-            <span className={styles.minDimension}>Min: {MIN_DIMENSIONS.length}&quot;</span>
-            <span className={styles.maxDimension}>Max: {MAX_DIMENSIONS.length}&quot;</span>
+          <div className={styles.inputGroup}>
+            <label htmlFor="length">Length (in)</label>
+            <input
+              type="number"
+              id="length"
+              name="length"
+              value={inputValues.length}
+              onChange={onDimensionChange}
+              onKeyDown={onDimensionKeyDown}
+              min={MIN_DIMENSIONS.length}
+              max={MAX_DIMENSIONS.length}
+              step="0.01"
+              className={getInputClass('length')}
+            />
+            <div className={styles.dimensionLimits}>
+              <span className={styles.minDimension}>Min: {MIN_DIMENSIONS.length}&quot;</span>
+              <span className={styles.maxDimension}>Max: {MAX_DIMENSIONS.length}&quot;</span>
+            </div>
+          </div>
+          
+          <div className={styles.inputGroup}>
+            <label htmlFor="width">Width (in)</label>
+            <input
+              type="number"
+              id="width"
+              name="width"
+              value={inputValues.width}
+              onChange={onDimensionChange}
+              onKeyDown={onDimensionKeyDown}
+              min={MIN_DIMENSIONS.width}
+              max={MAX_DIMENSIONS.width}
+              step="0.01"
+              className={getInputClass('width')}
+            />
+            <div className={styles.dimensionLimits}>
+              <span className={styles.minDimension}>Min: {MIN_DIMENSIONS.width}&quot;</span>
+              <span className={styles.maxDimension}>Max: {MAX_DIMENSIONS.width}&quot;</span>
+            </div>
+          </div>
+          
+          <div className={styles.inputGroup}>
+            <label htmlFor="height">Height (in)</label>
+            <input
+              type="number"
+              id="height"
+              name="height"
+              value={inputValues.height}
+              onChange={onDimensionChange}
+              onKeyDown={onDimensionKeyDown}
+              min={MIN_DIMENSIONS.height}
+              max={MAX_DIMENSIONS.height}
+              step="0.01"
+              className={getInputClass('height')}
+            />
+            <div className={styles.dimensionLimits}>
+              <span className={styles.minDimension}>Min: {MIN_DIMENSIONS.height}&quot;</span>
+              <span className={styles.maxDimension}>Max: {MAX_DIMENSIONS.height}&quot;</span>
+            </div>
           </div>
         </div>
-        
-        <div className={styles.inputGroup}>
-          <label htmlFor="width">Width (in)</label>
-          <input
-            type="number"
-            id="width"
-            name="width"
-            value={inputValues.width}
-            onChange={onDimensionChange}
-            onKeyDown={onDimensionKeyDown}
-            min={MIN_DIMENSIONS.width}
-            max={MAX_DIMENSIONS.width}
-            step="0.01"
-            className={getInputClass('width')}
-          />
-          <div className={styles.dimensionLimits}>
-            <span className={styles.minDimension}>Min: {MIN_DIMENSIONS.width}&quot;</span>
-            <span className={styles.maxDimension}>Max: {MAX_DIMENSIONS.width}&quot;</span>
-          </div>
-        </div>
-        
-        <div className={styles.inputGroup}>
-          <label htmlFor="height">Height (in)</label>
-          <input
-            type="number"
-            id="height"
-            name="height"
-            value={inputValues.height}
-            onChange={onDimensionChange}
-            onKeyDown={onDimensionKeyDown}
-            min={MIN_DIMENSIONS.height}
-            max={MAX_DIMENSIONS.height}
-            step="0.01"
-            className={getInputClass('height')}
-          />
-          <div className={styles.dimensionLimits}>
-            <span className={styles.minDimension}>Min: {MIN_DIMENSIONS.height}&quot;</span>
-            <span className={styles.maxDimension}>Max: {MAX_DIMENSIONS.height}&quot;</span>
-          </div>
-        </div>
-      </div>
         
         {/* Buttons to apply or reset dimensions */}
         <div className={styles.buttonGroup}>
@@ -434,20 +413,20 @@ const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Download Design Button */}
         <div className={styles.downloadButtonContainer}>
-        <button 
-          onClick={() => {
-            if (typeof downloadDesign === 'function') {
-              downloadDesign();
-            } else {
-              console.error("No download function available");
-              alert("Unable to download design at this time.");
-            }
-          }}
-          className={styles.downloadButton}
-        >
-          Download Design
-        </button>
-      </div>
+          <button 
+            onClick={() => {
+              if (typeof downloadDesign === 'function') {
+                downloadDesign();
+              } else {
+                console.error("No download function available");
+                alert("Unable to download design at this time.");
+              }
+            }}
+            className={styles.downloadButton}
+          >
+            Download Design
+          </button>
+        </div>
       </div>
       
       {/* Blueprint Example Modal */}

@@ -5,7 +5,7 @@ interface BagBlueprintProps {
   dimensions?: {
     length: number; // This will be the "section2Width" (310mm by default)
     width: number;  // This will be the "section1Width" (165mm by default)
-    height: number;
+    height: number; // This is now tabside height directly, not total height
   };
   isEditing?: boolean; // Flag to indicate if dimensions are being edited
   currentEditValues?: { // The values currently being edited in the form
@@ -16,7 +16,7 @@ interface BagBlueprintProps {
 }
 
 const BagBlueprint: React.FC<BagBlueprintProps> = ({ 
-  dimensions = { length: 310, width: 155, height: 428 },
+  dimensions = { length: 310, width: 155, height: 330 }, // Default tabside height ~13 inches
   isEditing = false,
   currentEditValues = {} // Values currently being edited
 }) => {
@@ -29,12 +29,16 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
     return exactInches.toFixed(2);
   };
 
+  // Format measurement to show inches with mm in parentheses
+  const formatMeasurement = (mm: number): string => {
+    return `${mmToInches(mm)} in (${Math.round(mm)} mm)`;
+  };
+
   // Custom function for tabside height display that never rounds to whole numbers
-  // This ensures values like 14.96 aren't rounded to 15
   const formatTabsideHeight = (mm: number): string => {
     const exactInches = mm / 25.4;
     // Always show 2 decimal places for tabside height
-    return exactInches.toFixed(2);
+    return `${exactInches.toFixed(2)} in (${Math.round(mm)} mm)`;
   };
 
   // For edit preview, use current edit values if available, otherwise use the saved dimensions
@@ -53,9 +57,22 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
   // The formula is based on: 2*width + 2*length + padding
   const calculatedTotalLength = (activeDimensions.width * 2) + (activeDimensions.length * 2) + 40;
   
-  // Calculate scaled dimensions - use an absolute scale, not relative
-  const totalWidth = calculatedTotalLength; 
-  const totalHeight = activeDimensions.height;
+  // Calculate tab length with precise formula: (width/2) + 20mm
+  // This ensures it's exactly half the width plus 20mm
+  const tabLengthMm = (activeDimensions.width / 2) + 20;
+  
+  // IMPORTANT CHANGE: dimensions.height is now directly the tabside height
+  const tabsideHeight = activeDimensions.height;
+  
+  // Calculate total height based on tabside height and tab length
+  // This is the opposite of the previous calculation
+  const totalHeight = tabsideHeight + tabLengthMm;
+  
+  // For rendering purposes only (not for calculations)
+  const tabLength = Math.round(tabLengthMm);
+  
+  // Calculate scaled dimensions - use an absolute scale, not relative 
+  const totalWidth = calculatedTotalLength;
   
   // Section measurements - directly use the dimensions provided by the user
   // This ensures sections are proportional to their actual dimensions
@@ -69,17 +86,6 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
   const section1End = section1Start + section1Width;
   const section2End = section1End + section2Width;
   const section3End = section2End + section3Width;
-
-  // Calculate tab length with precise formula: (width/2) + 20mm
-  // This ensures it's exactly half the width plus 20mm
-  const tabLengthMm = (activeDimensions.width / 2) + 20;
-  
-  // Calculate tabside height precisely as totalHeight - tabLength
-  // Don't round here to preserve exact measurements
-  const tabsideHeight = activeDimensions.height - tabLengthMm;
-  
-  // For rendering purposes only (not for calculations)
-  const tabLength = Math.round(tabLengthMm);
   
   // Position for height measurement arrow - always 30px to the right of the blueprint
   const heightArrowX = 50 + totalWidth + 30;
@@ -97,11 +103,16 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
     
     // If both width and length are at default values, force 38.17 display
     if (isDefaultWidth && isDefaultLength) {
-      return "38.17";
+      return `38.17 in (${Math.round(mm)} mm)`;
     }
     
     // Otherwise, use standard formatting
-    return mmToInches(mm);
+    return formatMeasurement(mm);
+  };
+  
+  // Calculate the total height in inches for display
+  const calculateTotalHeight = (): string => {
+    return formatMeasurement(totalHeight);
   };
 
   const viewBox = useMemo(() => {
@@ -112,8 +123,8 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
     const contentHeight = measurementTextY + 100; // Include text and bottom padding
     
     // Add generous buffer around the content
-    const bufferX = Math.max(90, contentWidth * 0.05); // At least 200px or 10% of content
-    const bufferY = Math.max(120, contentHeight * 0.05); // At least 150px or 10% of content
+    const bufferX = Math.max(90, contentWidth * 0.05); // At least 90px or 5% of content
+    const bufferY = Math.max(120, contentHeight * 0.05); // At least 120px or 5% of content
     
     // Calculate total required dimensions
     const requiredWidth = contentWidth + bufferX;
@@ -144,7 +155,7 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
       <metadata>
         {JSON.stringify({
           title: "Bag Blueprint",
-          description: `Bag with dimensions: L=${mmToInches(activeDimensions.length)}in × W=${mmToInches(activeDimensions.width)}in × H=${mmToInches(activeDimensions.height)}in`,
+          description: `Bag with dimensions: L=${mmToInches(activeDimensions.length)}in × W=${mmToInches(activeDimensions.width)}in × Tabside H=${mmToInches(tabsideHeight)}in`,
           creator: "MTC Bags Design Tool"
         })}
       </metadata>
@@ -162,21 +173,8 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
         </text>
       )}
       
-      {/* Base Rectangle - now just serves as a background 
-      <rect 
-        x="50" 
-        y="50" 
-        width={totalWidth + 10} 
-        height={totalHeight} 
-        fill="#f5f5f5" 
-        stroke="#000" 
-        strokeWidth="2" 
-        id="bag-outline"
-        data-name="Bag Outline"
-      /> 
-
-      {/* RECTANGLE 1: Left Small Section (40mm padding) */}
-        <g id="left-padding-upper" data-name="Left Padding Upper">
+      {/* Left Padding Upper Section */}
+      <g id="left-padding-upper" data-name="Left Padding Upper">
         <rect
           x="50"
           y="50"
@@ -210,7 +208,6 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
           data-section="padding-left-lower"
         />
       </g>
-
 
       {/* RECTANGLE 2: Section 1 (First Width) */}
       <g id="section1-panel" data-name="Width Panel 1">
@@ -349,52 +346,52 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
           Tab 2
         </text>
       </g>
+
       {/* NEW RECTANGLE: Section under Front 1 */}
-<g id="front1-bottom-panel" data-name="Front 1 Bottom">
-  <rect
-    x={section1End}
-    y={50 + tabsideHeight}
-    width={section2Width}
-    height={tabLength}
-    fill="none"
-    stroke="#000"
-    strokeWidth="1"
-    data-section="front1-bottom"
-  />
-  <text
-    x={section1End + section2Width / 2}
-    y={50 + tabsideHeight + tabLength / 2}
-    textAnchor="middle"
-    fontSize="14"
-    fill="#666"
-  >
-    Base 1
-  </text>
-</g>
+      <g id="front1-bottom-panel" data-name="Front 1 Bottom">
+        <rect
+          x={section1End}
+          y={50 + tabsideHeight}
+          width={section2Width}
+          height={tabLength}
+          fill="none"
+          stroke="#000"
+          strokeWidth="1"
+          data-section="front1-bottom"
+        />
+        <text
+          x={section1End + section2Width / 2}
+          y={50 + tabsideHeight + tabLength / 2}
+          textAnchor="middle"
+          fontSize="14"
+          fill="#666"
+        >
+          Base 1
+        </text>
+      </g>
 
-{/* NEW RECTANGLE: Section under Front 2 */}
-<g id="front2-bottom-panel" data-name="Front 2 Bottom">
-  <rect
-    x={section3End}
-    y={50 + tabsideHeight}
-    width={section4Width}
-    height={tabLength}
-    fill="none"
-    stroke="#000"
-    strokeWidth="1"
-    data-section="front2-bottom"
-  />
-  <text
-    x={section3End + section4Width / 2}
-    y={50 + tabsideHeight + tabLength / 2}
-    textAnchor="middle"
-    fontSize="14"
-    fill="#666"
-  >
-    Base 2
-  </text>
-</g>
-
+      {/* NEW RECTANGLE: Section under Front 2 */}
+      <g id="front2-bottom-panel" data-name="Front 2 Bottom">
+        <rect
+          x={section3End}
+          y={50 + tabsideHeight}
+          width={section4Width}
+          height={tabLength}
+          fill="none"
+          stroke="#000"
+          strokeWidth="1"
+          data-section="front2-bottom"
+        />
+        <text
+          x={section3End + section4Width / 2}
+          y={50 + tabsideHeight + tabLength / 2}
+          textAnchor="middle"
+          fontSize="14"
+          fill="#666"
+        >
+          Base 2
+        </text>
+      </g>
 
       {/* Measurements */}
       {/* 1. Total Width (Top) */}
@@ -403,10 +400,10 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
           x={50 + totalWidth / 2}
           y="15"
           textAnchor="middle"
-          fontSize="22"
+          fontSize="20"
           fill="#000"
         >
-          {formatTotalLength(calculatedTotalLength)} in
+          {formatTotalLength(calculatedTotalLength)}
         </text>
         {/* Arrow for Total Width */}
         <line x1="60" y1="30" x2={50 + totalWidth - 10} y2="30" stroke="#000" strokeWidth="1" />
@@ -420,11 +417,11 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
           x={heightArrowX + 20}
           y={50 + totalHeight / 2}
           textAnchor="middle"
-          fontSize="20"
+          fontSize="18"
           fill="#000"
           transform={`rotate(-270, ${heightArrowX + 20}, ${50 + totalHeight / 2})`}
         >
-          {mmToInches(activeDimensions.height)} in
+          {calculateTotalHeight()}
         </text>
         {/* Arrow for Total Height - positioned relative to the right edge of rectangle */}
         <line x1={heightArrowX} y1="50" x2={heightArrowX} y2={50 + totalHeight} stroke="#000" strokeWidth="1" />
@@ -432,17 +429,17 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
         <polygon points={`${heightArrowX - 5},${50 + totalHeight - 15} ${heightArrowX + 5},${50 + totalHeight - 15} ${heightArrowX},${50 + totalHeight}`} fill="#000" />
       </g>
 
-      {/* 3. Tabside Height (left) - Now calculated as totalHeight - tabLength */}
+      {/* 3. Tabside Height (left) - Now using the direct height value */}
       <g id="tabside-height-measurement">
         <text
           x="20"
           y={40 + tabsideHeight / 2}
           textAnchor="middle"
-          fontSize="20"
+          fontSize="18"
           fill="#000"
           transform={`rotate(-90, 30, ${50 + tabsideHeight / 2})`}
         >
-          {formatTabsideHeight(tabsideHeight)} in
+          {formatTabsideHeight(tabsideHeight)}
         </text>
         {/* Arrow for Tabside Height */}
         <line x1="35" y1="70" x2="35" y2={40 + tabsideHeight} stroke="#000" strokeWidth="1" />
@@ -456,11 +453,11 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
           x="20"
           y={50 + tabsideHeight + tabLength / 2}
           textAnchor="middle"
-          fontSize="18"
+          fontSize="16"
           fill="#000"
           transform={`rotate(-90, 20, ${50 + tabsideHeight + tabLength / 2})`}
         >
-          {mmToInches(tabLengthMm)} in
+          {formatMeasurement(tabLengthMm)}
         </text>
         {/* Arrow for Tab Length */}
         <line x1="35" y1={50 + tabsideHeight + 10} x2="35" y2={40 + tabsideHeight + tabLength} stroke="#000" strokeWidth="1" />
@@ -474,12 +471,12 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
         <g id="padding-measurement">
           <text
             x="75"
-            y={measurementTextY}
+            y={measurementTextY - 25}
             textAnchor="middle"
             fontSize="16"
             fill="#000"
           >
-            1.57 in
+            1.57 in (40 mm)
           </text>
           {/* Arrow for 40mm measurement - fixed */}
           <line x1="55" y1={measurementLineY} x2="95" y2={measurementLineY} stroke="#000" strokeWidth="1" />
@@ -493,10 +490,10 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
             x={section1Start + section1Width / 2}
             y={measurementTextY}
             textAnchor="middle"
-            fontSize="18"
+            fontSize="16"
             fill="#000"
           >
-            {mmToInches(activeDimensions.width)} in
+            {formatMeasurement(activeDimensions.width)}
           </text>
           {/* Arrow for Section 1 */}
           <line x1={section1Start} y1={measurementLineY} x2={section1End} y2={measurementLineY} stroke="#000" strokeWidth="1" />
@@ -510,10 +507,10 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
             x={section1End + section2Width / 2}
             y={measurementTextY}
             textAnchor="middle"
-            fontSize="20"
+            fontSize="16"
             fill="#000"
           >
-            {mmToInches(activeDimensions.length)} in
+            {formatMeasurement(activeDimensions.length)}
           </text>
           {/* Arrow for Section 2 */}
           <line x1={section1End} y1={measurementLineY} x2={section2End} y2={measurementLineY} stroke="#000" strokeWidth="1" />
@@ -527,10 +524,10 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
             x={section2End + section3Width / 2}
             y={measurementTextY}
             textAnchor="middle"
-            fontSize="18"
+            fontSize="16"
             fill="#000"
           >
-            {mmToInches(activeDimensions.width)} in
+            {formatMeasurement(activeDimensions.width)}
           </text>
           {/* Arrow for Section 3 */}
           <line x1={section2End} y1={measurementLineY} x2={section3End} y2={measurementLineY} stroke="#000" strokeWidth="1" />
@@ -544,10 +541,10 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
             x={section3End + section4Width / 2}
             y={measurementTextY}
             textAnchor="middle"
-            fontSize="20"
+            fontSize="16"
             fill="#000"
           >
-            {mmToInches(activeDimensions.length)} in
+            {formatMeasurement(activeDimensions.length)}
           </text>
           {/* Arrow for Section 4 */}
           <line x1={section3End} y1={measurementLineY} x2={50 + totalWidth} y2={measurementLineY} stroke="#000" strokeWidth="1" />
