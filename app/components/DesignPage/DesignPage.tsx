@@ -64,15 +64,16 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
         totalHeightInches: calculatedDim.totalHeightInches.toFixed(2)
       });
       
-      // Calculate PDF dimensions with proper margins using the utility function
-      const pdfDimensions = calculatePDFDimensions(calculatedDim, 4); // 2-inch margin
+      // Calculate PDF dimensions with LARGER margins
+      const pdfDimensions = calculatePDFDimensions(calculatedDim, 3); // 3-inch margin
       
       // Create a new jsPDF instance with size based on the actual bag dimensions plus margins
       const pdf = new jsPDF({
         orientation: pdfDimensions.orientation,
         unit: "in",
         format: [pdfDimensions.pdfWidthInches, pdfDimensions.pdfHeightInches],
-        compress: false // Keep vector quality
+        compress: false, // Keep vector quality
+        hotfixes: ["scale_correction"] // Add this to help with scaling issues
       });
       
       // Calculate page dimensions
@@ -94,10 +95,15 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
       if (bagBlueprintElement instanceof SVGElement) {
         // Clone the SVG to avoid modifications to the original
         const svgClone = bagBlueprintElement.cloneNode(true) as SVGElement;
-
+        
+        // Set explicit dimensions with some padding
+        const viewBoxWidth = calculatedDim.totalWidthMM * 1.35; // 35% extra width currently these lines are affecting precise measurements and viewing
+        const viewBoxHeight = calculatedDim.totalHeightMM * 1.35; // 35% extra height
+        
         svgClone.setAttribute('width', `${calculatedDim.totalWidthMM}mm`);
         svgClone.setAttribute('height', `${calculatedDim.totalHeightMM}mm`);
-        svgClone.setAttribute('viewBox', `0 0 ${calculatedDim.totalWidthMM} ${calculatedDim.totalHeightMM}`);
+        svgClone.setAttribute('viewBox', `0 0 ${viewBoxWidth} ${viewBoxHeight}`);
+        svgClone.setAttribute('preserveAspectRatio', 'xMidYMid meet');
         
         // Position the bag in the available space using values from the utility
         const xPos = pdfDimensions.xPos;
@@ -110,6 +116,7 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
           height: calculatedDim.totalHeightInches
         });
         
+        
         // Add SVG as vector with exact physical dimensions (1:1 scale)
         await svg2pdf(svgClone, pdf, {
           x: xPos,
@@ -117,6 +124,7 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
           width: calculatedDim.totalWidthInches,
           height: calculatedDim.totalHeightInches
         });
+        
         
         console.log(`Added bag blueprint at exact size: ${calculatedDim.totalWidthInches.toFixed(2)}×${calculatedDim.totalHeightInches.toFixed(2)} inches`);
         
