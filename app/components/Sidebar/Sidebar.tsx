@@ -1,17 +1,11 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link"; // Import Link from next/link
+import Link from "next/link";
 import styles from "./Sidebar.module.css";
 import downloadicon from "../../public/downloadicon.png";
-import BlueprintExample from "../../public/BlueprintExample.png"; // Import the blueprint example image
-
-// Import the BagDimensions interface or define it here
-interface BagDimensions {
-  length: number;
-  width: number;
-  height: number; // This represents tabside height in mm, not total height
-}
+import BlueprintExample from "../../public/BlueprintExample.png";
+import { BagDimensions, mmToInches} from "../../util/BagDimensions";
 
 interface SidebarProps {
   handleLogoUpload: (files: FileList) => void;
@@ -30,7 +24,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   fileInputRef,
   dimensions,
   handleDimensionChange,
-  startEditingDimensions = () => {}, // Default empty function if prop not provided
+  startEditingDimensions = () => {}, 
   downloadDesign,
   logoCount = 0 
 }) => {
@@ -41,39 +35,16 @@ const Sidebar: React.FC<SidebarProps> = ({
   const MAX_DIMENSIONS = {
     length: 21.65, 
     width: 11.81,
-    height: 18 // Max tabside height (not total height)
+    height: 22.14 
   };
 
   const MIN_DIMENSIONS = {
     length: 6,
     width: 2,
-    height: 6 // Min tabside height (not total height)
+    height: 6
   };
   
-  // Improved conversion factors with precise handling
-  const mmToInches = (mm: number) => {
-    // Exact conversion
-    const exactInches = mm / 25.4;
-    
-    // Common inch values for checking - these are values we want to show as clean numbers
-    const commonInches = [
-      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 
-      19, 20, 24
-    ];
-    
-    // Check if we're very close to a common inch value
-    for (const value of commonInches) {
-      // If within 0.005 inches treat as the clean value
-      if (Math.abs(exactInches - value) < 0.005) {
-        return value;
-      }
-    }
-    
-    // Otherwise return the precise conversion with 2 decimal places
-    return Math.round(exactInches * 100) / 100;
-  };
-  
-  // Precise conversion from inches to mm
+  // Use the utility function for precise conversion from inches to mm
   const inchesToMm = (inches: number) => {
     // Exact conversion - use decimal precision for millimeters
     return +(inches * 25.4).toFixed(2);
@@ -83,18 +54,18 @@ const Sidebar: React.FC<SidebarProps> = ({
   const [inputValues, setInputValues] = useState({
     length: "",
     width: "",
-    height: "" // This now represents tabside height
+    height: ""
   });
   
   // Store the actual numeric values (in inches) for calculations
   const [tempDimensionsInches, setTempDimensionsInches] = useState<{
     length: number;
     width: number;
-    height: number; // This now represents tabside height
+    height: number;
   }>({
-    length: mmToInches(dimensions.length),
-    width: mmToInches(dimensions.width),
-    height: mmToInches(dimensions.height) // This is tabside height
+    length: mmToInches(dimensions.length, 2),
+    width: mmToInches(dimensions.width, 2),
+    height: mmToInches(dimensions.height, 2)
   });
   
   const [dragActive, setDragActive] = useState(false);
@@ -102,9 +73,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   
   // Update both states when props change
   useEffect(() => {
-    const lengthInches = mmToInches(dimensions.length);
-    const widthInches = mmToInches(dimensions.width);
-    const tabsideHeightInches = mmToInches(dimensions.height);
+    const lengthInches = mmToInches(dimensions.length, 2);
+    const widthInches = mmToInches(dimensions.width, 2);
+    const tabsideHeightInches = mmToInches(dimensions.height, 2);
     
     setTempDimensionsInches({
       length: lengthInches,
@@ -168,7 +139,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     const newDimensions = {
       length: inchesToMm(clampedDimensions.length),
       width: inchesToMm(clampedDimensions.width),
-      height: inchesToMm(clampedDimensions.height) // Sending tabside height
+      height: inchesToMm(clampedDimensions.height)
     };
     
     handleDimensionChange(newDimensions);
@@ -182,9 +153,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   
   // Reset to the original dimensions
   const resetDimensions = () => {
-    const lengthInches = mmToInches(dimensions.length);
-    const widthInches = mmToInches(dimensions.width);
-    const heightInches = mmToInches(dimensions.height);
+    const lengthInches = mmToInches(dimensions.length, 2);
+    const widthInches = mmToInches(dimensions.width, 2);
+    const heightInches = mmToInches(dimensions.height, 2);
     
     setTempDimensionsInches({
       length: lengthInches,
@@ -199,7 +170,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     });
   };
 
-  // Drag and drop handlers
+  // Drag and drop handlers remain unchanged
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setDragActive(true);
@@ -237,9 +208,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   // Check if current values differ from original values
   const dimensionsChanged = () => {
     const originalInches = {
-      length: mmToInches(dimensions.length),
-      width: mmToInches(dimensions.width),
-      height: mmToInches(dimensions.height)
+      length: mmToInches(dimensions.length, 2),
+      width: mmToInches(dimensions.width, 2),
+      height: mmToInches(dimensions.height, 2)
     };
     
     // Use small epsilon for floating point comparison
@@ -272,6 +243,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       : styles.dimensionInput;
   };
 
+  // The JSX return remains the same
   return (
     <div className={styles.sidebarContainer}>
       <h2 className={styles.sidebarTitle}>Design Your Bag</h2>
