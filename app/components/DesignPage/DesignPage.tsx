@@ -65,7 +65,7 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
       });
       
       // Calculate PDF dimensions with LARGER margins
-      const pdfDimensions = calculatePDFDimensions(calculatedDim, 1); // 3-inch margin
+      const pdfDimensions = calculatePDFDimensions(calculatedDim, 2); // 3-inch margin
       
       // Create a new jsPDF instance with size based on the actual bag dimensions plus margins
       const pdf = new jsPDF({
