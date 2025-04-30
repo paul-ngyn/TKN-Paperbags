@@ -65,7 +65,7 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
       });
       
       // Calculate PDF dimensions with LARGER margins
-      const pdfDimensions = calculatePDFDimensions(calculatedDim, 3); // 3-inch margin
+      const pdfDimensions = calculatePDFDimensions(calculatedDim, 1); // 3-inch margin
       
       // Create a new jsPDF instance with size based on the actual bag dimensions plus margins
       const pdf = new jsPDF({
@@ -97,8 +97,8 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
         const svgClone = bagBlueprintElement.cloneNode(true) as SVGElement;
         
         // Set explicit dimensions with some padding
-        const viewBoxWidth = calculatedDim.totalWidthMM * 1.35; // 35% extra width currently these lines are affecting precise measurements and viewing
-        const viewBoxHeight = calculatedDim.totalHeightMM * 1.35; // 35% extra height
+        const viewBoxWidth = calculatedDim.totalWidthMM * 1; // if set to 1 measuremenets are almost precise, whole blueprint fits at 35% (1.35) extra width currently these lines are affecting precise measurements and viewing
+        const viewBoxHeight = calculatedDim.totalHeightMM * 1; // 35% extra height
         
         svgClone.setAttribute('width', `${calculatedDim.totalWidthMM}mm`);
         svgClone.setAttribute('height', `${calculatedDim.totalHeightMM}mm`);
