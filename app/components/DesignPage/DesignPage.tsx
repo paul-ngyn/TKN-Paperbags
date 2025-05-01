@@ -114,10 +114,6 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
       if (bagBlueprintElement instanceof SVGElement) {
         // Clone the SVG
         const svgClone = bagBlueprintElement.cloneNode(true) as SVGElement;
-
-        // --- REMOVE setting width/height in mm ---
-        // svgClone.setAttribute('width', `${calculatedDim.totalWidthMM}mm`); // REMOVE THIS
-        // svgClone.setAttribute('height', `${calculatedDim.totalHeightMM}mm`); // REMOVE THIS
         
         // Ensure the viewBox attribute is present (it should be from BagBlueprint)
         const finalViewBox = svgClone.getAttribute('viewBox');
