@@ -11,7 +11,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
   const MAX_DIMENSIONS = {
     length: 21.65, 
     width: 11.81,
-    height: 22.14
+    height: 22.1
   };
 
   const MIN_DIMENSIONS = {
@@ -30,12 +30,10 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
     dimension3: '',
     handletype: '',
     details: '',
-    pdf: null as File | null,
-    blueprint: null as File | null,
+    pdf: null as File | null
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [blueprintFileName, setBlueprintFileName] = useState<string | null>(null);
   const [pdfFileName, setPdfFileName] = useState<string | null>(null);
   const [dimensionErrors, setDimensionErrors] = useState({
     dimension1: false,
@@ -89,26 +87,18 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
-      const inputName = e.target.name;
       
       if (file && file.type === 'application/pdf') {
         setFormData({
           ...formData,
-          [inputName]: file,
+          pdf: file
         });
-        
-        if (inputName === 'pdf') {
-          setPdfFileName(file.name);
-        } else if (inputName === 'blueprint') {
-          setBlueprintFileName(file.name);
-        }
+        setPdfFileName(file.name);
       } else {
         alert('Please upload a valid PDF file.');
       }
     }
   };
-
- 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -133,10 +123,6 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
     data.append('dimensions', `${formData.dimension1} x ${formData.dimension2} x ${formData.dimension3}`);
     data.append('handletype', formData.handletype);
     data.append('details', formData.details);
-    
-    if (formData.blueprint) {
-      data.append('blueprint', formData.blueprint);
-    }
     
     if (formData.pdf) {
       data.append('pdf', formData.pdf);
