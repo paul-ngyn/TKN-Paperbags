@@ -145,10 +145,10 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
       {/* Left Padding Upper Section */}
       <g id="left-padding-upper" data-name="Left Padding Upper">
         <rect
-          x="50"
-          y="50"
-          width="40"
-          height={tabsideHeight}
+          x="50.5"
+          y="50.5"
+          width="39"
+          height={tabsideHeight-1}
           fill="none"
           stroke="#000"
           strokeWidth="1"
@@ -167,10 +167,10 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
       {/* Left Padding Lower Section */}
       <g id="left-padding-lower" data-name="Left Padding Lower">
         <rect
-          x="50"
-          y={50 + tabsideHeight}
-          width="40"
-          height={tabLength}
+          x="50.5"
+          y={50.5 + tabsideHeight}
+          width="39"
+          height={tabLength - 1}
           fill="none"
           stroke="#000"
           strokeWidth="1"
@@ -181,10 +181,10 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
       {/* RECTANGLE 2: Section 1 (First Width) */}
       <g id="section1-panel" data-name="Width Panel 1">
         <rect
-          x={section1Start}
-          y="50"
-          width={section1Width}
-          height={tabsideHeight}
+          x={section1Start + 0.5}
+          y="50.5"
+          width={section1Width -1}
+          height={tabsideHeight - 1}
           fill="none"
           stroke="#000"
           strokeWidth="1"
@@ -204,10 +204,10 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
       {/* RECTANGLE 3: Section 2 (First Length) */}
       <g id="section2-panel" data-name="Length Panel 1">
         <rect
-          x={section1End}
-          y="50"
-          width={section2Width}
-          height={tabsideHeight}
+          x={section1End + 0.5}
+          y="50.5"
+          width={section2Width - 1}
+          height={tabsideHeight - 1}
           fill="none"
           stroke="#000"
           strokeWidth="1"
@@ -227,10 +227,10 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
       {/* RECTANGLE 4: Section 3 (Second Width) */}
       <g id="section3-panel" data-name="Width Panel 2">
         <rect
-          x={section2End}
-          y="50"
-          width={section3Width}
-          height={tabsideHeight}
+          x={section2End +0.5}
+          y="50.5"
+          width={section3Width -1}
+          height={tabsideHeight - 1}
           fill="none"
           stroke="#000"
           strokeWidth="1"
@@ -250,10 +250,10 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
       {/* RECTANGLE 5: Section 4 (Second Length) */}
       <g id="section4-panel" data-name="Length Panel 2">
         <rect
-          x={section3End}
-          y="50"
-          width={section4Width}
-          height={tabsideHeight}
+          x={section3End + 0.5}
+          y="50.5"
+          width={section4Width - 1}
+          height={tabsideHeight - 1}
           fill="none"
           stroke="#000"
           strokeWidth="1"
@@ -273,10 +273,10 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
       {/* RECTANGLE 6: Tab 1 (Left Width) */}
       <g id="tab1-panel" data-name="Tab 1">
         <rect
-          x={section1Start}
-          y={50 + tabsideHeight}
-          width={section1Width}
-          height={tabLength}
+          x={section1Start + 0.5}
+          y={50.5 + tabsideHeight}
+          width={section1Width - 1}
+          height={tabLength - 1}
           fill="none"
           stroke="#000"
           strokeWidth="1"
@@ -297,10 +297,10 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
       {/* RECTANGLE 7: Tab 2 (Right Width) */}
       <g id="tab2-panel" data-name="Tab 2">
         <rect
-          x={section2End}
-          y={50 + tabsideHeight}
-          width={section3Width}
-          height={tabLength}
+          x={section2End + 0.5}
+          y={50.5 + tabsideHeight}
+          width={section3Width - 1}
+          height={tabLength - 1}
           fill="none"
           stroke="#000"
           strokeWidth="1"
@@ -321,10 +321,10 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
       {/* NEW RECTANGLE: Section under Front 1 */}
       <g id="front1-bottom-panel" data-name="Front 1 Bottom">
         <rect
-          x={section1End}
-          y={50 + tabsideHeight}
-          width={section2Width}
-          height={tabLength}
+          x={section1End + 0.5}
+          y={50.5 + tabsideHeight}
+          width={section2Width - 1}
+          height={tabLength -1}
           fill="none"
           stroke="#000"
           strokeWidth="1"
@@ -344,10 +344,10 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
       {/* NEW RECTANGLE: Section under Front 2 */}
       <g id="front2-bottom-panel" data-name="Front 2 Bottom">
         <rect
-          x={section3End}
-          y={50 + tabsideHeight}
-          width={section4Width}
-          height={tabLength}
+          x={section3End + 0.5}
+          y={50.5 + tabsideHeight}
+          width={section4Width - 1}
+          height={tabLength - 1}
           fill="none"
           stroke="#000"
           strokeWidth="1"
