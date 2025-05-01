@@ -161,8 +161,8 @@ export interface BagDimensions {
    */
   export function calculatePDFDimensions(bagDimensions: CalculatedDimensions, marginInches: number = 2) {
     // Add margins to both width and height
-    const pdfWidthInches = Math.ceil(bagDimensions.totalWidthInches + (marginInches * 2));
-    const pdfHeightInches = Math.ceil(bagDimensions.totalHeightInches + (marginInches * 2));
+    const pdfWidthInches = Math.ceil(bagDimensions.totalWidthInches + (marginInches * 1));
+    const pdfHeightInches = Math.ceil(bagDimensions.totalHeightInches + (marginInches * 1));
     
     // Determine orientation based on dimensions
     const orientation = pdfWidthInches > pdfHeightInches ? "landscape" as const : "portrait" as const;

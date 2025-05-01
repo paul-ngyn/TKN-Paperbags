@@ -51,143 +51,144 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
       // Use the BagDimensions utility for calculations
       const calculatedDim = calculateBagDimensions(dimensions);
       
-      console.log("Bag dimensions (mm):", {
-        length: dimensions.length,
-        width: dimensions.width,
-        height: dimensions.height
-      });
+      // ... console logs for dimensions ...
+
+      // --- PDF Page Size Calculation (Revised) ---
+      // Temporarily get the SVG element to read its final viewBox for sizing
+      // Note: This assumes the SVG is already rendered in the DOM. If not, this needs adjustment.
+      const tempSvgElement = document.querySelector(".bagBlueprint svg") || document.querySelector("svg");
+      let svgViewBoxWidth = calculatedDim.totalWidthMM + 150; // Estimate default if not found
+      let svgViewBoxHeight = calculatedDim.totalHeightMM + 150; // Estimate default if not found
+      if (tempSvgElement instanceof SVGElement) {
+          const tempViewBox = tempSvgElement.getAttribute('viewBox');
+          const tempViewBoxValues = tempViewBox ? tempViewBox.split(' ').map(Number) : [0, 0, svgViewBoxWidth, svgViewBoxHeight];
+          svgViewBoxWidth = tempViewBoxValues[2];
+          svgViewBoxHeight = tempViewBoxValues[3];
+      }
       
-      console.log("Calculated dimensions:", {
-        totalWidthMM: calculatedDim.totalWidthMM,
-        totalHeightMM: calculatedDim.totalHeightMM,
-        totalWidthInches: calculatedDim.totalWidthInches.toFixed(2),
-        totalHeightInches: calculatedDim.totalHeightInches.toFixed(2)
-      });
+      // Calculate the required physical size in INCHES based on the SVG's viewBox width/height
+      // Assuming the viewBox coordinates correspond roughly to millimeters
+      const MM_TO_INCHES = 1 / 25.4;
+      const requiredBlueprintWidthInches = svgViewBoxWidth * MM_TO_INCHES;
+      const requiredBlueprintHeightInches = svgViewBoxHeight * MM_TO_INCHES;
       
-      // Calculate PDF dimensions with LARGER margins
-      const pdfDimensions = calculatePDFDimensions(calculatedDim, 2); // 3-inch margin
+      const marginInches = 2; // Keep 2-inch margin
       
-      // Create a new jsPDF instance with size based on the actual bag dimensions plus margins
+      // Calculate PDF page size needed to contain the *entire viewBox* plus margins
+      const pdfWidthInches = Math.ceil(requiredBlueprintWidthInches + (marginInches * 2));
+      const pdfHeightInches = Math.ceil(requiredBlueprintHeightInches + (marginInches * 2));
+      const pdfOrientation = pdfWidthInches > pdfHeightInches ? "landscape" as const : "portrait" as const;
+
+      // Calculate position to center the blueprint (based on its full viewBox size)
+      const xPos = (pdfWidthInches - requiredBlueprintWidthInches) / 2;
+      const yPos = (pdfHeightInches - requiredBlueprintHeightInches) / 2;
+      // --- End Revised PDF Page Size Calculation ---
+
+      // Create a new jsPDF instance with the calculated size
       const pdf = new jsPDF({
-        orientation: pdfDimensions.orientation,
+        orientation: pdfOrientation,
         unit: "in",
-        format: [pdfDimensions.pdfWidthInches, pdfDimensions.pdfHeightInches],
-        compress: false, // Keep vector quality
-        hotfixes: ["scale_correction"] // Add this to help with scaling issues
+        format: [pdfWidthInches, pdfHeightInches], // Use newly calculated page size
+        compress: false, 
+        hotfixes: ["scale_correction"] 
       });
       
-      // Calculate page dimensions
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
       
-      console.log("PDF dimensions:", {
-        width: pdfDimensions.pdfWidthInches,
-        height: pdfDimensions.pdfHeightInches,
-        orientation: pdfDimensions.orientation,
+      console.log("Revised PDF dimensions:", {
+        width: pdfWidthInches,
+        height: pdfHeightInches,
+        orientation: pdfOrientation,
         pageWidth,
-        pageHeight
+        pageHeight,
+        requiredBlueprintWidthInches: requiredBlueprintWidthInches.toFixed(2),
+        requiredBlueprintHeightInches: requiredBlueprintHeightInches.toFixed(2),
+        xPos: xPos.toFixed(2),
+        yPos: yPos.toFixed(2)
       });
       
-      // Get the bag blueprint SVG
-      const bagBlueprintElement = document.querySelector(".bagBlueprint") || 
-                                document.querySelector("svg");
-      
+      // Get the bag blueprint SVG element again for cloning
+      const bagBlueprintElement = document.querySelector(".bagBlueprint svg") || document.querySelector("svg");
+
       if (bagBlueprintElement instanceof SVGElement) {
-        // Clone the SVG to avoid modifications to the original
+        // Clone the SVG
         const svgClone = bagBlueprintElement.cloneNode(true) as SVGElement;
+
+        // --- REMOVE setting width/height in mm ---
+        // svgClone.setAttribute('width', `${calculatedDim.totalWidthMM}mm`); // REMOVE THIS
+        // svgClone.setAttribute('height', `${calculatedDim.totalHeightMM}mm`); // REMOVE THIS
         
-        // Set explicit dimensions with some padding
-        const viewBoxWidth = calculatedDim.totalWidthMM * 1; // if set to 1 measuremenets are almost precise, whole blueprint fits at 35% (1.35) extra width currently these lines are affecting precise measurements and viewing
-        const viewBoxHeight = calculatedDim.totalHeightMM * 1; // 35% extra height
+        // Ensure the viewBox attribute is present (it should be from BagBlueprint)
+        const finalViewBox = svgClone.getAttribute('viewBox');
+        if (!finalViewBox) {
+            console.warn("SVG clone is missing viewBox attribute!");
+            // Optionally set a fallback based on tempViewBoxValues if needed
+        } else {
+             console.log("Using SVG viewBox for scaling:", finalViewBox);
+        }
         
-        svgClone.setAttribute('width', `${calculatedDim.totalWidthMM}mm`);
-        svgClone.setAttribute('height', `${calculatedDim.totalHeightMM}mm`);
-        svgClone.setAttribute('viewBox', `0 0 ${viewBoxWidth} ${viewBoxHeight}`);
+        // Ensure preserveAspectRatio is set
         svgClone.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-        
-        // Position the bag in the available space using values from the utility
-        const xPos = pdfDimensions.xPos;
-        const yPos = pdfDimensions.yPos;
-        
-        console.log("SVG placement:", {
-          x: xPos,
-          y: yPos,
-          width: calculatedDim.totalWidthInches,
-          height: calculatedDim.totalHeightInches
-        });
-        
-        
-        // Add SVG as vector with exact physical dimensions (1:1 scale)
+
+        // --- Use the physical dimensions of the ENTIRE viewBox ---
         await svg2pdf(svgClone, pdf, {
-          x: xPos,
-          y: yPos,
-          width: calculatedDim.totalWidthInches,
-          height: calculatedDim.totalHeightInches
+          x: xPos, // Use centering position based on full viewBox
+          y: yPos, // Use centering position based on full viewBox
+          width: requiredBlueprintWidthInches,  // Target physical width for the whole viewBox
+          height: requiredBlueprintHeightInches // Target physical height for the whole viewBox
         });
+                      
+        console.log(`Added bag blueprint. Target physical size for SVG content: ${requiredBlueprintWidthInches.toFixed(2)}×${requiredBlueprintHeightInches.toFixed(2)} inches`);
         
+        // --- Logo Positioning Needs Adjustment ---
+        // The scale factor now needs to relate screen pixels to the physical size 
+        // of the SVG container *within the PDF*.
+        const bagContainerRect = bagContainerRef.current?.getBoundingClientRect() || { width: 0, height: 0 };
         
-        console.log(`Added bag blueprint at exact size: ${calculatedDim.totalWidthInches.toFixed(2)}×${calculatedDim.totalHeightInches.toFixed(2)} inches`);
+        // Scale factor: inches_in_pdf / pixels_on_screen
+        // The blueprint SVG now occupies requiredBlueprintWidthInches x requiredBlueprintHeightInches in the PDF
+        const scaleX = requiredBlueprintWidthInches / bagContainerRect.width;
+        const scaleY = requiredBlueprintHeightInches / bagContainerRect.height;
         
-        // Get container dimensions for logo positioning
-        const bagContainerRect = bagContainerRef.current?.getBoundingClientRect() || 
-                               { width: 0, height: 0 };
+        // The logo's (0,0) origin relative to the PDF page is xPos, yPos
+        const logoOriginX = xPos;
+        const logoOriginY = yPos;
         
-        // Calculate logo positions using the utility function
-        const logoPositions = calculateLogoPositions(
-          bagContainerRect, 
-          calculatedDim,
-          xPos,
-          yPos
-        );
-        
-        // Add logos at their correct physical positions
+        // Add logos at their correct physical positions relative to the scaled blueprint
         if (logos.length > 0) {
-          console.log("Adding logos with following scale factors:", {
-            scaleX: logoPositions.scaleX,
-            scaleY: logoPositions.scaleY
-          });
+          console.log("Adding logos with following scale factors:", { scaleX, scaleY });
           
           for (const logo of logos) {
             try {
-              // Convert screen positions to physical positions
-              const logoXInPDF = logoPositions.xPos + (logo.position.x * logoPositions.scaleX);
-              const logoYInPDF = logoPositions.yPos + (logo.position.y * logoPositions.scaleY);
-              const logoWidthInPDF = logo.size.width * logoPositions.scaleX;
-              const logoHeightInPDF = logo.size.height * logoPositions.scaleY;
+              // Convert screen pixel position (relative to container) to PDF inch position
+              // Need to map the logo's position within the SVG's coordinate system first, then scale.
+              // This part is tricky. Let's assume logo.position is relative to the top-left of the bagContainerRef
+              // We need to map this to the SVG's internal coordinate system, then to PDF inches.
+              
+              // Simpler approach: Map directly from screen container pixels to PDF inches
+              const logoXInPDF = logoOriginX + (logo.position.x * scaleX);
+              const logoYInPDF = logoOriginY + (logo.position.y * scaleY);
+              const logoWidthInPDF = logo.size.width * scaleX;
+              const logoHeightInPDF = logo.size.height * scaleY;
               
               console.log(`Logo ${logo.id} position:`, {
                 screen: { x: logo.position.x, y: logo.position.y },
-                pdf: { x: logoXInPDF, y: logoYInPDF }
+                pdf: { x: logoXInPDF.toFixed(2), y: logoYInPDF.toFixed(2) },
+                pdf_size: { w: logoWidthInPDF.toFixed(2), h: logoHeightInPDF.toFixed(2) }
               });
               
-              // Add the logo to PDF
-              pdf.addImage(
-                logo.src, 
-                'PNG', 
-                logoXInPDF, 
-                logoYInPDF, 
-                logoWidthInPDF, 
-                logoHeightInPDF
-              );
+              pdf.addImage(logo.src, 'PNG', logoXInPDF, logoYInPDF, logoWidthInPDF, logoHeightInPDF);
             } catch (err) {
               console.error(`Failed to add logo ${logo.id}:`, err);
             }
           }
         }
         
-        // Add dimensions text to the bottom of the PDF
-        // Use formatted values from the calculator for consistency
-        const dimensionsText = `Bag Dimensions: Length: ${calculatedDim.formattedLength} × Width: ${calculatedDim.formattedWidth} × Height: ${calculatedDim.formattedHeight}`;
-        pdf.text(dimensionsText, pageWidth / 2, pageHeight - 0.7, { align: "center" });
+        // Save the PDF
+        pdf.save(`MTC-Bag-Design-${calculatedDim.totalWidthInches.toFixed(2)}x${calculatedDim.totalHeightInches.toFixed(2)}-inches_Physical.pdf`);
         
-        // Additional info for total unfolded size
-        const unfoldedSizeText = `Total unfolded size: ${calculatedDim.formattedTotalWidth} × ${calculatedDim.formattedTotalHeight}`;
-        pdf.text(unfoldedSizeText, pageWidth / 2, pageHeight - 0.4, { align: "center" });
-        
-        // Save the PDF with exact dimensions in the filename
-        pdf.save(`MTC-Bag-Design-${calculatedDim.totalWidthInches.toFixed(2)}x${calculatedDim.totalHeightInches.toFixed(2)}-inches.pdf`);
-        
-        console.log("Physical-size PDF generation complete with exact 1:1 scaling!");
+        console.log("Physical-size PDF generation complete. Check scale in CorelDraw.");
         return true;
       }
       
