@@ -8,7 +8,7 @@ import resizeIcon from "../../public/resize.png";
 import Image from "next/image";
 import jsPDF from "jspdf";
 import {svg2pdf} from "svg2pdf.js";
-import { BagDimensions, calculateBagDimensions, calculatePDFDimensions, calculateLogoPositions } from "../../util/BagDimensions";
+import { BagDimensions, calculateBagDimensions } from "../../util/BagDimensions";
 
 interface DesignPageProps {
   handleNavigation: (page: string) => void;
