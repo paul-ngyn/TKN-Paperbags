@@ -11,7 +11,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
   const MAX_DIMENSIONS = {
     length: 21.65, 
     width: 11.81,
-    height: 25.98
+    height: 22.14
   };
 
   const MIN_DIMENSIONS = {
@@ -306,21 +306,6 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
             onChange={handleChange}
             required
           />
-        </div>
-        
-        {/* Upload Blueprint Section */}
-        <div className={styles.formGroup}>
-          <label htmlFor="blueprint">Upload Blueprint</label>
-          <input
-            type="file"
-            id="blueprint"
-            name="blueprint"
-            accept="application/pdf"
-            onChange={handleFileChange}
-          />
-          {blueprintFileName && (
-            <p className={styles.fileName}>Selected: {blueprintFileName}</p>
-          )}
         </div>
 
         <div className={styles.formGroup}>
