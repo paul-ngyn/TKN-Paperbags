@@ -48,7 +48,7 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
   
   // Calculate positions using YOUR positioning logic
   // This is critical to maintain the same visual appearance
-  const section1Start = 100; // This is your original value!
+  const section1Start = 90; // This is your original value!
   const section1End = section1Start + section1Width;
   const section2End = section1End + section2Width;
   const section3End = section2End + section3Width;
@@ -147,7 +147,7 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
         <rect
           x="50"
           y="50"
-          width="50"
+          width="40"
           height={tabsideHeight}
           fill="none"
           stroke="#000"
@@ -169,7 +169,7 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
         <rect
           x="50"
           y={50 + tabsideHeight}
-          width="50"
+          width="40"
           height={tabLength}
           fill="none"
           stroke="#000"
@@ -441,7 +441,7 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
         {/* Small 40mm Arrow - Fixed at 1.57 inches */}
         <g id="padding-measurement">
           <text
-            x="75"
+            x="70"
             y={measurementTextY - 25}
             textAnchor="middle"
             fontSize="16"
@@ -450,9 +450,9 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
             1.57 in (40 mm)
           </text>
           {/* Arrow for 40mm measurement - fixed */}
-          <line x1="55" y1={measurementLineY} x2="95" y2={measurementLineY} stroke="#000" strokeWidth="1" />
-          <polygon points={`90,${measurementLineY-5} 90,${measurementLineY+5} 105,${measurementLineY}`} fill="#000" />
-          <polygon points={`60,${measurementLineY-5} 60,${measurementLineY+5} 45,${measurementLineY}`} fill="#000" />
+          <line x1="50" y1={measurementLineY} x2="90" y2={measurementLineY} stroke="#000" strokeWidth="1" />
+          <polygon points={`85,${measurementLineY-5} 85,${measurementLineY+5} 100,${measurementLineY}`} fill="#000" />
+          <polygon points={`55,${measurementLineY-5} 55,${measurementLineY+5} 45,${measurementLineY}`} fill="#000" />
         </g>
 
         {/* 5. Section 1 Width - Shows actual width value */}
