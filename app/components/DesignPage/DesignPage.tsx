@@ -398,76 +398,67 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
       size={{ width: logo.size.width, height: logo.size.height }}
       bounds="parent"
       disableDragging={!(isLogoActive && draggable)}
-      enableResizing={isLogoActive && draggable ? { 
-        bottomRight: true, 
-      } : false}
-      onDragStart={() => {
-        setIsDragging(true);
+  enableResizing={isLogoActive && draggable ? { 
+    bottomRight: true, 
+  } : false}
+  onDragStart={() => {
+    setIsDragging(true);
+  }}
+  // Use onDrag for live updates instead of just onDragStop
+  onDrag={(e, d) => {
+    // Update position in real-time during dragging
+    handleLogoMove(logo.id, {x: d.x, y: d.y});
+  }}
+  onDragStop={(e, d) => {
+    handleLogoMove(logo.id, {x: d.x, y: d.y});
+    disableDrag();
+  }}
+  // Also update in real-time during resizing
+  onResize={(e, direction, ref, delta, position) => {
+    handleLogoMove(
+      logo.id, 
+      position,
+      { width: parseInt(ref.style.width), height: parseInt(ref.style.height) }
+    );
+  }}
+  onResizeStop={(e, direction, ref, delta, position) => {
+    handleLogoMove(
+      logo.id, 
+      position,
+      { width: parseInt(ref.style.width), height: parseInt(ref.style.height) }
+    );
+    disableDrag();
+  }}
+  ref={logoRefs.current.get(logo.id)}
+  cancel=".logoControlButtons, .duplicateLogoButton, .removeLogoButton, .dragButton, .resizeButton"
+  // Set this to make dragging more responsive
+  dragHandleClassName={styles.logoOverlay}
+>
+  <div
+    style={{ 
+      width: "100%", 
+      height: "100%", 
+      position: "relative",
+      cursor: isLogoActive && draggable ? "move" : "pointer" 
+    }}
+    onClick={(e) => {
+      e.stopPropagation();
+      toggleDragMode(logo.id);
+    }}
+    className={`${styles.logoOverlay} ${isLogoActive && isActive ? styles.active : ""}`}
+  >
+    <img
+      src={logo.src}
+      alt={`Logo ${logo.id}`}
+      style={{ 
+        width: "100%", 
+        height: "100%",
+        pointerEvents: "none" // This prevents the image from interfering with drag
       }}
-      onDragStop={(e, d) => {
-        handleLogoMove(logo.id, {x: d.x, y: d.y});
-        disableDrag();
-      }}
-      onResizeStop={(e, direction, ref, delta, position) => {
-        handleLogoMove(
-          logo.id, 
-          position,
-          { width: parseInt(ref.style.width), height: parseInt(ref.style.height) }
-        );
-        disableDrag();
-      }}
-      ref={logoRefs.current.get(logo.id)}
-      cancel=".logoControlButtons, .duplicateLogoButton, .removeLogoButton, .dragButton"
-    >
-      <div
-        style={{ width: "100%", height: "100%", position: "relative" }}
-        onClick={(e) => {
-          e.stopPropagation();
-          toggleDragMode(logo.id);
-        }}
-        className={`${styles.logoOverlay} ${isLogoActive && isActive ? styles.active : ""}`}
-      >
-        <img
-          src={logo.src}
-          alt={`Logo ${logo.id}`}
-          style={{ width: "100%", height: "100%" }}
-        />
-        {isLogoActive && isActive && (
+      draggable={false} // Prevent browser's native drag
+    />
+    {isLogoActive && isActive && (
           <>
-            {/* Drag button - moved to top-right */}
-            <button 
-              className={`${styles.dragButton}`}
-              style={{
-                position: "absolute",
-                top: "-15px",
-                right: "-15px",
-                backgroundColor: "white",
-                border: "1px solid #ccc",
-                borderRadius: "50%",
-                width: "26px",
-                height: "26px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: isDragging ? "grabbing" : "grab",
-                zIndex: 1002
-              }}
-              aria-label="Move Logo"
-              title="Move Logo"
-            >
-              {dragIcon ? (
-                <Image
-                  src={dragIcon}
-                  alt="Move"
-                  width={16}
-                  height={16}
-                  style={{ objectFit: "contain" }}
-                />
-              ) : (
-                <span style={{ fontSize: '14px', userSelect: 'none' }}>⇄</span>
-              )}
-            </button>
-
             {/* Resize handle at bottom-right */}
             <div className={styles.customResizeHandle}>
               <Image

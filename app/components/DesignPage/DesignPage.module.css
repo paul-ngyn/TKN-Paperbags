@@ -35,15 +35,7 @@
     border: 2px dashed rgb(97, 94, 94); /* Adds a dashed border when active */
   }
 
-  .resizeHandle {
-    position: absolute;
-    user-select: none;
-    width: 30px; /* Increased width */
-    height: 30px; /* Increased height */
-    right: -15px; /* Adjusted position */
-    bottom: -15px; /* Adjusted position */
-    cursor: se-resize;
-  }
+
   
   .customResizeHandle {
     position: absolute;
