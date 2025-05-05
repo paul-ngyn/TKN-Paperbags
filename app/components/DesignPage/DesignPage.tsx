@@ -6,7 +6,6 @@ import BagBlueprint from "../BagBlueprint/BagBlueprint";
 import styles from "./DesignPage.module.css";
 import resizeIcon from "../../public/resize-68.png";
 import duplicateIcon from "../../public/duplicate-icon.png";
-import dragIcon from "../../public/drag-icon.png";
 import Image from "next/image";
 import jsPDF from "jspdf";
 import {svg2pdf} from "svg2pdf.js";
