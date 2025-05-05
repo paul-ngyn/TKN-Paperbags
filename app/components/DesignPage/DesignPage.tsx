@@ -1,17 +1,14 @@
 "use client";
 import React, { useState, useRef } from "react";
 import { Rnd } from "react-rnd";
-import Draggable from 'react-draggable';
-import { ResizableBox } from 'react-resizable';
-import 'react-resizable/css/styles.css';
 import Sidebar from "../Sidebar/Sidebar";
-import Image from "next/image";
 import BagBlueprint from "../BagBlueprint/BagBlueprint";
 import styles from "./DesignPage.module.css";
+import resizeIcon from "../../public/resize-68.png";
+import duplicateIcon from "../../public/duplicate-icon.png";
+import dragIcon from "../../public/drag-icon.png";
+import Image from "next/image";
 import jsPDF from "jspdf";
-import duplicateicon from "../../public/duplicate-icon.png"; // Assuming you have a duplicate icon
-import resizeicon from "../../public/resize-icon.png"; // Assuming you have a resize icon
-
 import {svg2pdf} from "svg2pdf.js";
 import { BagDimensions, calculateBagDimensions } from "../../util/BagDimensions";
 
@@ -33,6 +30,7 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
   const [activeLogoId, setActiveLogoId] = useState<string | null>(null);
   const [draggable, setDraggable] = useState(false);
   const [isActive, setIsActive] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const logoRefs = useRef<Map<string, React.RefObject<Rnd>>>(new Map());
@@ -302,20 +300,29 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
   };
 
   const toggleDragMode = (logoId: string) => {
-    // If it's already active, no need to change anything
-    if (activeLogoId === logoId && draggable) return;
-    
-    // Deactivate any previously active logo
+    // Always make the logo active when clicked
     setActiveLogoId(logoId);
-    setDraggable(true);
     setIsActive(true);
-  };
-
-  const disableDrag = () => {
-    setDraggable(false);
-    setIsActive(false);
+    
+    // If it wasn't already active and draggable, enable dragging
+    if (activeLogoId !== logoId || !draggable) {
+      setDraggable(true);
+    }
   };
   
+  // Modify to keep drag mode active
+  const disableDrag = () => {
+    // Don't disable dragging right away
+    // Instead keep it enabled while the logo is active
+    setIsDragging(false);
+  };
+  
+  // Add a function to explicitly start dragging when the drag handle is used
+  const startDragging = (logoId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleDragMode(logoId);
+    setIsDragging(true);
+  };
   // Update logo position and size when moved or resized
   const handleLogoMove = (logoId: string, position: {x: number, y: number}, size?: {width: number, height: number}) => {
     setLogos(prev => prev.map(logo => {
@@ -375,99 +382,175 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
           currentEditValues={isEditingDimensions ? dimensions : undefined}
         />
 
-        {logos.map((logo) => {
-          const isLogoActive = logo.id === activeLogoId;
-          return (
-            <Draggable
-              key={logo.id}
-              position={{x: logo.position.x, y: logo.position.y}}
-              disabled={!(isLogoActive && draggable)}
-              bounds="parent"
-              onStop={(e, data) => {
-                handleLogoMove(logo.id, {x: data.x, y: data.y});
-                disableDrag();
-              }}
-              handle=".dragHandle" // This enables drag only on elements with this class
-            >
-              <div style={{position: 'absolute'}}>
-                <ResizableBox
-                  width={logo.size.width}
-                  height={logo.size.height}
-                  minConstraints={[50, 50]}
-                  maxConstraints={[500, 500]}
-                  resizeHandles={isLogoActive && draggable ? ['se'] : []} 
-                  onResizeStop={(e, data) => {
-                    const { width, height } = data.size;
-                    handleLogoMove(
-                      logo.id,
-                      { x: logo.position.x, y: logo.position.y },
-                      { width, height }
-                    );
-                    disableDrag();
-                  }}
-                >
-                  <div
-                    style={{ width: '100%', height: '100%', position: 'relative' }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleDragMode(logo.id);
-                    }}
-                    className={`${styles.logoOverlay} ${isLogoActive && isActive ? styles.active : ""}`}
-                  >
-                    <img
-                      src={logo.src}
-                      alt={`Logo ${logo.id}`}
-                      style={{ width: '100%', height: '100%' }}
-                    />
 
-                {isLogoActive && isActive && (
-                  <>
-                    <div className={styles.resizeHandle}>
-                      {/* Replace text/emoji with actual image */}
-                      <Image 
-                        src={resizeicon} 
-                        alt="Resize" 
-                        style={{ 
-                          width: '20px',
-                          height: '20px',
-                          objectFit: 'contain'
-                        }} 
-                      />
-                    </div>
-                    <div className={`${styles.dragHandleButton} dragHandle`}>
-                      <span role="img" aria-label="drag">↔</span>
-                    </div>
-                    <div className={styles.logoControlButtons}>
-                      <button 
-                        className={styles.duplicateLogoButton}
-                        onClick={(e) => handleDuplicateLogo(logo.id, e)}
-                      >
-                        {/* Replace emoji with actual image */}
-                        <Image 
-                          src={duplicateicon} 
-                          alt="Duplicate" 
-                          style={{ 
-                            width: '45px',
-                            height: '45px',
-                            objectFit: 'contain'
-                          }} 
-                        />
-                      </button>
-                      <button 
-                        className={styles.removeLogoButton}
-                        onClick={(e) => handleLogoDelete(logo.id, e)}
-                      >
-                        &times;
-                      </button>
-                    </div>
-                  </>
-                )}
-                  </div>
-                </ResizableBox>
-              </div>
-            </Draggable>
-          );
-        })}
+{logos.map((logo) => {
+  const isLogoActive = logo.id === activeLogoId;
+  return (
+    <Rnd
+      key={logo.id}
+      default={{ 
+        x: logo.position.x, 
+        y: logo.position.y, 
+        width: logo.size.width, 
+        height: logo.size.height 
+      }}
+      position={{ x: logo.position.x, y: logo.position.y }}
+      size={{ width: logo.size.width, height: logo.size.height }}
+      bounds="parent"
+      disableDragging={!(isLogoActive && draggable)}
+      enableResizing={isLogoActive && draggable ? { 
+        bottomRight: true, 
+      } : false}
+      onDragStart={() => {
+        setIsDragging(true);
+      }}
+      onDragStop={(e, d) => {
+        handleLogoMove(logo.id, {x: d.x, y: d.y});
+        disableDrag();
+      }}
+      onResizeStop={(e, direction, ref, delta, position) => {
+        handleLogoMove(
+          logo.id, 
+          position,
+          { width: parseInt(ref.style.width), height: parseInt(ref.style.height) }
+        );
+        disableDrag();
+      }}
+      ref={logoRefs.current.get(logo.id)}
+      cancel=".logoControlButtons, .duplicateLogoButton, .removeLogoButton, .dragButton"
+    >
+      <div
+        style={{ width: "100%", height: "100%", position: "relative" }}
+        onClick={(e) => {
+          e.stopPropagation();
+          toggleDragMode(logo.id);
+        }}
+        className={`${styles.logoOverlay} ${isLogoActive && isActive ? styles.active : ""}`}
+      >
+        <img
+          src={logo.src}
+          alt={`Logo ${logo.id}`}
+          style={{ width: "100%", height: "100%" }}
+        />
+        {isLogoActive && isActive && (
+          <>
+            {/* Drag button - moved to top-right */}
+            <button 
+              className={`${styles.dragButton}`}
+              style={{
+                position: "absolute",
+                top: "-15px",
+                right: "-15px",
+                backgroundColor: "white",
+                border: "1px solid #ccc",
+                borderRadius: "50%",
+                width: "26px",
+                height: "26px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: isDragging ? "grabbing" : "grab",
+                zIndex: 1002
+              }}
+              aria-label="Move Logo"
+              title="Move Logo"
+            >
+              {dragIcon ? (
+                <Image
+                  src={dragIcon}
+                  alt="Move"
+                  width={16}
+                  height={16}
+                  style={{ objectFit: "contain" }}
+                />
+              ) : (
+                <span style={{ fontSize: '14px', userSelect: 'none' }}>⇄</span>
+              )}
+            </button>
+
+            {/* Resize handle at bottom-right */}
+            <div className={styles.customResizeHandle}>
+              <Image
+                src={resizeIcon}
+                alt="Resize Handle"
+                width={24}
+                height={22}
+                style={{ objectFit: "contain" }}
+              />
+            </div>
+            
+            {/* Delete button - positioned at top-left */}
+            <button 
+              className={styles.removeLogoButton}
+              onMouseDown={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                handleLogoDelete(logo.id, e);
+              }}
+              style={{
+                position: "absolute",
+                top: "-15px",
+                left: "-15px",
+                backgroundColor: "white",
+                border: "1px solid #ccc",
+                borderRadius: "50%",
+                width: "26px",
+                height: "26px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                color: "#ff3b30",
+                fontWeight: "bold",
+                fontSize: "18px",
+                zIndex: 1002
+              }}
+              aria-label="Remove Logo"
+              title="Remove Logo"
+            >
+              &times;
+            </button>
+            
+            {/* Duplicate button - positioned at bottom-left */}
+            <button 
+              className={styles.duplicateLogoButton}
+              onMouseDown={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                handleDuplicateLogo(logo.id, e);
+              }}
+              style={{
+                position: "absolute",
+                bottom: "-15px",
+                left: "-15px",
+                backgroundColor: "white",
+                border: "1px solid #ccc",
+                borderRadius: "50%",
+                width: "26px",
+                height: "26px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                zIndex: 1002
+              }}
+              aria-label="Duplicate Logo"
+              title="Duplicate Logo"
+            >
+              <Image
+                src={duplicateIcon}
+                alt="Duplicate"
+                width={20}
+                height={20}
+                style={{ objectFit: "contain" }}
+              />
+            </button>
+          </>
+        )}
+      </div>
+    </Rnd>
+  );
+})}
       </div>
     </div>
   );

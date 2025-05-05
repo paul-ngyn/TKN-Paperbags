@@ -48,32 +48,11 @@
   .customResizeHandle {
     position: absolute;
     width: 30px; /* Increased width */
-    height: 30px; /* Increased height */
-    right: -15px; /* Adjusted position */
+    height: 20px; /* Increased height */
+    right: -25px; /* Adjusted position */
     bottom: -15px; /* Adjusted position */
     cursor: se-resize;
   }
-
-
-.dragHandleButton {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(255, 255, 255, 0.8);
-  color: black;
-  border: 1px solid #ccc;
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: grab;
-  font-size: 16px;
-  z-index: 10;
-  opacity: 1;
-}
 
 .dragHandleButton:hover {
   background: rgba(255, 255, 255, 1);
@@ -155,6 +134,7 @@
     justify-content: center;
     cursor: pointer;
     z-index: 100;
+  
   }
   
   .duplicateLogoButton:hover {
