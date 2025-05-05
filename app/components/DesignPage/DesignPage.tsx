@@ -29,6 +29,7 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
   const [activeLogoId, setActiveLogoId] = useState<string | null>(null);
   const [draggable, setDraggable] = useState(false);
   const [isActive, setIsActive] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isDragging, setIsDragging] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
