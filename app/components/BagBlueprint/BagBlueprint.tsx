@@ -99,8 +99,8 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
     const requiredHeight = contentHeight + bufferY;
     
     // Center the content in the viewBox
-    const minX = -bufferX / 3;
-    const minY = -bufferY / 5; // Position it higher to show more of the diagram
+    const minX = -bufferX / 1.5;
+    const minY = -bufferY / 1; // Position it higher to show more of the diagram
     
     return {
       minX,
@@ -523,29 +523,6 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
           <polygon points={`${section3End+10},${measurementLineY-5} ${section3End+10},${measurementLineY+5} ${section3End-5},${measurementLineY}`} fill="#000" />
         </g>
       </g>
-
-      {/* For debugging - this will help you see that Tab 1 and Tab 2 have exactly the same width */}
-      {false && (
-        <g id="debug-info" opacity="0.7">
-          <rect
-            x={section1Start}
-            y={50 + tabsideHeight}
-            width={section1Width}
-            height={10}
-            fill="rgba(255,0,0,0.3)"
-          />
-          <rect
-            x={section2End}
-            y={50 + tabsideHeight}
-            width={section3Width}
-            height={10}
-            fill="rgba(0,0,255,0.3)"
-          />
-          <text x="10" y="-10" fontSize="10" fill="#999">
-            Tab1: {section1Width}mm, Tab2: {section3Width}mm (should be equal)
-          </text>
-        </g>
-      )}
     </svg>
   );
 };

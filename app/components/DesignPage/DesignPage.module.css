@@ -9,13 +9,13 @@
     
   .bagContainer {
     position: relative;
-    width: 650px;
-    height: 650px;
+    width: 700px;
+    height: 700px;
     border: 1px solid white;
-    margin-top: 7%;
-    margin-left: 12%;
-    margin-bottom: 10%;
+    margin-top: 5%;
+    left: 1%;
     overflow: hidden; /* Ensures child elements cannot be seen outside */
+  
   }
     
   .controls {
@@ -84,7 +84,7 @@
     position: contain;
     max-width: 100%;
     max-height: 100%;
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: #ffffff;
     border-radius: 10px;
     pointer-events: none; /* Prevents interaction with the blueprint */
   }
@@ -98,7 +98,7 @@
     width: 100%;
     overflow: hidden;
     position: relative;
-    background-color: #f8f8f8;
+    background-color: #ffffff;
     padding: 5px;
     right: 7%;
   }
