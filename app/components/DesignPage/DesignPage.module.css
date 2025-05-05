@@ -24,7 +24,7 @@
 
   .navLink {
     display: block;
-    margin-bottom: 4%;
+    margin-bottom: 3%;
     margin-right: 16%;
     color: #0070f3;
     text-decoration: underline;
@@ -53,6 +53,46 @@
     bottom: -15px; /* Adjusted position */
     cursor: se-resize;
   }
+
+
+.dragHandleButton {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.8);
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  font-size: 16px;
+  z-index: 10;
+  opacity: 0.8;
+}
+
+.dragHandleButton:hover {
+  background: rgba(255, 255, 255, 1);
+  opacity: 1;
+}
+
+.dragHandleButton:active {
+  cursor: grabbing;
+}
+
+/* Make the entire logo appear with a special cursor when active */
+.logoOverlay.active {
+  cursor: move; /* Fallback */
+  cursor: grab;
+}
+
+.logoOverlay.active:active {
+  cursor: grabbing;
+}
   
 
   .uploadLabel {

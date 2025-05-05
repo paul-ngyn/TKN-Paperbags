@@ -1,6 +1,9 @@
 "use client";
 import React, { useState, useRef } from "react";
 import { Rnd } from "react-rnd";
+import Draggable from 'react-draggable';
+import { ResizableBox } from 'react-resizable';
+import 'react-resizable/css/styles.css';
 import Sidebar from "../Sidebar/Sidebar";
 import BagBlueprint from "../BagBlueprint/BagBlueprint";
 import styles from "./DesignPage.module.css";
@@ -373,80 +376,73 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
         {logos.map((logo) => {
           const isLogoActive = logo.id === activeLogoId;
           return (
-            <Rnd
+            <Draggable
               key={logo.id}
-              default={{ 
-                x: logo.position.x, 
-                y: logo.position.y, 
-                width: logo.size.width, 
-                height: logo.size.height 
-              }}
-              position={{ x: logo.position.x, y: logo.position.y }}
-              size={{ width: logo.size.width, height: logo.size.height }}
+              position={{x: logo.position.x, y: logo.position.y}}
+              disabled={!(isLogoActive && draggable)}
               bounds="parent"
-              disableDragging={!(isLogoActive && draggable)}
-              enableResizing={isLogoActive && draggable ? { 
-                bottomRight: true, 
-              } : false}
-              onDragStop={(e, d) => {
-                handleLogoMove(logo.id, {x: d.x, y: d.y});
+              onStop={(e, data) => {
+                handleLogoMove(logo.id, {x: data.x, y: data.y});
                 disableDrag();
               }}
-              onResizeStop={(e, direction, ref, delta, position) => {
-                handleLogoMove(
-                  logo.id, 
-                  position,
-                  { width: parseInt(ref.style.width), height: parseInt(ref.style.height) }
-                );
-                disableDrag();
-              }}
-              ref={logoRefs.current.get(logo.id)}
+              handle=".dragHandle" // This enables drag only on elements with this class
             >
-              <div
-                style={{ width: "100%", height: "100%", position: "relative" }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleDragMode(logo.id);
-                }}
-                className={`${styles.logoOverlay} ${isLogoActive && isActive ? styles.active : ""}`}
-              >
-                <img
-                  src={logo.src}
-                  alt={`Logo ${logo.id}`}
-                  style={{ width: "100%", height: "100%" }}
-                />
-                {isLogoActive && isActive && (
-                  <>
-                    <div className={styles.customResizeHandle}>
-                      <Image
-                        src={resizeIcon}
-                        alt="Resize Handle"
-                        layout="fill"
-                        objectFit="contain"
-                      />
-                    </div>
-                    <div className={styles.logoControlButtons}>
-                      <button 
-                        className={styles.duplicateLogoButton}
-                        onClick={(e) => handleDuplicateLogo(logo.id, e)}
-                        aria-label="Duplicate Logo"
-                        title="Duplicate Logo"
-                      >
-                        <span role="img" aria-label="duplicate">📋</span>
-                      </button>
-                      <button 
-                        className={styles.removeLogoButton}
-                        onClick={(e) => handleLogoDelete(logo.id, e)}
-                        aria-label="Remove Logo"
-                        title="Remove Logo"
-                      >
-                        &times;
-                      </button>
-                    </div>
-                  </>
-                )}
+              <div style={{position: 'absolute'}}>
+                <ResizableBox
+                  width={logo.size.width}
+                  height={logo.size.height}
+                  minConstraints={[50, 50]}
+                  maxConstraints={[500, 500]}
+                  resizeHandles={isLogoActive && draggable ? ['se'] : []} 
+                  onResizeStop={(e, data) => {
+                    const { width, height } = data.size;
+                    handleLogoMove(
+                      logo.id,
+                      { x: logo.position.x, y: logo.position.y },
+                      { width, height }
+                    );
+                    disableDrag();
+                  }}
+                >
+                  <div
+                    style={{ width: '100%', height: '100%', position: 'relative' }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleDragMode(logo.id);
+                    }}
+                    className={`${styles.logoOverlay} ${isLogoActive && isActive ? styles.active : ""}`}
+                  >
+                    <img
+                      src={logo.src}
+                      alt={`Logo ${logo.id}`}
+                      style={{ width: '100%', height: '100%' }}
+                    />
+                    {isLogoActive && isActive && (
+                      <>
+                        <div className={styles.resizeHandle}></div>
+                        <div className={`${styles.dragHandleButton} dragHandle`}>
+                          <span role="img" aria-label="drag">↔</span>
+                        </div>
+                        <div className={styles.logoControlButtons}>
+                          <button 
+                            className={styles.duplicateLogoButton}
+                            onClick={(e) => handleDuplicateLogo(logo.id, e)}
+                          >
+                            <span role="img" aria-label="duplicate">📋</span>
+                          </button>
+                          <button 
+                            className={styles.removeLogoButton}
+                            onClick={(e) => handleLogoDelete(logo.id, e)}
+                          >
+                            &times;
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </ResizableBox>
               </div>
-            </Rnd>
+            </Draggable>
           );
         })}
       </div>
