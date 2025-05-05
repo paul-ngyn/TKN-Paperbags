@@ -1,7 +1,7 @@
 .sidebarContainer {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 1.5rem;
   padding: 1.5rem;
   border: 2px solid rgb(245, 240, 240);
   border-radius: 8px;
@@ -25,7 +25,6 @@
   font-size: 16px;
   font-weight: bold;
   align-self: center;
-  margin-top: 0.5rem;
 }
 
 /* Dimension section */
@@ -161,6 +160,7 @@
 .downloadButtonContainer {
   display: flex;
   justify-content: center;
+  margin-top: 0.4rem;
 }
 
 .downloadButton {
@@ -187,7 +187,7 @@
 .clearButton {
   background-color: #f44336;
   color: white;
-  margin-top: 0.2rem;
+  margin-top: 10px;
 }
 
 .clearButton:hover {
@@ -227,7 +227,6 @@
 .addLogoButton:hover {
   background-color: #3a80d2;
 }
-
 
 .dropZone {
   display: flex;
