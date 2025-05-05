@@ -1,12 +1,13 @@
 .navbar {
   background-color: #ffffff;
-  padding: 2rem;
+  padding: 2.05rem;
   width: 100%; /* Takes up the full width of the screen */
   margin: 0 auto; /* Centers the navbar horizontally */
   position: fixed;
   top: 0;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Add shadow */
   z-index: 1000; /* Ensure the navbar is above other content */
+  border-radius: 2px;
 }
 
 
