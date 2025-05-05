@@ -316,12 +316,7 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
     setIsDragging(false);
   };
   
-  // Add a function to explicitly start dragging when the drag handle is used
-  const startDragging = (logoId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    toggleDragMode(logoId);
-    setIsDragging(true);
-  };
+
   // Update logo position and size when moved or resized
   const handleLogoMove = (logoId: string, position: {x: number, y: number}, size?: {width: number, height: number}) => {
     setLogos(prev => prev.map(logo => {
