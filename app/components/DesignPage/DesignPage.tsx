@@ -5,11 +5,13 @@ import Draggable from 'react-draggable';
 import { ResizableBox } from 'react-resizable';
 import 'react-resizable/css/styles.css';
 import Sidebar from "../Sidebar/Sidebar";
+import Image from "next/image";
 import BagBlueprint from "../BagBlueprint/BagBlueprint";
 import styles from "./DesignPage.module.css";
-import resizeIcon from "../../public/resize.png";
-import Image from "next/image";
 import jsPDF from "jspdf";
+import duplicateicon from "../../public/duplicate-icon.png"; // Assuming you have a duplicate icon
+import resizeicon from "../../public/resize-icon.png"; // Assuming you have a resize icon
+
 import {svg2pdf} from "svg2pdf.js";
 import { BagDimensions, calculateBagDimensions } from "../../util/BagDimensions";
 
@@ -417,28 +419,49 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
                       alt={`Logo ${logo.id}`}
                       style={{ width: '100%', height: '100%' }}
                     />
-                    {isLogoActive && isActive && (
-                      <>
-                        <div className={styles.resizeHandle}></div>
-                        <div className={`${styles.dragHandleButton} dragHandle`}>
-                          <span role="img" aria-label="drag">↔</span>
-                        </div>
-                        <div className={styles.logoControlButtons}>
-                          <button 
-                            className={styles.duplicateLogoButton}
-                            onClick={(e) => handleDuplicateLogo(logo.id, e)}
-                          >
-                            <span role="img" aria-label="duplicate">📋</span>
-                          </button>
-                          <button 
-                            className={styles.removeLogoButton}
-                            onClick={(e) => handleLogoDelete(logo.id, e)}
-                          >
-                            &times;
-                          </button>
-                        </div>
-                      </>
-                    )}
+
+                {isLogoActive && isActive && (
+                  <>
+                    <div className={styles.resizeHandle}>
+                      {/* Replace text/emoji with actual image */}
+                      <Image 
+                        src={resizeicon} 
+                        alt="Resize" 
+                        style={{ 
+                          width: '20px',
+                          height: '20px',
+                          objectFit: 'contain'
+                        }} 
+                      />
+                    </div>
+                    <div className={`${styles.dragHandleButton} dragHandle`}>
+                      <span role="img" aria-label="drag">↔</span>
+                    </div>
+                    <div className={styles.logoControlButtons}>
+                      <button 
+                        className={styles.duplicateLogoButton}
+                        onClick={(e) => handleDuplicateLogo(logo.id, e)}
+                      >
+                        {/* Replace emoji with actual image */}
+                        <Image 
+                          src={duplicateicon} 
+                          alt="Duplicate" 
+                          style={{ 
+                            width: '45px',
+                            height: '45px',
+                            objectFit: 'contain'
+                          }} 
+                        />
+                      </button>
+                      <button 
+                        className={styles.removeLogoButton}
+                        onClick={(e) => handleLogoDelete(logo.id, e)}
+                      >
+                        &times;
+                      </button>
+                    </div>
+                  </>
+                )}
                   </div>
                 </ResizableBox>
               </div>
