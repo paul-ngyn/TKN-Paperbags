@@ -207,11 +207,10 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
                 
                 pdf.setFont(pdfFontName, fontStyle);
                 
-                // Adjust font size calculation for better visibility
-                const scaledFontSize = (logo.textStyle?.fontSize || 24) * 
-                  Math.min(scaleX, scaleY) * 0.8; // Scale factor
+                // Adjust font size calculation for better visibility fix this const for pdf generation 
+                const scaledFontSize = Math.max(99, (logo.textStyle?.fontSize || 128) * Math.min(scaleX, scaleY) * 1);
                 
-                pdf.setFontSize(scaledFontSize);
+                pdf.setFontSize(99);
                 
                 // Set text color (convert hex to RGB components)
                 const color = logo.textStyle?.color || '#000000';
