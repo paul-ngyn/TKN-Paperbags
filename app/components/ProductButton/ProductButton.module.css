@@ -6,8 +6,9 @@
     position: fixed;
     top: 2vh;
     left: 9%;
+    font-weight: bold;
   }
   
   .navButton:hover {
-    text-decoration: underline;
+    color:#1c63cd
   }

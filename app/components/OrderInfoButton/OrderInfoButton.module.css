@@ -6,10 +6,11 @@
     position: fixed;
     top: 2vh;
     left: 30%;
+    font-weight: bold;
   }
   
   .navButton:hover {
-    text-decoration: underline;
+    color:#1c51a3
   }
 
   @media (max-width: 950px) {
