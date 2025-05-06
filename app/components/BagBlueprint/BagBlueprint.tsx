@@ -96,7 +96,7 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
     
     // Calculate total required dimensions with minimal padding
     const requiredWidth = contentWidth + bufferX - 50;
-    const requiredHeight = contentHeight + bufferY;
+    const requiredHeight = contentHeight + bufferY - 60;
     
     // Center the content in the viewBox
     const minX = -bufferX / 1.5;
@@ -154,14 +154,6 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
           strokeWidth="1"
           data-section="padding-left-upper"
         />
-        <text
-          x="75"
-          y={50 + tabsideHeight / 2}
-          textAnchor="middle"
-          fontSize="12"
-          fill="#666"
-        >
-        </text>
       </g>
 
       {/* Left Padding Lower Section */}
@@ -190,15 +182,6 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
           strokeWidth="1"
           data-section="side1"
         />
-        <text
-          x={section1Start + section1Width / 2}
-          y={50 + tabsideHeight / 2}
-          textAnchor="middle"
-          fontSize="14"
-          fill="#666"
-        >
-          Side 1
-        </text>
       </g>
 
       {/* RECTANGLE 3: Section 2 (First Length) */}
@@ -213,15 +196,6 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
           strokeWidth="1"
           data-section="front1"
         />
-        <text
-          x={section1End + section2Width / 2}
-          y={50 + tabsideHeight / 2}
-          textAnchor="middle"
-          fontSize="14"
-          fill="#666"
-        >
-          Front 1
-        </text>
       </g>
 
       {/* RECTANGLE 4: Section 3 (Second Width) */}
@@ -236,15 +210,6 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
           strokeWidth="1"
           data-section="side2"
         />
-        <text
-          x={section2End + section3Width / 2}
-          y={50 + tabsideHeight / 2}
-          textAnchor="middle"
-          fontSize="14"
-          fill="#666"
-        >
-          Side 2
-        </text>
       </g>
 
       {/* RECTANGLE 5: Section 4 (Second Length) */}
@@ -259,15 +224,6 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
           strokeWidth="1"
           data-section="front2"
         />
-        <text
-          x={section3End + section4Width / 2}
-          y={50 + tabsideHeight / 2}
-          textAnchor="middle"
-          fontSize="14"
-          fill="#666"
-        >
-          Front 2
-        </text>
       </g>
 
       {/* RECTANGLE 6: Tab 1 (Left Width) */}
@@ -283,15 +239,6 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
           data-section="tab1"
           data-width={section1Width}
         />
-        <text
-          x={section1Start + section1Width / 2}
-          y={50 + tabsideHeight + tabLength / 2}
-          textAnchor="middle"
-          fontSize="14"
-          fill="#666"
-        >
-          Tab 1
-        </text>
       </g>
 
       {/* RECTANGLE 7: Tab 2 (Right Width) */}
@@ -307,15 +254,6 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
           data-section="tab2"
           data-width={section3Width}
         />
-        <text
-          x={section2End + section3Width / 2}
-          y={50 + tabsideHeight + tabLength / 2}
-          textAnchor="middle"
-          fontSize="14"
-          fill="#666"
-        >
-          Tab 2
-        </text>
       </g>
 
       {/* NEW RECTANGLE: Section under Front 1 */}
@@ -330,15 +268,6 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
           strokeWidth="1"
           data-section="front1-bottom"
         />
-        <text
-          x={section1End + section2Width / 2}
-          y={50 + tabsideHeight + tabLength / 2}
-          textAnchor="middle"
-          fontSize="14"
-          fill="#666"
-        >
-          Base 1
-        </text>
       </g>
 
       {/* NEW RECTANGLE: Section under Front 2 */}
@@ -353,15 +282,6 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
           strokeWidth="1"
           data-section="front2-bottom"
         />
-        <text
-          x={section3End + section4Width / 2}
-          y={50 + tabsideHeight + tabLength / 2}
-          textAnchor="middle"
-          fontSize="14"
-          fill="#666"
-        >
-          Base 2
-        </text>
       </g>
 
       {/* Measurements */}
