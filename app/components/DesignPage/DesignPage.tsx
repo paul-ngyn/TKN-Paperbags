@@ -180,18 +180,37 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
               if (logo.type === 'text' && logo.text) {
                 // Handle text elements in PDF
                 const fontFamily = logo.textStyle?.fontFamily || 'helvetica';
-                // Map font names to jsPDF standard fonts
-                const pdfFontName = 
-                  fontFamily.toLowerCase().includes('times') ? 'times' : 
-                  fontFamily.toLowerCase().includes('courier') ? 'courier' : 'helvetica';
+                
+                // More reliable font mapping
+                let pdfFontName;
+                if (fontFamily.toLowerCase().includes('times')) {
+                  pdfFontName = 'times';
+                } else if (fontFamily.toLowerCase().includes('courier')) {
+                  pdfFontName = 'courier'; 
+                } else if (fontFamily.toLowerCase().includes('helvetica')) {
+                  pdfFontName = 'helvetica';
+                } else if (fontFamily.toLowerCase().includes('arial')) {
+                  pdfFontName = 'helvetica'; // Arial maps to helvetica in PDF
+                } else {
+                  pdfFontName = 'helvetica'; // Default fallback
+                }
                 
                 // Set font style based on weight
-                const fontStyle = logo.textStyle?.fontWeight === 'bold' ? 'bold' : 'normal';
+                let fontStyle;
+                if (logo.textStyle?.fontWeight === 'bold') {
+                  fontStyle = 'bold';
+                } else if (logo.textStyle?.fontWeight === 'lighter') {
+                  fontStyle = 'normal'; // PDF doesn't have "lighter"
+                } else {
+                  fontStyle = 'normal';
+                }
+                
                 pdf.setFont(pdfFontName, fontStyle);
                 
-                // Calculate font size proportionally to the element size
+                // Adjust font size calculation for better visibility
                 const scaledFontSize = (logo.textStyle?.fontSize || 24) * 
-                  Math.min(scaleX, scaleY) * 0.8; // Scale down slightly to ensure text fits
+                  Math.min(scaleX, scaleY) * 0.8; // Scale factor
+                
                 pdf.setFontSize(scaledFontSize);
                 
                 // Set text color (convert hex to RGB components)
@@ -201,12 +220,22 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
                 const b = parseInt(color.slice(5, 7), 16);
                 pdf.setTextColor(r, g, b);
                 
-                // Position text in the center of the element
-                const textX = logoXInPDF + logoWidthInPDF / 2;
-                const textY = logoYInPDF + logoHeightInPDF / 2;
+                // Position text centered in the element
+                const textX = logoXInPDF + (logoWidthInPDF / 2);
+                // Adjust Y position - PDF text positioning can be tricky
+                // Text baseline is bottom by default, so move it up by half the font size
+                const textY = logoYInPDF + (logoHeightInPDF / 2) + (scaledFontSize * 0.2);
                 
-                // Add text to PDF with alignment options
-                pdf.text(logo.text, textX, textY, { 
+                // Debug text positioning
+                console.log(`Adding text "${logo.text}" at:`, {
+                  position: { x: textX.toFixed(2), y: textY.toFixed(2) },
+                  fontSize: scaledFontSize.toFixed(2),
+                  font: `${pdfFontName} ${fontStyle}`,
+                  color: color
+                });
+                
+                // Add text to PDF with explicit alignment
+                pdf.text(logo.text, textX, textY, {
                   align: 'center',
                   baseline: 'middle'
                 });
@@ -410,13 +439,19 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
   
 
   // Update logo position and size when moved or resized
-  const handleLogoMove = (logoId: string, position: {x: number, y: number}, size?: {width: number, height: number}) => {
+  const handleLogoMove = (
+    logoId: string, 
+    position: {x: number, y: number}, 
+    size?: {width: number, height: number},
+    textStyle?: TextStyle
+  ) => {
     setLogos(prev => prev.map(logo => {
       if (logo.id === logoId) {
         return {
           ...logo,
           position: position,
-          size: size || logo.size
+          size: size || logo.size,
+          textStyle: textStyle || logo.textStyle
         };
       }
       return logo;
@@ -504,12 +539,41 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
               }}
               // Also update in real-time during resizing
               onResize={(e, direction, ref, delta, position) => {
-                handleLogoMove(
-                  logo.id, 
-                  position,
-                  { width: parseInt(ref.style.width), height: parseInt(ref.style.height) }
-                );
-              }}
+                const newWidth = parseInt(ref.style.width);
+                const newHeight = parseInt(ref.style.height);
+                
+                // Find the logo being resized
+                const resizedLogo = logos.find(logo => logo.id === logo.id);
+                
+                // If this is a text element, adjust font size proportionally
+                if (resizedLogo && resizedLogo.type === 'text' && resizedLogo.textStyle) {
+                  // Calculate a scaling factor based on width change
+                  const originalWidth = resizedLogo.size.width;
+                  const scaleFactor = newWidth / originalWidth;
+                  
+                  // Create updated text style with new font size
+                  const updatedTextStyle = {
+                    ...resizedLogo.textStyle,
+                    fontSize: Math.max(10, Math.round(resizedLogo.textStyle.fontSize * scaleFactor))
+                  };
+                  
+                  // Update both position/size and text style
+                  handleLogoMove(
+                    logo.id,
+                    position,
+                    { width: newWidth, height: newHeight },
+                    updatedTextStyle // Pass the updated text style
+                  );
+                } else {
+                  // For images, just update position and size as before
+                  handleLogoMove(
+                    logo.id,
+                    position,
+                    { width: newWidth, height: newHeight }
+                  );
+                }
+              }
+              }
               onResizeStop={(e, direction, ref, delta, position) => {
                 handleLogoMove(
                   logo.id, 
