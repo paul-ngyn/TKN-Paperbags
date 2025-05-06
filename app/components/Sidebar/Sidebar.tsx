@@ -227,6 +227,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     setDragActive(false);
   };
 
+  
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setDragActive(false);

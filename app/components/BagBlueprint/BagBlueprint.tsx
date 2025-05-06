@@ -95,7 +95,7 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
     const bufferY = Math.max(40, contentHeight * 0.03); // Just 3% buffer
     
     // Calculate total required dimensions with minimal padding
-    const requiredWidth = contentWidth + bufferX;
+    const requiredWidth = contentWidth + bufferX - 50;
     const requiredHeight = contentHeight + bufferY;
     
     // Center the content in the viewBox
