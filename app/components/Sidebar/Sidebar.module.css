@@ -65,7 +65,12 @@
   gap: 10px;
   margin-top: 0.2rem;
 }
-
+.buttonGroupText {
+  display: flex;
+  gap: 10px;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
 .buttonInfoGroup {
   display: flex;
   flex-direction: column;
@@ -130,7 +135,7 @@
   box-sizing: border-box;
 }
 
-.applyButton, .resetButton, .clearButton {
+.applyButton, .resetButton, .textButton {
   padding: 8px 16px;
   border: none;
   border-radius: 4px;
@@ -162,7 +167,6 @@
 .downloadButtonContainer {
   display: flex;
   justify-content: center;
-  margin-top: 0.4rem;
 }
 
 .downloadButton {
@@ -186,14 +190,14 @@
 }
 
 
-.clearButton {
-  background-color: #f44336;
+.textButton {
+  background-color: #1c51a3;
   color: white;
   margin-top: 10px;
 }
 
-.clearButton:hover {
-  background-color: #d32f2f;
+.textButton:hover {
+  background-color: #3a7bc8;
 }
 
 .applyButton:disabled, .resetButton:disabled {
@@ -334,4 +338,100 @@
 
 .infoLink:hover {
   color: #3a7bc8;
+}
+/* Add these styles to your existing CSS file */
+
+.tabNavigation {
+  display: flex;
+  border-bottom: 1px solid #ddd;
+}
+
+.tabButton {
+  flex: 1;
+  padding: 10px 5px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  color: #666;
+  transition: all 0.2s ease;
+}
+
+.tabButton:hover {
+  color: #007bff;
+}
+
+.activeTab {
+  color: #007bff;
+  border-bottom: 2px solid #007bff;
+}
+
+.textInputSection {
+  padding: 15px 0;
+}
+
+.formGroup {
+  margin-bottom: 15px;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.textArea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 80px;
+}
+
+.select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+}
+
+.slider {
+  width: 100%;
+}
+
+.colorPickerContainer {
+  display: flex;
+  align-items: center;
+}
+
+.colorPicker {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.colorValue {
+  font-family: monospace;
+}
+
+.textPreview {
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  border: 1px dashed #ccc;
+  border-radius: 4px;
+  padding: 15px;
+  margin: 15px 0;
+  text-align: center;
 }

@@ -34,8 +34,6 @@
   .active {
     border: 2px dashed rgb(97, 94, 94); /* Adds a dashed border when active */
   }
-
-
   
   .customResizeHandle {
     position: absolute;

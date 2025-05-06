@@ -7,29 +7,76 @@ import downloadicon from "../../public/downloadicon.png";
 import BlueprintExample from "../../public/BlueprintExample.png";
 import { BagDimensions, mmToInches} from "../../util/BagDimensions";
 
+// Extended props to support text customization
 interface SidebarProps {
   handleLogoUpload: (files: FileList) => void;
-  handleClear: () => void;
+  handleAddText: (text?: string, style?: TextStyle) => void; // Modified to receive text and style
   fileInputRef: React.RefObject<HTMLInputElement>;
   dimensions: BagDimensions;
   handleDimensionChange: (dimensions: BagDimensions) => void;
   startEditingDimensions?: () => void;
   downloadDesign?: () => void;
   logoCount?: number;
+  activeLogoId?: string | null;
+  activeLogoText?: string;
+  activeLogoTextStyle?: TextStyle;
+  updateTextContent?: (id: string, text: string, style: TextStyle) => void;
+}
+
+interface TextStyle {
+  fontFamily: string;
+  fontSize: number;
+  color: string;
+  fontWeight: string;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
   handleLogoUpload,
-  handleClear,
+  handleAddText,
   fileInputRef,
   dimensions,
   handleDimensionChange,
   startEditingDimensions = () => {}, 
   downloadDesign,
-  logoCount = 0 
+  logoCount = 0,
+  activeLogoId = null,
+  activeLogoText = "",
+  activeLogoTextStyle,
+  updateTextContent
 }) => {
   // Add state for showing/hiding the blueprint example modal
   const [showBlueprintExample, setShowBlueprintExample] = useState(false);
+  
+  // Add state for sidebar mode (default/text)
+  const [sidebarMode, setSidebarMode] = useState<'default' | 'text'>('default');
+  
+  // State for text input and styling
+  const [textInput, setTextInput] = useState('Your text here');
+  const [textStyle, setTextStyle] = useState<TextStyle>({
+    fontFamily: 'Arial',
+    fontSize: 24,
+    color: '#000000',
+    fontWeight: 'normal'
+  });
+  
+  // Update text editing mode when active text logo changes
+  useEffect(() => {
+    if (activeLogoId && activeLogoText && activeLogoTextStyle) {
+      // We're editing an existing text logo
+      setTextInput(activeLogoText);
+      setTextStyle(activeLogoTextStyle);
+      setSidebarMode('text');
+    } else if (sidebarMode === 'text' && !activeLogoId) {
+      // If we were in text mode but no active logo, reset
+      setTextInput('Your text here');
+      setTextStyle({
+        fontFamily: 'Arial',
+        fontSize: 24, 
+        color: '#000000',
+        fontWeight: 'normal'
+      });
+    }
+  }, [activeLogoId, activeLogoText, activeLogoTextStyle, sidebarMode]);
 
   // Define max dimensions in inches
   const MAX_DIMENSIONS = {
@@ -200,9 +247,51 @@ const Sidebar: React.FC<SidebarProps> = ({
     fileInputRef.current?.click();
   };
 
-  const handleClearClick = () => {
-    setFileName(null);
-    handleClear();
+  // === New Text Handling Functions ===
+  const handleAddTextClick = () => {
+    setSidebarMode('text');
+    setTextInput('Your text here');
+    setTextStyle({
+      fontFamily: 'Arial',
+      fontSize: 24,
+      color: '#000000',
+      fontWeight: 'normal'
+    });
+  };
+  
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setTextInput(e.target.value);
+  };
+  
+  const handleFontFamilyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setTextStyle(prev => ({ ...prev, fontFamily: e.target.value }));
+  };
+  
+  const handleFontSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTextStyle(prev => ({ ...prev, fontSize: parseInt(e.target.value, 10) }));
+  };
+  
+  const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTextStyle(prev => ({ ...prev, color: e.target.value }));
+  };
+  
+  const handleFontWeightChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setTextStyle(prev => ({ ...prev, fontWeight: e.target.value }));
+  };
+  
+  const applyTextChanges = () => {
+    if (activeLogoId && updateTextContent) {
+      // Update existing text
+      updateTextContent(activeLogoId, textInput, textStyle);
+    } else {
+      // Add new text
+      handleAddText(textInput, textStyle);
+    }
+    setSidebarMode('default');
+  };
+  
+  const cancelTextChanges = () => {
+    setSidebarMode('default');
   };
 
   // Check if current values differ from original values
@@ -243,165 +332,307 @@ const Sidebar: React.FC<SidebarProps> = ({
       : styles.dimensionInput;
   };
 
-  // The JSX return remains the same
   return (
     <div className={styles.sidebarContainer}>
       <h2 className={styles.sidebarTitle}>Design Your Bag</h2>
 
-      <div className={styles.uploadSection}>
-        <div 
-          className={`${styles.dropZone} ${dragActive ? styles.dragOver : ""}`}
-          onClick={handleClick}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-        >
-          <Image
-            src={downloadicon}
-            alt="Upload Icon"
-            width={40}
-            height={40}
-            className={styles.dropIcon}
-          />
-          <p>Drag & drop your logos here, or click to browse</p>
-          {fileName && <p className={styles.fileName}>Selected: {fileName}</p>}
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileInputChange}
-            ref={fileInputRef}
-            style={{ display: "none" }}
-          />
-        </div>
-        <div className={styles.buttonInfoGroup}>
-          {logoCount > 0 && (
-            <p className={styles.logoCount}>
-              {logoCount} logo{logoCount !== 1 ? 's' : ''} added
-            </p>
-          )}
-          <button onClick={handleClick} className={styles.addLogoButton}>
-            Add {logoCount > 0 ? 'Another' : 'New'} Logo
-          </button>
-          <button onClick={handleClearClick} className={styles.clearButton}>
-            {logoCount > 1 ? 'Clear All Logos' : 'Clear Logos'}
-          </button>
-        </div>
-      </div>
-
-      <div className={styles.infoLinkContainer}>
-        <Link href="/orderinfo" className={styles.infoLink}>
-          Image Upload Details
-        </Link>
-        <span className={styles.linkSeparator}>-</span>
+      {/* Tab Navigation */}
+      <div className={styles.tabNavigation}>
         <button 
-          onClick={() => setShowBlueprintExample(true)}
-          className={styles.infoLink}
+          className={`${styles.tabButton} ${sidebarMode === 'default' ? styles.activeTab : ''}`}
+          onClick={() => setSidebarMode('default')}
         >
-          Blueprint Example
+          Upload
+        </button>
+        <button 
+          className={`${styles.tabButton} ${sidebarMode === 'text' ? styles.activeTab : ''}`}
+          onClick={handleAddTextClick}
+        >
+          Text
         </button>
       </div>
-      
-      <div className={styles.dimensionContainer}>
-        <h3 className={styles.sectionTitle}>Customize Your Bag Dimensions</h3>
-        <div className={styles.dimensionInputs}>
-          <div className={styles.inputGroup}>
-            <label htmlFor="length">Length (in)</label>
-            <input
-              type="number"
-              id="length"
-              name="length"
-              value={inputValues.length}
-              onChange={onDimensionChange}
-              onKeyDown={onDimensionKeyDown}
-              min={MIN_DIMENSIONS.length}
-              max={MAX_DIMENSIONS.length}
-              step="0.01"
-              className={getInputClass('length')}
-            />
-            <div className={styles.dimensionLimits}>
-              <span className={styles.minDimension}>Min: {MIN_DIMENSIONS.length}&quot;</span>
-              <span className={styles.maxDimension}>Max: {MAX_DIMENSIONS.length}&quot;</span>
-            </div>
-          </div>
-          
-          <div className={styles.inputGroup}>
-            <label htmlFor="width">Width (in)</label>
-            <input
-              type="number"
-              id="width"
-              name="width"
-              value={inputValues.width}
-              onChange={onDimensionChange}
-              onKeyDown={onDimensionKeyDown}
-              min={MIN_DIMENSIONS.width}
-              max={MAX_DIMENSIONS.width}
-              step="0.01"
-              className={getInputClass('width')}
-            />
-            <div className={styles.dimensionLimits}>
-              <span className={styles.minDimension}>Min: {MIN_DIMENSIONS.width}&quot;</span>
-              <span className={styles.maxDimension}>Max: {MAX_DIMENSIONS.width}&quot;</span>
-            </div>
-          </div>
-          
-          <div className={styles.inputGroup}>
-            <label htmlFor="height">Height (in)</label>
-            <input
-              type="number"
-              id="height"
-              name="height"
-              value={inputValues.height}
-              onChange={onDimensionChange}
-              onKeyDown={onDimensionKeyDown}
-              min={MIN_DIMENSIONS.height}
-              max={MAX_DIMENSIONS.height}
-              step="0.01"
-              className={getInputClass('height')}
-            />
-            <div className={styles.dimensionLimits}>
-              <span className={styles.minDimension}>Min: {MIN_DIMENSIONS.height}&quot;</span>
-              <span className={styles.maxDimension}>Max: {MAX_DIMENSIONS.height}&quot;</span>
-            </div>
-          </div>
-        </div>
-        
-        {/* Buttons to apply or reset dimensions */}
-        <div className={styles.buttonGroup}>
-          <button 
-            onClick={applyDimensions} 
-            className={styles.applyButton}
-            disabled={!dimensionsChanged()}
-          >
-            Apply Dimensions
-          </button>
-          <button 
-            onClick={resetDimensions} 
-            className={styles.resetButton}
-            disabled={!dimensionsChanged()}
-          >
-            Reset
-          </button>
-        </div>
 
-        {/* Download Design Button */}
-        <div className={styles.downloadButtonContainer}>
-          <button 
-            onClick={() => {
-              if (typeof downloadDesign === 'function') {
-                downloadDesign();
-              } else {
-                console.error("No download function available");
-                alert("Unable to download design at this time.");
-              }
-            }}
-            className={styles.downloadButton}
+      {/* Default Upload Section */}
+      {sidebarMode === 'default' && (
+        <div className={styles.uploadSection}>
+          <div 
+            className={`${styles.dropZone} ${dragActive ? styles.dragOver : ""}`}
+            onClick={handleClick}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
           >
-            Download Design
-          </button>
+            <Image
+              src={downloadicon}
+              alt="Upload Icon"
+              width={40}
+              height={40}
+              className={styles.dropIcon}
+            />
+            <p>Drag & drop your logos here, or click to browse</p>
+            {fileName && <p className={styles.fileName}>Selected: {fileName}</p>}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileInputChange}
+              ref={fileInputRef}
+              style={{ display: "none" }}
+            />
+          </div>
+          <div className={styles.buttonInfoGroup}>
+            {logoCount > 0 && (
+              <p className={styles.logoCount}>
+                {logoCount} logo{logoCount !== 1 ? 's' : ''} added
+              </p>
+            )}
+            <button onClick={handleClick} className={styles.addLogoButton}>
+              Add {logoCount > 0 ? 'Another' : 'New'} Logo
+            </button>
+            <button onClick={handleAddTextClick} className={styles.textButton}>         
+              Add Text
+            </button>
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Text Input Section */}
+      {sidebarMode === 'text' && (
+        <div className={styles.textInputSection}>
+          <h3>{activeLogoId ? 'Edit Text' : 'Add New Text:'}</h3>
+          
+          <div className={styles.formGroup}>
+            <textarea
+              id="text-input"
+              value={textInput}
+              onChange={handleTextChange}
+              className={styles.textArea}
+              rows={3}
+              placeholder="Enter your text here"
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="font-family">Font:</label>
+            <select 
+              id="font-family" 
+              value={textStyle.fontFamily}
+              onChange={handleFontFamilyChange}
+              className={styles.select}
+            >
+              <option value="Arial">Arial</option>
+              <option value="Verdana">Verdana</option>
+              <option value="Helvetica">Helvetica</option>
+              <option value="Times New Roman">Times New Roman</option>
+              <option value="Courier New">Courier New</option>
+            </select>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="font-size">Size: {textStyle.fontSize}px</label>
+            <input
+              id="font-size"
+              type="range"
+              min="10"
+              max="72"
+              value={textStyle.fontSize}
+              onChange={handleFontSizeChange}
+              className={styles.slider}
+            />
+          </div>
+          
+          <div className={styles.formGroup}>
+            <label htmlFor="text-color">Color:</label>
+            <div className={styles.colorPickerContainer}>
+              <input
+                id="text-color"
+                type="color"
+                value={textStyle.color}
+                onChange={handleColorChange}
+                className={styles.colorPicker}
+              />
+              <span className={styles.colorValue}>{textStyle.color}</span>
+            </div>
+          </div>
+          
+          <div className={styles.formGroup}>
+            <label htmlFor="font-weight">Style:</label>
+            <select
+              id="font-weight"
+              value={textStyle.fontWeight}
+              onChange={handleFontWeightChange}
+              className={styles.select}
+            >
+              <option value="normal">Normal</option>
+              <option value="bold">Bold</option>
+              <option value="lighter">Light</option>
+            </select>
+          </div>
+          
+          <div 
+            className={styles.textPreview} 
+            style={{
+              fontFamily: textStyle.fontFamily,
+              fontSize: `${textStyle.fontSize}px`,
+              fontWeight: textStyle.fontWeight,
+              color: textStyle.color,
+            }}
+          >
+            {textInput || "Preview"}
+          </div>
+
+          <div className={styles.buttonGroupText}>
+            <button 
+              onClick={applyTextChanges} 
+              className={styles.applyButton}
+            >
+              {activeLogoId ? 'Update Text' : 'Add to Design'}
+            </button>
+            <button 
+              onClick={cancelTextChanges} 
+              className={styles.resetButton}
+            >
+              Cancel
+            </button>
+          </div>
+          
+          {/* Download Design Button - always visible regardless of mode */}
+          <div className={styles.downloadButtonContainer}>
+            <button 
+              onClick={() => {
+                if (typeof downloadDesign === 'function') {
+                  downloadDesign();
+                } else {
+                  console.error("No download function available");
+                  alert("Unable to download design at this time.");
+                }
+              }}
+              className={styles.downloadButton}
+            >
+              Download Design
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Only show these sections in default mode */}
+      {sidebarMode === 'default' && (
+        <>
+          <div className={styles.infoLinkContainer}>
+            <Link href="/orderinfo" className={styles.infoLink}>
+              Image Upload Details
+            </Link>
+            <span className={styles.linkSeparator}>-</span>
+            <button 
+              onClick={() => setShowBlueprintExample(true)}
+              className={styles.infoLink}
+            >
+              Blueprint Example
+            </button>
+          </div>
+          
+          <div className={styles.dimensionContainer}>
+            <h3 className={styles.sectionTitle}>Customize Your Bag Dimensions</h3>
+            <div className={styles.dimensionInputs}>
+              <div className={styles.inputGroup}>
+                <label htmlFor="length">Length (in)</label>
+                <input
+                  type="number"
+                  id="length"
+                  name="length"
+                  value={inputValues.length}
+                  onChange={onDimensionChange}
+                  onKeyDown={onDimensionKeyDown}
+                  min={MIN_DIMENSIONS.length}
+                  max={MAX_DIMENSIONS.length}
+                  step="0.01"
+                  className={getInputClass('length')}
+                />
+                <div className={styles.dimensionLimits}>
+                  <span className={styles.minDimension}>Min: {MIN_DIMENSIONS.length}&quot;</span>
+                  <span className={styles.maxDimension}>Max: {MAX_DIMENSIONS.length}&quot;</span>
+                </div>
+              </div>
+              
+              <div className={styles.inputGroup}>
+                <label htmlFor="width">Width (in)</label>
+                <input
+                  type="number"
+                  id="width"
+                  name="width"
+                  value={inputValues.width}
+                  onChange={onDimensionChange}
+                  onKeyDown={onDimensionKeyDown}
+                  min={MIN_DIMENSIONS.width}
+                  max={MAX_DIMENSIONS.width}
+                  step="0.01"
+                  className={getInputClass('width')}
+                />
+                <div className={styles.dimensionLimits}>
+                  <span className={styles.minDimension}>Min: {MIN_DIMENSIONS.width}&quot;</span>
+                  <span className={styles.maxDimension}>Max: {MAX_DIMENSIONS.width}&quot;</span>
+                </div>
+              </div>
+              
+              <div className={styles.inputGroup}>
+                <label htmlFor="height">Height (in)</label>
+                <input
+                  type="number"
+                  id="height"
+                  name="height"
+                  value={inputValues.height}
+                  onChange={onDimensionChange}
+                  onKeyDown={onDimensionKeyDown}
+                  min={MIN_DIMENSIONS.height}
+                  max={MAX_DIMENSIONS.height}
+                  step="0.01"
+                  className={getInputClass('height')}
+                />
+                <div className={styles.dimensionLimits}>
+                  <span className={styles.minDimension}>Min: {MIN_DIMENSIONS.height}&quot;</span>
+                  <span className={styles.maxDimension}>Max: {MAX_DIMENSIONS.height}&quot;</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Buttons to apply or reset dimensions */}
+            <div className={styles.buttonGroup}>
+              <button 
+                onClick={applyDimensions} 
+                className={styles.applyButton}
+                disabled={!dimensionsChanged()}
+              >
+                Apply Dimensions
+              </button>
+              <button 
+                onClick={resetDimensions} 
+                className={styles.resetButton}
+                disabled={!dimensionsChanged()}
+              >
+                Reset
+              </button>
+            </div>
+
+            {/* Download Design Button */}
+            <div className={styles.downloadButtonContainer}>
+              <button 
+                onClick={() => {
+                  if (typeof downloadDesign === 'function') {
+                    downloadDesign();
+                  } else {
+                    console.error("No download function available");
+                    alert("Unable to download design at this time.");
+                  }
+                }}
+                className={styles.downloadButton}
+              >
+                Download Design
+              </button>
+            </div>
+          </div>
+        </>
+      )}
       
-      {/* Blueprint Example Modal */}
+      {/* Blueprint Example Modal - available regardless of mode */}
       {showBlueprintExample && (
         <div className={styles.modal}>
           <div className={styles.modalContent}>
