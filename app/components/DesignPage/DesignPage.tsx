@@ -218,7 +218,7 @@ const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: nu
       if (hasLineBreaks) {
         // For multi-line text, explicitly handle line positioning
         const lineHeight = fontSize * 1.2;
-        const centerX = logo.size.width / 2;
+        const centerX = logo.size.width / 2 - (fontSize * 0.25); 
         
         // Calculate actual text bounds for proper vertical centering
         const lines = text.split('\n');
@@ -235,7 +235,9 @@ const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: nu
         // For single-line text, simple centered positioning
         const centerX = logo.size.width / 2;
         const centerY = logo.size.height / 2;
-        ctx.fillText(text, centerX, centerY);
+        // Add a small vertical offset (8% of font size) to visually center single-line text
+        const verticalOffset = fontSize * 0.08;
+        ctx.fillText(text, centerX, centerY + verticalOffset);
       }
       
       // Convert to image and add to PDF
