@@ -217,8 +217,8 @@ const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: nu
       // Different rendering approach based on text type
       if (hasLineBreaks) {
         // For multi-line text, explicitly handle line positioning
-        const lineHeight = fontSize * 1.2;
-        const centerX = logo.size.width / 2 - (fontSize * 0.25); 
+        const lineHeight = fontSize * 1.4;
+        const centerX = logo.size.width / 2 - (fontSize * 0.2); 
         
         // Calculate actual text bounds for proper vertical centering
         const lines = text.split('\n');
