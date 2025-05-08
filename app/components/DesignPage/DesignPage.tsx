@@ -64,9 +64,6 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
       // Use the BagDimensions utility for calculations
       const calculatedDim = calculateBagDimensions(dimensions);
       
-      // ... console logs for dimensions ...
-
-      // --- PDF Page Size Calculation (Revised) ---
       // Temporarily get the SVG element to read its final viewBox for sizing
       // Note: This assumes the SVG is already rendered in the DOM. If not, this needs adjustment.
       const tempSvgElement = document.querySelector(".bagBlueprint svg") || document.querySelector("svg");
@@ -95,7 +92,7 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
       // Calculate position to center the blueprint (based on its full viewBox size)
       const xPos = (pdfWidthInches - requiredBlueprintWidthInches) / 2;
       const yPos = (pdfHeightInches - requiredBlueprintHeightInches) / 2;
-      // --- End Revised PDF Page Size Calculation ---
+
 
       // Create a new jsPDF instance with the calculated size
       const pdf = new jsPDF({
@@ -106,20 +103,6 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
         hotfixes: ["scale_correction"] 
       });
       
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      
-      console.log("Revised PDF dimensions:", {
-        width: pdfWidthInches,
-        height: pdfHeightInches,
-        orientation: pdfOrientation,
-        pageWidth,
-        pageHeight,
-        requiredBlueprintWidthInches: requiredBlueprintWidthInches.toFixed(2),
-        requiredBlueprintHeightInches: requiredBlueprintHeightInches.toFixed(2),
-        xPos: xPos.toFixed(2),
-        yPos: yPos.toFixed(2)
-      });
       
       // Get the bag blueprint SVG element again for cloning
       const bagBlueprintElement = document.querySelector(".bagBlueprint svg") || document.querySelector("svg");
@@ -148,8 +131,6 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
           height: requiredBlueprintHeightInches // Target physical height for the whole viewBox
         });
                       
-        console.log(`Added bag blueprint. Target physical size for SVG content: ${requiredBlueprintWidthInches.toFixed(2)}×${requiredBlueprintHeightInches.toFixed(2)} inches`);
-        
         // --- Logo Positioning Needs Adjustment ---
         // The scale factor now needs to relate screen pixels to the physical size 
         // of the SVG container *within the PDF*.
@@ -199,18 +180,21 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
                 let fontStyle;
                 if (logo.textStyle?.fontWeight === 'bold') {
                   fontStyle = 'bold';
-                } else if (logo.textStyle?.fontWeight === 'lighter') {
-                  fontStyle = 'normal'; // PDF doesn't have "lighter"
                 } else {
                   fontStyle = 'normal';
                 }
                 
                 pdf.setFont(pdfFontName, fontStyle);
                 
-                // Adjust font size calculation for better visibility fix this const for pdf generation 
-                const scaledFontSize = Math.max(99, (logo.textStyle?.fontSize || 128) * Math.min(scaleX, scaleY) * 1);
+                // FIXED: Calculate font size based on both scale factors and original font size
+                // This needs to be proportional to match the visual appearance
+                const originalFontSize = logo.textStyle?.fontSize || 24;
+                const scaleFactor = Math.min(scaleX, scaleY);
+                const fontSizeAdjustmentFactor = 60; // This multiplier helps match visual size
+                const scaledFontSize = Math.max(16, originalFontSize * scaleFactor * fontSizeAdjustmentFactor);
                 
-                pdf.setFontSize(99);
+                // IMPORTANT: Actually use the calculated size
+                pdf.setFontSize(scaledFontSize);
                 
                 // Set text color (convert hex to RGB components)
                 const color = logo.textStyle?.color || '#000000';
@@ -221,32 +205,17 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
                 
                 // Position text centered in the element
                 const textX = logoXInPDF + (logoWidthInPDF / 2);
-                // Adjust Y position - PDF text positioning can be tricky
-                // Text baseline is bottom by default, so move it up by half the font size
-                const textY = logoYInPDF + (logoHeightInPDF / 2) + (scaledFontSize * 0.2);
-                
-                // Debug text positioning
-                console.log(`Adding text "${logo.text}" at:`, {
-                  position: { x: textX.toFixed(2), y: textY.toFixed(2) },
-                  fontSize: scaledFontSize.toFixed(2),
-                  font: `${pdfFontName} ${fontStyle}`,
-                  color: color
-                });
+                // Adjust Y position with proper vertical centering
+                const textY = logoYInPDF + (logoHeightInPDF / 2);
                 
                 // Add text to PDF with explicit alignment
                 pdf.text(logo.text, textX, textY, {
                   align: 'center',
                   baseline: 'middle'
                 });
+              }
                 
-                console.log(`Text ${logo.id} added at position:`, {
-                  screen: { x: logo.position.x, y: logo.position.y },
-                  pdf: { x: logoXInPDF.toFixed(2), y: logoYInPDF.toFixed(2) },
-                  pdf_size: { w: logoWidthInPDF.toFixed(2), h: logoHeightInPDF.toFixed(2) },
-                  fontSize: scaledFontSize.toFixed(2),
-                  text: logo.text
-                });
-              } else if (logo.type === 'image' && logo.src) {
+               else if (logo.type === 'image' && logo.src) {
                 // Handle image elements
                 console.log(`Logo ${logo.id} position:`, {
                   screen: { x: logo.position.x, y: logo.position.y },
@@ -267,7 +236,6 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
         // Save the PDF
         pdf.save(`MTC-Bag-Design-${calculatedDim.totalWidthInches.toFixed(2)}x${calculatedDim.totalHeightInches.toFixed(2)}-inches_Physical.pdf`);
         
-        console.log("Physical-size PDF generation complete. Check scale in CorelDraw.");
         return true;
       }
       
@@ -542,8 +510,8 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
                 const newHeight = parseInt(ref.style.height);
                 
                 // Find the logo being resized
-                const resizedLogo = logos.find(logo => logo.id === logo.id);
-                
+                const resizedLogo = logos.find(l => l.id === logo.id);
+
                 // If this is a text element, adjust font size proportionally
                 if (resizedLogo && resizedLogo.type === 'text' && resizedLogo.textStyle) {
                   // Calculate a scaling factor based on width change

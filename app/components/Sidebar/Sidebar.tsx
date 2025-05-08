@@ -465,7 +465,6 @@ const Sidebar: React.FC<SidebarProps> = ({
             >
               <option value="normal">Normal</option>
               <option value="bold">Bold</option>
-              <option value="lighter">Light</option>
             </select>
           </div>
           

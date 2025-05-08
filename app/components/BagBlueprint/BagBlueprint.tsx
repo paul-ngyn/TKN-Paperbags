@@ -100,7 +100,7 @@ const BagBlueprint: React.FC<BagBlueprintProps> = ({
     
     // Center the content in the viewBox
     const minX = -bufferX / 1.5;
-    const minY = -bufferY / 1; // Position it higher to show more of the diagram
+    const minY = -bufferY / 1.8; // Position it higher to show more of the diagram
     
     return {
       minX,
