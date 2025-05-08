@@ -233,8 +233,8 @@ const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: nu
         });
       } else {
         // For single-line text, simple centered positioning
-        const centerX = logo.size.width / 2 - (fontSize * 0.05);
-        const centerY = logo.size.height / 2;
+        const centerX = logo.size.width / 2 - (fontSize * 0.09);
+        const centerY = logo.size.height / 2 - (fontSize * 0.14);
         // Add a small vertical offset (8% of font size) to visually center single-line text
         const verticalOffset = fontSize * 0.08;
         ctx.fillText(text, centerX, centerY + verticalOffset);
