@@ -620,28 +620,6 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
                   
                   if (resizedLogo && resizedLogo.type === 'text' && resizedLogo.textStyle) {
                     // Better text sizing constraints
-                    
-                    // 1. Get text properties
-                    const text = resizedLogo.text || '';
-                    const fontSize = resizedLogo.textStyle.fontSize || 24;
-                    
-                    // 2. Calculate text dimensions more accurately
-                    // We'll use a formula based on character count rather than rough pixel estimates
-                    const charWidthFactor = fontSize * 0.6;  // Average character width as factor of font size
-                    const textWidth = text.length * charWidthFactor;
-                    
-                    // 3. Calculate a more appropriate size range
-                    // - Minimum: 80% of ideal text width, but at least 100px
-                    // - Maximum: 200% of ideal text width, but no more than 500px
-                    const idealTextWidth = Math.max(textWidth, 100);
-                    
-                    // 4. For height, calculate based on line count and font size
-                    // Count actual line breaks if any
-                    const lineBreaks = (text.match(/\n/g) || []).length;
-                    // Use greater of manual line breaks 
-                    const lineCount = Math.max(lineBreaks + 1, 1);
-                    
-                    // 6. Prioritize width for scaling calculation (since text flows horizontally)
                     const originalWidth = resizedLogo.size.width;
                     const widthRatio = newWidth / originalWidth;
                     
