@@ -192,7 +192,7 @@ const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: nu
       }
       
       // Set canvas properties - higher ratio for better quality
-      const pixelRatio = 8;
+      const pixelRatio = 5;
       canvas.width = logo.size.width * pixelRatio;
       canvas.height = logo.size.height * pixelRatio;
       ctx.scale(pixelRatio, pixelRatio);
@@ -218,7 +218,7 @@ const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: nu
       if (hasLineBreaks) {
         // For multi-line text, explicitly handle line positioning
         const lineHeight = fontSize * 1.4;
-        const centerX = logo.size.width / 2 - (fontSize * 0.2); 
+        const centerX = logo.size.width / 2 - (fontSize * 0.1); 
         
         // Calculate actual text bounds for proper vertical centering
         const lines = text.split('\n');
@@ -233,7 +233,7 @@ const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: nu
         });
       } else {
         // For single-line text, simple centered positioning
-        const centerX = logo.size.width / 2;
+        const centerX = logo.size.width / 2 - (fontSize * 0.05);
         const centerY = logo.size.height / 2;
         // Add a small vertical offset (8% of font size) to visually center single-line text
         const verticalOffset = fontSize * 0.08;
