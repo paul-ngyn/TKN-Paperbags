@@ -214,7 +214,8 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
                     
                     // Calculate vertical centering based on number of lines
                     const totalHeight = lines.length * lineHeight;
-                    const startY = y - (totalHeight / 2) + (lineHeight / 2);
+                    const verticalOffset = fontSize * 0.12;
+                    const startY = y - (totalHeight / 2) + (lineHeight / 2) + verticalOffset;
                     
                     // Draw each line centrally aligned
                     for (let i = 0; i < lines.length; i++) {
@@ -565,82 +566,123 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
           const isLogoActive = logo.id === activeLogoId;
           return (
             <Rnd
-              key={logo.id}
-              default={{ 
-                x: logo.position.x, 
-                y: logo.position.y, 
-                width: logo.size.width, 
-                height: logo.size.height 
-              }}
-              position={{ x: logo.position.x, y: logo.position.y }}
-              size={{ width: logo.size.width, height: logo.size.height }}
-              bounds="parent"
-              disableDragging={!(isLogoActive && draggable)}
-              enableResizing={isLogoActive && draggable ? { 
-                bottomRight: true, 
-              } : false}
-              onDragStart={() => {
-                setIsDragging(true);
-              }}
-              // Use onDrag for live updates instead of just onDragStop
-              onDrag={(e, d) => {
-                // Update position in real-time during dragging
-                handleLogoMove(logo.id, {x: d.x, y: d.y});
-              }}
-              onDragStop={(e, d) => {
-                handleLogoMove(logo.id, {x: d.x, y: d.y});
-                disableDrag();
-              }}
-              // Also update in real-time during resizing
-              onResize={(e, direction, ref, delta, position) => {
-                const newWidth = parseInt(ref.style.width);
-                const newHeight = parseInt(ref.style.height);
-                
-                // Find the logo being resized
-                const resizedLogo = logos.find(l => l.id === logo.id);
-
-                // If this is a text element, adjust font size proportionally
-                if (resizedLogo && resizedLogo.type === 'text' && resizedLogo.textStyle) {
-                  // Calculate a scaling factor based on width change
-                  const originalWidth = resizedLogo.size.width;
-                  const scaleFactor = newWidth / originalWidth;
-                  
-                  // Create updated text style with new font size
-                  const updatedTextStyle = {
-                    ...resizedLogo.textStyle,
-                    fontSize: Math.max(10, Math.round(resizedLogo.textStyle.fontSize * scaleFactor))
-                  };
-                  
-                  // Update both position/size and text style
-                  handleLogoMove(
-                    logo.id,
-                    position,
-                    { width: newWidth, height: newHeight },
-                    updatedTextStyle // Pass the updated text style
-                  );
-                } else {
-                  // For images, just update position and size as before
-                  handleLogoMove(
-                    logo.id,
-                    position,
-                    { width: newWidth, height: newHeight }
-                  );
+                key={logo.id}
+                default={{ 
+                  x: logo.position.x, 
+                  y: logo.position.y, 
+                  width: logo.size.width, 
+                  height: logo.size.height 
+                }}
+                position={{ x: logo.position.x, y: logo.position.y }}
+                size={{ width: logo.size.width, height: logo.size.height }}
+                bounds="parent"
+                disableDragging={!(isLogoActive && draggable)}
+                enableResizing={isLogoActive && draggable ? { 
+                  bottomRight: true, 
+                } : false}
+                // Add min/max size constraints based on logo type
+                minWidth={logo.type === 'text' ? 
+                  Math.max(100, ((logo.text?.length || 10) * (logo.textStyle?.fontSize || 24) * 0.5)) :
+                  50
                 }
-              }
-              }
-              onResizeStop={(e, direction, ref, delta, position) => {
-                handleLogoMove(
-                  logo.id, 
-                  position,
-                  { width: parseInt(ref.style.width), height: parseInt(ref.style.height) }
-                );
-                disableDrag();
-              }}
-              ref={logoRefs.current.get(logo.id)}
-              cancel=".logoControlButtons, .duplicateLogoButton, .removeLogoButton, .dragButton, .resizeButton"
-              // Set this to make dragging more responsive
-              dragHandleClassName={styles.logoOverlay}
-            >
+                maxWidth={logo.type === 'text' ? 
+                  Math.min(500, ((logo.text?.length || 10) * (logo.textStyle?.fontSize || 24) * 1.2)) :
+                  800
+                }
+                minHeight={logo.type === 'text' ? 
+                  Math.max(40, ((logo.textStyle?.fontSize || 24) * 1.5)) :
+                  50
+                }
+                maxHeight={logo.type === 'text' ? 
+                  Math.min(300, ((logo.textStyle?.fontSize || 24) * 5)) :
+                  800
+                }
+                onDragStart={() => {
+                  setIsDragging(true);
+                }}
+                // Use onDrag for live updates instead of just onDragStop
+                onDrag={(e, d) => {
+                  // Update position in real-time during dragging
+                  handleLogoMove(logo.id, {x: d.x, y: d.y});
+                }}
+                onDragStop={(e, d) => {
+                  handleLogoMove(logo.id, {x: d.x, y: d.y});
+                  disableDrag();
+                }}
+                // Also update in real-time during resizing
+                onResize={(e, direction, ref, delta, position) => {
+                  // Get current dimensions from the ref
+                  const newWidth = parseInt(ref.style.width);
+                  const newHeight = parseInt(ref.style.height);
+                  
+                  // Find the logo being resized
+                  const resizedLogo = logos.find(l => l.id === logo.id);
+                  
+                  if (resizedLogo && resizedLogo.type === 'text' && resizedLogo.textStyle) {
+                    // Better text sizing constraints
+                    
+                    // 1. Get text properties
+                    const text = resizedLogo.text || '';
+                    const fontSize = resizedLogo.textStyle.fontSize || 24;
+                    
+                    // 2. Calculate text dimensions more accurately
+                    // We'll use a formula based on character count rather than rough pixel estimates
+                    const charWidthFactor = fontSize * 0.6;  // Average character width as factor of font size
+                    const textWidth = text.length * charWidthFactor;
+                    
+                    // 3. Calculate a more appropriate size range
+                    // - Minimum: 80% of ideal text width, but at least 100px
+                    // - Maximum: 200% of ideal text width, but no more than 500px
+                    const idealTextWidth = Math.max(textWidth, 100);
+                    
+                    // 4. For height, calculate based on line count and font size
+                    // Count actual line breaks if any
+                    const lineBreaks = (text.match(/\n/g) || []).length;
+                    // Use greater of manual line breaks 
+                    const lineCount = Math.max(lineBreaks + 1, 1);
+                    
+                    // 6. Prioritize width for scaling calculation (since text flows horizontally)
+                    const originalWidth = resizedLogo.size.width;
+                    const widthRatio = newWidth / originalWidth;
+                    
+                    // 7. Apply a more controlled scaling - limit to reasonable bounds
+                    const scaleFactor = Math.min(1.5, Math.max(0.8, widthRatio));
+                    
+                    // 8. Create updated text style with new font size (use more conservative scaling)
+                    const updatedTextStyle = {
+                      ...resizedLogo.textStyle,
+                      fontSize: Math.max(12, Math.min(60, Math.round(resizedLogo.textStyle.fontSize * scaleFactor)))
+                    };
+                    
+                    // 9. Update both position/size and text style with constrained values
+                    handleLogoMove(
+                      logo.id,
+                      position,
+                      { width: newWidth, height: newHeight },
+                      updatedTextStyle
+                    );
+                  } else {
+                    // For images, just update without additional calculations since we're using min/max constraints
+                    handleLogoMove(
+                      logo.id,
+                      position,
+                      { width: newWidth, height: newHeight }
+                    );
+                  }
+                }}
+                onResizeStop={(e, direction, ref, delta, position) => {
+                  handleLogoMove(
+                    logo.id, 
+                    position,
+                    { width: parseInt(ref.style.width), height: parseInt(ref.style.height) }
+                  );
+                  disableDrag();
+                }}
+                ref={logoRefs.current.get(logo.id)}
+                cancel=".logoControlButtons, .duplicateLogoButton, .removeLogoButton, .dragButton, .resizeButton"
+                // Set this to make dragging more responsive
+                dragHandleClassName={styles.logoOverlay}
+              >
               <div
                 style={{ 
                   width: "100%", 
@@ -668,10 +710,11 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
                       color: logo.textStyle?.color || '#000000',
                       pointerEvents: "none",
                       userSelect: "none",
-                      wordBreak: "break-word",
+                      whiteSpace: "pre-wrap",   // Changed from break-word to pre-wrap
                       textAlign: "center",
                       overflow: "hidden",
-                      padding: "5px"
+                      padding: "5px",
+                      boxSizing: "border-box"
                     }}
                   >
                     {logo.text || "Text"}
