@@ -445,6 +445,37 @@ const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: nu
     setIsActive(true);
     if (activeLogoId !== logoId || !draggable) {
       setDraggable(true);
+      
+      // Check if we need to validate text element's size constraints
+      const selectedLogo = logos.find(logo => logo.id === logoId);
+      if (selectedLogo?.type === 'text' && selectedLogo.textStyle) {
+        // Get the Rnd reference
+        const rndRef = logoRefs.current.get(logoId);
+        if (rndRef?.current) {
+          // Calculate proper constraints based on current text and font size
+          const text = selectedLogo.text || '';
+          const lineBreaks = (text.match(/\n/g) || []).length;
+          const fontSize = selectedLogo.textStyle.fontSize;
+          const constraints = calculateTextConstraints(text, fontSize, lineBreaks);
+          
+          // Check if current size meets constraints
+          const needsResize = 
+            selectedLogo.size.width < constraints.minWidth || 
+            selectedLogo.size.height < constraints.minHeight;
+          
+          if (needsResize) {
+            // Update element size to meet minimum constraints
+            const newSize = {
+              width: Math.max(constraints.minWidth, selectedLogo.size.width),
+              height: Math.max(constraints.minHeight, selectedLogo.size.height)
+            };
+            
+            // Update both the state and the component
+            handleLogoMove(logoId, selectedLogo.position, newSize);
+            rndRef.current.updateSize(newSize);
+          }
+        }
+      }
     }
   };
   
@@ -579,7 +610,7 @@ const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: nu
                       
                       const updatedTextStyle = {
                         ...resizedLogo.textStyle,
-                        fontSize: Math.max(12, Math.min(48, Math.round(resizedLogo.textStyle.fontSize * scaleFactor)))
+                        fontSize: Math.max(12, Math.min(64, Math.round(resizedLogo.textStyle.fontSize * scaleFactor)))
                       };
                       
                       // Adjust width to maintain good text wrapping
@@ -603,7 +634,7 @@ const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: nu
                       
                       const updatedTextStyle = {
                         ...resizedLogo.textStyle,
-                        fontSize: Math.max(12, Math.min(60, Math.round(resizedLogo.textStyle.fontSize * scaleFactor)))
+                        fontSize: Math.max(12, Math.min(64, Math.round(resizedLogo.textStyle.fontSize * scaleFactor)))
                       };
                       
                       handleLogoMove(
