@@ -191,11 +191,14 @@ const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: nu
         throw new Error("Could not create canvas context");
       }
       
-      // Set canvas properties
+      // Set canvas properties - higher ratio for better quality
       const pixelRatio = 8;
       canvas.width = logo.size.width * pixelRatio;
       canvas.height = logo.size.height * pixelRatio;
       ctx.scale(pixelRatio, pixelRatio);
+      
+      // Clear canvas
+      ctx.clearRect(0, 0, logo.size.width, logo.size.height);
       
       // Set text styling
       const fontWeight = logo.textStyle?.fontWeight || 'normal';
@@ -207,60 +210,42 @@ const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: nu
       ctx.fillStyle = color;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.clearRect(0, 0, logo.size.width, logo.size.height);
       
-      // Render text with wrapping
-      const centerX = logo.size.width / 2;
-      const centerY = logo.size.height / 2;
-      const maxWidth = logo.size.width - 10;
-      const lineHeight = fontSize * 1.2;
+      const text = logo.text || '';
+      const hasLineBreaks = text.includes('\n');
       
-      // Split text into lines and draw
-      const paragraphs = (logo.text || '').split('\n');
-      const lines: string[] = [];
-      const verticalOffset = fontSize * 0.12;
-      
-      // Process each paragraph
-      for (const paragraph of paragraphs) {
-        if (paragraph.trim() === '') {
-          lines.push('');
-          continue;
-        }
+      // Different rendering approach based on text type
+      if (hasLineBreaks) {
+        // For multi-line text, explicitly handle line positioning
+        const lineHeight = fontSize * 1.2;
+        const centerX = logo.size.width / 2;
         
-        let line = '';
-        const words = paragraph.split(' ');
+        // Calculate actual text bounds for proper vertical centering
+        const lines = text.split('\n');
+        const totalTextHeight = lines.length * lineHeight;
         
-        for (let n = 0; n < words.length; n++) {
-          const testLine = line + words[n] + ' ';
-          const metrics = ctx.measureText(testLine);
-          
-          if (metrics.width > maxWidth && n > 0) {
-            lines.push(line);
-            line = words[n] + ' ';
-          } else {
-            line = testLine;
-          }
-        }
-        lines.push(line);
+        // Start position for first line (centered vertically)
+        const startY = (logo.size.height - totalTextHeight) / 2 + lineHeight / 2;
+        
+        // Draw each line separately
+        lines.forEach((line, index) => {
+          ctx.fillText(line, centerX, startY + (index * lineHeight));
+        });
+      } else {
+        // For single-line text, simple centered positioning
+        const centerX = logo.size.width / 2;
+        const centerY = logo.size.height / 2;
+        ctx.fillText(text, centerX, centerY);
       }
       
-      // Calculate vertical centering
-      const totalHeight = lines.length * lineHeight;
-      const startY = centerY - (totalHeight / 2) + (lineHeight / 2) + verticalOffset;
-      
-      // Draw each line
-      for (let i = 0; i < lines.length; i++) {
-        ctx.fillText(lines[i], centerX, startY + (i * lineHeight));
-      }
-      
-      // Add to PDF
+      // Convert to image and add to PDF
       const textImageDataUrl = canvas.toDataURL('image/png');
       pdf.addImage(textImageDataUrl, 'PNG', x, y, width, height);
       
     } catch (err) {
-      // Fallback to standard text rendering
       console.log("Falling back to standard text rendering:", err);
       
+      // Standard PDF text rendering as fallback
       const fontFamily = logo.textStyle?.fontFamily || 'helvetica';
       let pdfFontName = 'helvetica';
       
@@ -289,10 +274,20 @@ const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: nu
       const textX = x + (width / 2);
       const textY = y + (height / 2);
       
-      pdf.text(logo.text || '', textX, textY, {
-        align: 'center',
-        baseline: 'middle'
-      });
+      const text = logo.text || '';
+      if (text.includes('\n')) {
+        // For multi-line text in fallback mode
+        const lines = text.split('\n');
+        pdf.text(lines, textX, textY, {
+          align: 'center',
+          baseline: 'middle'
+        });
+      } else {
+        pdf.text(text, textX, textY, {
+          align: 'center',
+          baseline: 'middle'
+        });
+      }
     }
   };
   
@@ -575,7 +570,6 @@ const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: nu
                     if (hasLineBreaks) {
                       // For multi-line text, preserve font size more but allow height to adjust
                       const heightRatio = newHeight / resizedLogo.size.height;
-                      const widthRatio = newWidth / resizedLogo.size.width;
                       
                       // Scale font size more conservatively for multi-line text
                       // Prefer scaling based on height for multi-line text
