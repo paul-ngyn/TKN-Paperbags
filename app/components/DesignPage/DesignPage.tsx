@@ -159,60 +159,147 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
               
               // Process based on logo type
               if (logo.type === 'text' && logo.text) {
-                // Handle text elements in PDF
-                const fontFamily = logo.textStyle?.fontFamily || 'helvetica';
-                
-                // More reliable font mapping
-                let pdfFontName;
-                if (fontFamily.toLowerCase().includes('times')) {
-                  pdfFontName = 'times';
-                } else if (fontFamily.toLowerCase().includes('courier')) {
-                  pdfFontName = 'courier'; 
-                } else if (fontFamily.toLowerCase().includes('helvetica')) {
-                  pdfFontName = 'helvetica';
-                } else if (fontFamily.toLowerCase().includes('arial')) {
-                  pdfFontName = 'helvetica'; // Arial maps to helvetica in PDF
-                } else {
-                  pdfFontName = 'helvetica'; // Default fallback
+                try {
+                  // Create an offscreen canvas to render text exactly as shown on screen
+                  const canvas = document.createElement('canvas');
+                  const ctx = canvas.getContext('2d');
+                  
+                  if (!ctx) {
+                    console.error("Could not create canvas context for text rendering");
+                    continue; // Skip this text element if we can't create context
+                  }
+                  
+                  // Set canvas size to match the logo size (with a pixel density multiplier for quality)
+                  const pixelRatio = 8; // Higher for better quality
+                  canvas.width = logo.size.width * pixelRatio;
+                  canvas.height = logo.size.height * pixelRatio;
+                  
+                  // Scale the context to account for the pixel ratio
+                  ctx.scale(pixelRatio, pixelRatio);
+                  
+                  // Set up text styling exactly as in the UI
+                  const fontWeight = logo.textStyle?.fontWeight || 'normal';
+                  const fontSize = logo.textStyle?.fontSize || 24;
+                  const fontFamily = logo.textStyle?.fontFamily || 'Arial';
+                  const color = logo.textStyle?.color || '#000000';
+                  
+                  ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+                  ctx.fillStyle = color;
+                  ctx.textAlign = 'center';
+                  ctx.textBaseline = 'middle';
+                  
+                  // Clear the canvas with a transparent background
+                  ctx.clearRect(0, 0, logo.size.width, logo.size.height);
+                  
+                  // Word wrapping function for multi-line text
+                  const wrapText = (context: CanvasRenderingContext2D, text: string, x: number, y: number, maxWidth: number, lineHeight: number) => {
+                    const words = text.split(' ');
+                    let line = '';
+                    const lines = [];
+                    
+                    // Break text into lines that fit the width
+                    for (let n = 0; n < words.length; n++) {
+                      const testLine = line + words[n] + ' ';
+                      const metrics = context.measureText(testLine);
+                      const testWidth = metrics.width;
+                      
+                      if (testWidth > maxWidth && n > 0) {
+                        lines.push(line);
+                        line = words[n] + ' ';
+                      } else {
+                        line = testLine;
+                      }
+                    }
+                    lines.push(line);
+                    
+                    // Calculate vertical centering based on number of lines
+                    const totalHeight = lines.length * lineHeight;
+                    const startY = y - (totalHeight / 2) + (lineHeight / 2);
+                    
+                    // Draw each line centrally aligned
+                    for (let i = 0; i < lines.length; i++) {
+                      context.fillText(lines[i], x, startY + (i * lineHeight));
+                    }
+                  };
+                  
+                  // Render the text centered within the canvas
+                  const centerX = logo.size.width / 2;
+                  const centerY = logo.size.height / 2;
+                  const maxWidth = logo.size.width - 10; // Margin of 5px on each side
+                  const lineHeight = fontSize * 1.2; // Standard line spacing
+                  
+                  // Draw text with word wrapping
+                  wrapText(ctx, logo.text, centerX, centerY, maxWidth, lineHeight);
+                  
+                  // Convert the canvas to a data URL
+                  const textImageDataUrl = canvas.toDataURL('image/png');
+                  
+                  // Use the same positioning as for images
+                  console.log(`Text element ${logo.id} rendered as image:`, {
+                    screen: { x: logo.position.x, y: logo.position.y },
+                    pdf: { x: logoXInPDF.toFixed(2), y: logoYInPDF.toFixed(2) },
+                    pdf_size: { w: logoWidthInPDF.toFixed(2), h: logoHeightInPDF.toFixed(2) }
+                  });
+                  
+                  // Add the text as an image to the PDF
+                  pdf.addImage(textImageDataUrl, 'PNG', logoXInPDF, logoYInPDF, logoWidthInPDF, logoHeightInPDF);
+                  
+                } catch (err) {
+                  console.error(`Failed to render text element ${logo.id} as image:`, err);
+                  
+                  // Fallback to standard text rendering if image conversion fails
+                  console.log("Falling back to standard text rendering");
+                  
+                  const fontFamily = logo.textStyle?.fontFamily || 'helvetica';
+                  
+                  // Map font family names to PDF font names
+                  let pdfFontName;
+                  if (fontFamily.toLowerCase().includes('times')) {
+                    pdfFontName = 'times';
+                  } else if (fontFamily.toLowerCase().includes('courier')) {
+                    pdfFontName = 'courier'; 
+                  } else if (fontFamily.toLowerCase().includes('helvetica')) {
+                    pdfFontName = 'helvetica';
+                  } else if (fontFamily.toLowerCase().includes('arial')) {
+                    pdfFontName = 'helvetica'; // Arial maps to helvetica in PDF
+                  } else {
+                    pdfFontName = 'helvetica'; // Default fallback
+                  }
+                  
+                  // Set font style based on weight
+                  let fontStyle;
+                  if (logo.textStyle?.fontWeight === 'bold') {
+                    fontStyle = 'bold';
+                  } else {
+                    fontStyle = 'normal';
+                  }
+                  
+                  pdf.setFont(pdfFontName, fontStyle);
+                  
+                  // Calculate font size based on scaling factors
+                  const originalFontSize = logo.textStyle?.fontSize || 24;
+                  const scaleFactor = Math.min(scaleX, scaleY);
+                  const fontSizeAdjustmentFactor = 71;
+                  const scaledFontSize = Math.max(16, originalFontSize * scaleFactor * fontSizeAdjustmentFactor);
+                  
+                  pdf.setFontSize(scaledFontSize);
+                  
+                  // Set text color
+                  const color = logo.textStyle?.color || '#000000';
+                  const r = parseInt(color.slice(1, 3), 16);
+                  const g = parseInt(color.slice(3, 5), 16);
+                  const b = parseInt(color.slice(5, 7), 16);
+                  pdf.setTextColor(r, g, b);
+                  
+                  // Position and render text
+                  const textX = logoXInPDF + (logoWidthInPDF / 2);
+                  const textY = logoYInPDF + (logoHeightInPDF / 2);
+                  
+                  pdf.text(logo.text, textX, textY, {
+                    align: 'center',
+                    baseline: 'middle'
+                  });
                 }
-                
-                // Set font style based on weight
-                let fontStyle;
-                if (logo.textStyle?.fontWeight === 'bold') {
-                  fontStyle = 'bold';
-                } else {
-                  fontStyle = 'normal';
-                }
-                
-                pdf.setFont(pdfFontName, fontStyle);
-                
-                // FIXED: Calculate font size based on both scale factors and original font size
-                // This needs to be proportional to match the visual appearance
-                const originalFontSize = logo.textStyle?.fontSize || 24;
-                const scaleFactor = Math.min(scaleX, scaleY);
-                const fontSizeAdjustmentFactor = 60; // This multiplier helps match visual size
-                const scaledFontSize = Math.max(16, originalFontSize * scaleFactor * fontSizeAdjustmentFactor);
-                
-                // IMPORTANT: Actually use the calculated size
-                pdf.setFontSize(scaledFontSize);
-                
-                // Set text color (convert hex to RGB components)
-                const color = logo.textStyle?.color || '#000000';
-                const r = parseInt(color.slice(1, 3), 16);
-                const g = parseInt(color.slice(3, 5), 16);
-                const b = parseInt(color.slice(5, 7), 16);
-                pdf.setTextColor(r, g, b);
-                
-                // Position text centered in the element
-                const textX = logoXInPDF + (logoWidthInPDF / 2);
-                // Adjust Y position with proper vertical centering
-                const textY = logoYInPDF + (logoHeightInPDF / 2);
-                
-                // Add text to PDF with explicit alignment
-                pdf.text(logo.text, textX, textY, {
-                  align: 'center',
-                  baseline: 'middle'
-                });
               }
                 
                else if (logo.type === 'image' && logo.src) {
@@ -610,7 +697,7 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
                         src={resizeIcon}
                         alt="Resize Handle"
                         width={24}
-                        height={22}
+                        height={24}
                         style={{ objectFit: "contain" }}
                       />
                     </div>

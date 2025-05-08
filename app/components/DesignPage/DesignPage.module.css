@@ -38,8 +38,8 @@
   .customResizeHandle {
     position: absolute;
     width: 30px; /* Increased width */
-    height: 20px; /* Increased height */
-    right: -25px; /* Adjusted position */
+    height: 25px; /* Increased height */
+    right: -20px; /* Adjusted position */
     bottom: -15px; /* Adjusted position */
     cursor: se-resize;
   }
