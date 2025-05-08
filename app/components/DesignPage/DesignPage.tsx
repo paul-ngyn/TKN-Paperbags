@@ -32,31 +32,58 @@ interface Logo {
   size: { width: number, height: number };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
-  // Change to array of Logo objects
+const DesignPage: React.FC<DesignPageProps> = () => {
+  // State declarations
   const [logos, setLogos] = useState<Logo[]>([]);
   const [activeLogoId, setActiveLogoId] = useState<string | null>(null);
   const [draggable, setDraggable] = useState(false);
   const [isActive, setIsActive] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [isDragging, setIsDragging] = useState(false);
-  
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const logoRefs = useRef<Map<string, React.RefObject<Rnd>>>(new Map());
-  const bagContainerRef = useRef<HTMLDivElement>(null);
-  
-  // Add state for bag dimensions
   const [dimensions, setDimensions] = useState<BagDimensions>({
     length: 310,
     width: 155,
     height: 428
   });
-  
-  // Add state to track if dimensions are being edited
   const [isEditingDimensions, setIsEditingDimensions] = useState(false);
   
-  // Generate PDF function - updated to use the utility calculator
+  // Refs
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const logoRefs = useRef<Map<string, React.RefObject<Rnd>>>(new Map());
+  const bagContainerRef = useRef<HTMLDivElement>(null);
+  
+  // Calculate size constraints for text elements
+  // Replace the existing calculateTextConstraints function with this improved version
+const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: number = 0) => {
+  const charWidthFactor = fontSize * 0.6;
+  
+  // Handle multi-line text differently than single-line text
+  const hasLineBreaks = lineBreaks > 0;
+  
+  if (hasLineBreaks) {
+    // For multi-line text, calculate based on the longest line
+    const lines = text.split('\n');
+    const longestLineLength = Math.max(...lines.map(line => line.length));
+    const longestLineWidth = longestLineLength * charWidthFactor;
+    
+    return {
+      minWidth: Math.max(100, Math.min(300, longestLineWidth * 0.8)),
+      maxWidth: Math.min(600, Math.max(200, longestLineWidth * 1.5)),
+      minHeight: Math.max(60, (lineBreaks + 1) * fontSize * 1.5),
+      maxHeight: Math.min(500, (lineBreaks + 1) * fontSize * 3)
+    };
+  } else {
+    // For single-line text, use the original logic
+    const textWidth = text.length * charWidthFactor;
+    
+    return {
+      minWidth: Math.max(100, Math.min(300, textWidth * 0.8)),
+      maxWidth: Math.min(500, Math.max(200, textWidth * 1.5)),
+      minHeight: Math.max(40, fontSize * 1.5),
+      maxHeight: Math.min(300, fontSize * 3)
+    };
+  }
+};
+  
+  // Generate PDF function
   const generatePDF = async () => {
     console.log("Starting PDF generation with accurate physical dimensions...");
     
@@ -64,271 +91,87 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
       // Use the BagDimensions utility for calculations
       const calculatedDim = calculateBagDimensions(dimensions);
       
-      // Temporarily get the SVG element to read its final viewBox for sizing
-      // Note: This assumes the SVG is already rendered in the DOM. If not, this needs adjustment.
+      // Get SVG viewBox dimensions
       const tempSvgElement = document.querySelector(".bagBlueprint svg") || document.querySelector("svg");
-      let svgViewBoxWidth = calculatedDim.totalWidthMM + 150; // Estimate default if not found
-      let svgViewBoxHeight = calculatedDim.totalHeightMM + 150; // Estimate default if not found
+      let svgViewBoxWidth = calculatedDim.totalWidthMM + 150;
+      let svgViewBoxHeight = calculatedDim.totalHeightMM + 150;
+      
       if (tempSvgElement instanceof SVGElement) {
-          const tempViewBox = tempSvgElement.getAttribute('viewBox');
-          const tempViewBoxValues = tempViewBox ? tempViewBox.split(' ').map(Number) : [0, 0, svgViewBoxWidth, svgViewBoxHeight];
-          svgViewBoxWidth = tempViewBoxValues[2];
-          svgViewBoxHeight = tempViewBoxValues[3];
+        const tempViewBox = tempSvgElement.getAttribute('viewBox');
+        const tempViewBoxValues = tempViewBox ? tempViewBox.split(' ').map(Number) : [0, 0, svgViewBoxWidth, svgViewBoxHeight];
+        svgViewBoxWidth = tempViewBoxValues[2];
+        svgViewBoxHeight = tempViewBoxValues[3];
       }
       
-      // Calculate the required physical size in INCHES based on the SVG's viewBox width/height
-      // Assuming the viewBox coordinates correspond roughly to millimeters
+      // Calculate PDF dimensions
       const MM_TO_INCHES = 1 / 25.4;
       const requiredBlueprintWidthInches = svgViewBoxWidth * MM_TO_INCHES;
       const requiredBlueprintHeightInches = svgViewBoxHeight * MM_TO_INCHES;
+      const marginInches = 2;
       
-      const marginInches = 2; // Keep 2-inch margin
-      
-      // Calculate PDF page size needed to contain the *entire viewBox* plus margins
       const pdfWidthInches = Math.ceil(requiredBlueprintWidthInches + (marginInches * 2));
       const pdfHeightInches = Math.ceil(requiredBlueprintHeightInches + (marginInches * 2));
       const pdfOrientation = pdfWidthInches > pdfHeightInches ? "landscape" as const : "portrait" as const;
-
-      // Calculate position to center the blueprint (based on its full viewBox size)
       const xPos = (pdfWidthInches - requiredBlueprintWidthInches) / 2;
       const yPos = (pdfHeightInches - requiredBlueprintHeightInches) / 2;
 
-
-      // Create a new jsPDF instance with the calculated size
+      // Create PDF
       const pdf = new jsPDF({
         orientation: pdfOrientation,
         unit: "in",
-        format: [pdfWidthInches, pdfHeightInches], // Use newly calculated page size
+        format: [pdfWidthInches, pdfHeightInches],
         compress: false, 
         hotfixes: ["scale_correction"] 
       });
       
-      
-      // Get the bag blueprint SVG element again for cloning
+      // Add blueprint to PDF
       const bagBlueprintElement = document.querySelector(".bagBlueprint svg") || document.querySelector("svg");
-
-      if (bagBlueprintElement instanceof SVGElement) {
-        // Clone the SVG
-        const svgClone = bagBlueprintElement.cloneNode(true) as SVGElement;
-        
-        // Ensure the viewBox attribute is present (it should be from BagBlueprint)
-        const finalViewBox = svgClone.getAttribute('viewBox');
-        if (!finalViewBox) {
-            console.warn("SVG clone is missing viewBox attribute!");
-            // Optionally set a fallback based on tempViewBoxValues if needed
-        } else {
-             console.log("Using SVG viewBox for scaling:", finalViewBox);
-        }
-        
-        // Ensure preserveAspectRatio is set
-        svgClone.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-
-        // --- Use the physical dimensions of the ENTIRE viewBox ---
-        await svg2pdf(svgClone, pdf, {
-          x: xPos, // Use centering position based on full viewBox
-          y: yPos, // Use centering position based on full viewBox
-          width: requiredBlueprintWidthInches,  // Target physical width for the whole viewBox
-          height: requiredBlueprintHeightInches // Target physical height for the whole viewBox
-        });
-                      
-        // --- Logo Positioning Needs Adjustment ---
-        // The scale factor now needs to relate screen pixels to the physical size 
-        // of the SVG container *within the PDF*.
-        const bagContainerRect = bagContainerRef.current?.getBoundingClientRect() || { width: 0, height: 0 };
-        
-        // Scale factor: inches_in_pdf / pixels_on_screen
-        // The blueprint SVG now occupies requiredBlueprintWidthInches x requiredBlueprintHeightInches in the PDF
-        const scaleX = requiredBlueprintWidthInches / bagContainerRect.width;
-        const scaleY = requiredBlueprintHeightInches / bagContainerRect.height;
-        
-        // The logo's (0,0) origin relative to the PDF page is xPos, yPos
-        const logoOriginX = xPos;
-        const logoOriginY = yPos;
-        
-        // Add logos at their correct physical positions relative to the scaled blueprint
-        if (logos.length > 0) {
-          console.log("Adding logos with following scale factors:", { scaleX, scaleY });
-          
-          for (const logo of logos) {
-            try {
-              // Convert screen pixel position (relative to container) to PDF inch position
-              const logoXInPDF = logoOriginX + (logo.position.x * scaleX);
-              const logoYInPDF = logoOriginY + (logo.position.y * scaleY);
-              const logoWidthInPDF = logo.size.width * scaleX;
-              const logoHeightInPDF = logo.size.height * scaleY;
-              
-              // Process based on logo type
-              if (logo.type === 'text' && logo.text) {
-                try {
-                  // Create an offscreen canvas to render text exactly as shown on screen
-                  const canvas = document.createElement('canvas');
-                  const ctx = canvas.getContext('2d');
-                  
-                  if (!ctx) {
-                    console.error("Could not create canvas context for text rendering");
-                    continue; // Skip this text element if we can't create context
-                  }
-                  
-                  // Set canvas size to match the logo size (with a pixel density multiplier for quality)
-                  const pixelRatio = 8; // Higher for better quality
-                  canvas.width = logo.size.width * pixelRatio;
-                  canvas.height = logo.size.height * pixelRatio;
-                  
-                  // Scale the context to account for the pixel ratio
-                  ctx.scale(pixelRatio, pixelRatio);
-                  
-                  // Set up text styling exactly as in the UI
-                  const fontWeight = logo.textStyle?.fontWeight || 'normal';
-                  const fontSize = logo.textStyle?.fontSize || 24;
-                  const fontFamily = logo.textStyle?.fontFamily || 'Arial';
-                  const color = logo.textStyle?.color || '#000000';
-                  
-                  ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
-                  ctx.fillStyle = color;
-                  ctx.textAlign = 'center';
-                  ctx.textBaseline = 'middle';
-                  
-                  // Clear the canvas with a transparent background
-                  ctx.clearRect(0, 0, logo.size.width, logo.size.height);
-                  
-                  // Word wrapping function for multi-line text
-                  const wrapText = (context: CanvasRenderingContext2D, text: string, x: number, y: number, maxWidth: number, lineHeight: number) => {
-                    const words = text.split(' ');
-                    let line = '';
-                    const lines = [];
-                    
-                    // Break text into lines that fit the width
-                    for (let n = 0; n < words.length; n++) {
-                      const testLine = line + words[n] + ' ';
-                      const metrics = context.measureText(testLine);
-                      const testWidth = metrics.width;
-                      
-                      if (testWidth > maxWidth && n > 0) {
-                        lines.push(line);
-                        line = words[n] + ' ';
-                      } else {
-                        line = testLine;
-                      }
-                    }
-                    lines.push(line);
-                    
-                    // Calculate vertical centering based on number of lines
-                    const totalHeight = lines.length * lineHeight;
-                    const verticalOffset = fontSize * 0.12;
-                    const startY = y - (totalHeight / 2) + (lineHeight / 2) + verticalOffset;
-                    
-                    // Draw each line centrally aligned
-                    for (let i = 0; i < lines.length; i++) {
-                      context.fillText(lines[i], x, startY + (i * lineHeight));
-                    }
-                  };
-                  
-                  // Render the text centered within the canvas
-                  const centerX = logo.size.width / 2;
-                  const centerY = logo.size.height / 2;
-                  const maxWidth = logo.size.width - 10; // Margin of 5px on each side
-                  const lineHeight = fontSize * 1.2; // Standard line spacing
-                  
-                  // Draw text with word wrapping
-                  wrapText(ctx, logo.text, centerX, centerY, maxWidth, lineHeight);
-                  
-                  // Convert the canvas to a data URL
-                  const textImageDataUrl = canvas.toDataURL('image/png');
-                  
-                  // Use the same positioning as for images
-                  console.log(`Text element ${logo.id} rendered as image:`, {
-                    screen: { x: logo.position.x, y: logo.position.y },
-                    pdf: { x: logoXInPDF.toFixed(2), y: logoYInPDF.toFixed(2) },
-                    pdf_size: { w: logoWidthInPDF.toFixed(2), h: logoHeightInPDF.toFixed(2) }
-                  });
-                  
-                  // Add the text as an image to the PDF
-                  pdf.addImage(textImageDataUrl, 'PNG', logoXInPDF, logoYInPDF, logoWidthInPDF, logoHeightInPDF);
-                  
-                } catch (err) {
-                  console.error(`Failed to render text element ${logo.id} as image:`, err);
-                  
-                  // Fallback to standard text rendering if image conversion fails
-                  console.log("Falling back to standard text rendering");
-                  
-                  const fontFamily = logo.textStyle?.fontFamily || 'helvetica';
-                  
-                  // Map font family names to PDF font names
-                  let pdfFontName;
-                  if (fontFamily.toLowerCase().includes('times')) {
-                    pdfFontName = 'times';
-                  } else if (fontFamily.toLowerCase().includes('courier')) {
-                    pdfFontName = 'courier'; 
-                  } else if (fontFamily.toLowerCase().includes('helvetica')) {
-                    pdfFontName = 'helvetica';
-                  } else if (fontFamily.toLowerCase().includes('arial')) {
-                    pdfFontName = 'helvetica'; // Arial maps to helvetica in PDF
-                  } else {
-                    pdfFontName = 'helvetica'; // Default fallback
-                  }
-                  
-                  // Set font style based on weight
-                  let fontStyle;
-                  if (logo.textStyle?.fontWeight === 'bold') {
-                    fontStyle = 'bold';
-                  } else {
-                    fontStyle = 'normal';
-                  }
-                  
-                  pdf.setFont(pdfFontName, fontStyle);
-                  
-                  // Calculate font size based on scaling factors
-                  const originalFontSize = logo.textStyle?.fontSize || 24;
-                  const scaleFactor = Math.min(scaleX, scaleY);
-                  const fontSizeAdjustmentFactor = 71;
-                  const scaledFontSize = Math.max(16, originalFontSize * scaleFactor * fontSizeAdjustmentFactor);
-                  
-                  pdf.setFontSize(scaledFontSize);
-                  
-                  // Set text color
-                  const color = logo.textStyle?.color || '#000000';
-                  const r = parseInt(color.slice(1, 3), 16);
-                  const g = parseInt(color.slice(3, 5), 16);
-                  const b = parseInt(color.slice(5, 7), 16);
-                  pdf.setTextColor(r, g, b);
-                  
-                  // Position and render text
-                  const textX = logoXInPDF + (logoWidthInPDF / 2);
-                  const textY = logoYInPDF + (logoHeightInPDF / 2);
-                  
-                  pdf.text(logo.text, textX, textY, {
-                    align: 'center',
-                    baseline: 'middle'
-                  });
-                }
-              }
-                
-               else if (logo.type === 'image' && logo.src) {
-                // Handle image elements
-                console.log(`Logo ${logo.id} position:`, {
-                  screen: { x: logo.position.x, y: logo.position.y },
-                  pdf: { x: logoXInPDF.toFixed(2), y: logoYInPDF.toFixed(2) },
-                  pdf_size: { w: logoWidthInPDF.toFixed(2), h: logoHeightInPDF.toFixed(2) }
-                });
-                
-                pdf.addImage(logo.src, 'PNG', logoXInPDF, logoYInPDF, logoWidthInPDF, logoHeightInPDF);
-              } else {
-                console.warn(`Skipping logo ${logo.id} - invalid type or missing content`);
-              }
-            } catch (err) {
-              console.error(`Failed to add logo/text ${logo.id}:`, err);
-            }
-          }
-        }
-        
-        // Save the PDF
-        pdf.save(`MTC-Bag-Design-${calculatedDim.totalWidthInches.toFixed(2)}x${calculatedDim.totalHeightInches.toFixed(2)}-inches_Physical.pdf`);
-        
-        return true;
+      if (!(bagBlueprintElement instanceof SVGElement)) {
+        console.warn("SVG element not found");
+        return false;
       }
       
-      console.warn("SVG element not found");
-      return false;
+      const svgClone = bagBlueprintElement.cloneNode(true) as SVGElement;
+      svgClone.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+
+      await svg2pdf(svgClone, pdf, {
+        x: xPos,
+        y: yPos,
+        width: requiredBlueprintWidthInches,
+        height: requiredBlueprintHeightInches
+      });
+                  
+      // Calculate logo positioning scales
+      const bagContainerRect = bagContainerRef.current?.getBoundingClientRect() || { width: 0, height: 0 };
+      const scaleX = requiredBlueprintWidthInches / bagContainerRect.width;
+      const scaleY = requiredBlueprintHeightInches / bagContainerRect.height;
+      
+      // Add logos to PDF
+      if (logos.length > 0) {
+        for (const logo of logos) {
+          try {
+            const logoXInPDF = xPos + (logo.position.x * scaleX);
+            const logoYInPDF = yPos + (logo.position.y * scaleY);
+            const logoWidthInPDF = logo.size.width * scaleX;
+            const logoHeightInPDF = logo.size.height * scaleY;
+            
+            // Process based on logo type
+            if (logo.type === 'text' && logo.text) {
+              addTextToPdf(pdf, logo, logoXInPDF, logoYInPDF, logoWidthInPDF, logoHeightInPDF, scaleX, scaleY);
+            } else if (logo.type === 'image' && logo.src) {
+              pdf.addImage(logo.src, 'PNG', logoXInPDF, logoYInPDF, logoWidthInPDF, logoHeightInPDF);
+            } else {
+              console.warn(`Skipping logo ${logo.id} - invalid type or missing content`);
+            }
+          } catch (err) {
+            console.error(`Failed to add logo/text ${logo.id}:`, err);
+          }
+        }
+      }
+      
+      // Save PDF
+      pdf.save(`MTC-Bag-Design-${calculatedDim.totalWidthInches.toFixed(2)}x${calculatedDim.totalHeightInches.toFixed(2)}-inches_Physical.pdf`);
+      return true;
       
     } catch (error) {
       console.error("Failed to generate PDF:", error);
@@ -337,43 +180,153 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
     }
   };
   
-  const handleLogoUpload = (files: FileList) => {
-    if (files && files.length > 0) {
-      const file = files[0];
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target && typeof e.target.result === "string") {
-          const newLogo: Logo = {
-            id: `logo-${Date.now()}`,
-            type: 'image',
-            src: e.target.result,
-            position: { x: 50, y: 50 }, // Default position
-            size: { width: 150, height: 150 } // Default size
-          };
-          
-          // Create a new ref for this logo
-          logoRefs.current.set(newLogo.id, React.createRef<Rnd>());
-          
-          // Add the new logo to the array
-          setLogos(prev => [...prev, newLogo]);
-          // Make it the active logo
-          setActiveLogoId(newLogo.id);
-          setDraggable(true);
-          setIsActive(true);
-        }
-      };
-      reader.readAsDataURL(file);
+  // Helper function to add text to PDF
+  const addTextToPdf = (pdf: jsPDF, logo: Logo, x: number, y: number, width: number, height: number, scaleX: number, scaleY: number) => {
+    try {
+      // Create canvas for text rendering
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
       
-      // Reset file input to allow selecting the same file again
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
+      if (!ctx) {
+        throw new Error("Could not create canvas context");
       }
+      
+      // Set canvas properties
+      const pixelRatio = 8;
+      canvas.width = logo.size.width * pixelRatio;
+      canvas.height = logo.size.height * pixelRatio;
+      ctx.scale(pixelRatio, pixelRatio);
+      
+      // Set text styling
+      const fontWeight = logo.textStyle?.fontWeight || 'normal';
+      const fontSize = logo.textStyle?.fontSize || 24;
+      const fontFamily = logo.textStyle?.fontFamily || 'Arial';
+      const color = logo.textStyle?.color || '#000000';
+      
+      ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+      ctx.fillStyle = color;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.clearRect(0, 0, logo.size.width, logo.size.height);
+      
+      // Render text with wrapping
+      const centerX = logo.size.width / 2;
+      const centerY = logo.size.height / 2;
+      const maxWidth = logo.size.width - 10;
+      const lineHeight = fontSize * 1.2;
+      
+      // Split text into lines and draw
+      const paragraphs = (logo.text || '').split('\n');
+      const lines: string[] = [];
+      const verticalOffset = fontSize * 0.12;
+      
+      // Process each paragraph
+      for (const paragraph of paragraphs) {
+        if (paragraph.trim() === '') {
+          lines.push('');
+          continue;
+        }
+        
+        let line = '';
+        const words = paragraph.split(' ');
+        
+        for (let n = 0; n < words.length; n++) {
+          const testLine = line + words[n] + ' ';
+          const metrics = ctx.measureText(testLine);
+          
+          if (metrics.width > maxWidth && n > 0) {
+            lines.push(line);
+            line = words[n] + ' ';
+          } else {
+            line = testLine;
+          }
+        }
+        lines.push(line);
+      }
+      
+      // Calculate vertical centering
+      const totalHeight = lines.length * lineHeight;
+      const startY = centerY - (totalHeight / 2) + (lineHeight / 2) + verticalOffset;
+      
+      // Draw each line
+      for (let i = 0; i < lines.length; i++) {
+        ctx.fillText(lines[i], centerX, startY + (i * lineHeight));
+      }
+      
+      // Add to PDF
+      const textImageDataUrl = canvas.toDataURL('image/png');
+      pdf.addImage(textImageDataUrl, 'PNG', x, y, width, height);
+      
+    } catch (err) {
+      // Fallback to standard text rendering
+      console.log("Falling back to standard text rendering:", err);
+      
+      const fontFamily = logo.textStyle?.fontFamily || 'helvetica';
+      let pdfFontName = 'helvetica';
+      
+      if (fontFamily.toLowerCase().includes('times')) {
+        pdfFontName = 'times';
+      } else if (fontFamily.toLowerCase().includes('courier')) {
+        pdfFontName = 'courier';
+      }
+      
+      const fontStyle = logo.textStyle?.fontWeight === 'bold' ? 'bold' : 'normal';
+      pdf.setFont(pdfFontName, fontStyle);
+      
+      const fontSize = logo.textStyle?.fontSize || 24;
+      const scaleFactor = Math.min(scaleX, scaleY);
+      const scaledFontSize = Math.max(16, fontSize * scaleFactor * 71);
+      pdf.setFontSize(scaledFontSize);
+      
+      // Set text color
+      const color = logo.textStyle?.color || '#000000';
+      const r = parseInt(color.slice(1, 3), 16);
+      const g = parseInt(color.slice(3, 5), 16);
+      const b = parseInt(color.slice(5, 7), 16);
+      pdf.setTextColor(r, g, b);
+      
+      // Position and render
+      const textX = x + (width / 2);
+      const textY = y + (height / 2);
+      
+      pdf.text(logo.text || '', textX, textY, {
+        align: 'center',
+        baseline: 'middle'
+      });
     }
   };
+  
+  // Handle logo upload
+  const handleLogoUpload = (files: FileList) => {
+    if (!files.length) return;
+    
+    const file = files[0];
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+      if (e.target?.result && typeof e.target.result === "string") {
+        const newLogo: Logo = {
+          id: `logo-${Date.now()}`,
+          type: 'image',
+          src: e.target.result,
+          position: { x: 50, y: 50 },
+          size: { width: 150, height: 150 }
+        };
+        
+        logoRefs.current.set(newLogo.id, React.createRef<Rnd>());
+        setLogos(prev => [...prev, newLogo]);
+        setActiveLogoId(newLogo.id);
+        setDraggable(true);
+        setIsActive(true);
+      }
+    };
+    
+    reader.readAsDataURL(file);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
-  // Add text element to the design
+  // Handle adding text
   const handleAddText = (text?: string, style?: TextStyle) => {
-    // Default text and style if not provided
     const textContent = text || "Your text here";
     const textStyle = style || {
       fontFamily: 'Arial',
@@ -382,7 +335,6 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
       fontWeight: 'normal'
     };
     
-    // Create new text element
     const newTextLogo: Logo = {
       id: `text-${Date.now()}`,
       type: 'text',
@@ -392,44 +344,52 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
       size: { width: 200, height: 60 }
     };
     
-    // Create a ref for this element
     logoRefs.current.set(newTextLogo.id, React.createRef<Rnd>());
-    
-    // Add to logos array
     setLogos(prev => [...prev, newTextLogo]);
-    
-    // Make it active
     setActiveLogoId(newTextLogo.id);
     setDraggable(true);
     setIsActive(true);
   };
   
-  // Update text content and styling
+  // Update text content and styling with proper constraints
   const updateTextContent = (id: string, text: string, style: TextStyle) => {
     setLogos(prev => prev.map(logo => {
       if (logo.id === id) {
-        return {
-          ...logo,
-          text: text,
-          textStyle: style
+        // Calculate size constraints based on new text
+        const lineBreaks = (text.match(/\n/g) || []).length;
+        const constraints = calculateTextConstraints(text, style.fontSize, lineBreaks);
+        
+        // Ensure size is within new constraints
+        const newSize = {
+          width: Math.min(constraints.maxWidth, Math.max(constraints.minWidth, logo.size.width)),
+          height: Math.min(constraints.maxHeight, Math.max(constraints.minHeight, logo.size.height))
         };
+        
+        return { ...logo, text, textStyle: style, size: newSize };
       }
       return logo;
     }));
+    
+    // Update the component size if needed
+    const logo = logos.find(l => l.id === id);
+    if (logo && logoRefs.current.get(logo.id)?.current) {
+      const constraints = calculateTextConstraints(text, style.fontSize);
+      const newSize = {
+        width: Math.min(constraints.maxWidth, Math.max(constraints.minWidth, logo.size.width)),
+        height: Math.min(constraints.maxHeight, Math.max(constraints.minHeight, logo.size.height))
+      };
+      
+      logoRefs.current.get(logo.id)?.current?.updateSize(newSize);
+    }
   };
 
-
+  // Logo operations (delete, duplicate, move)
   const handleLogoDelete = (logoId: string, e?: React.MouseEvent) => {
-    if (e) {
-      e.stopPropagation();
-    }
+    if (e) e.stopPropagation();
     
-    // Remove specific logo
     setLogos(prev => prev.filter(logo => logo.id !== logoId));
-    // Clear the ref
     logoRefs.current.delete(logoId);
     
-    // Reset active logo if needed
     if (activeLogoId === logoId) {
       setActiveLogoId(null);
       setDraggable(false);
@@ -437,63 +397,32 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
     }
   };
 
-  // Add new duplicate logo function
   const handleDuplicateLogo = (logoId: string, e?: React.MouseEvent) => {
-    if (e) {
-      e.stopPropagation();
-    }
+    if (e) e.stopPropagation();
     
-    // Find the logo to duplicate
     const logoToDuplicate = logos.find(logo => logo.id === logoId);
+    if (!logoToDuplicate) return;
     
-    if (logoToDuplicate) {
-      // Create a new logo with the same properties but slightly offset position
-      const newLogo: Logo = {
-        id: `${logoToDuplicate.type}-${Date.now()}`, // New unique ID
-        type: logoToDuplicate.type,
-        src: logoToDuplicate.src,
-        text: logoToDuplicate.text,
-        textStyle: logoToDuplicate.textStyle ? {...logoToDuplicate.textStyle} : undefined,
-        position: { 
-          x: logoToDuplicate.position.x + 20, 
-          y: logoToDuplicate.position.y + 20 
-        },
-        size: { ...logoToDuplicate.size }
-      };
-      
-      // Create a new ref for the duplicated logo
-      logoRefs.current.set(newLogo.id, React.createRef<Rnd>());
-      
-      // Add the new logo to the array
-      setLogos(prev => [...prev, newLogo]);
-      
-      // Make it the active logo
-      setActiveLogoId(newLogo.id);
-      setDraggable(true);
-      setIsActive(true);
-    }
-  };
-
-  const toggleDragMode = (logoId: string) => {
-    // Always make the logo active when clicked
-    setActiveLogoId(logoId);
+    const newLogo: Logo = {
+      id: `${logoToDuplicate.type}-${Date.now()}`,
+      type: logoToDuplicate.type,
+      src: logoToDuplicate.src,
+      text: logoToDuplicate.text,
+      textStyle: logoToDuplicate.textStyle ? {...logoToDuplicate.textStyle} : undefined,
+      position: { 
+        x: logoToDuplicate.position.x + 20, 
+        y: logoToDuplicate.position.y + 20 
+      },
+      size: { ...logoToDuplicate.size }
+    };
+    
+    logoRefs.current.set(newLogo.id, React.createRef<Rnd>());
+    setLogos(prev => [...prev, newLogo]);
+    setActiveLogoId(newLogo.id);
+    setDraggable(true);
     setIsActive(true);
-    
-    // If it wasn't already active and draggable, enable dragging
-    if (activeLogoId !== logoId || !draggable) {
-      setDraggable(true);
-    }
   };
-  
-  // Modify to keep drag mode active
-  const disableDrag = () => {
-    // Don't disable dragging right away
-    // Instead keep it enabled while the logo is active
-    setIsDragging(false);
-  };
-  
 
-  // Update logo position and size when moved or resized
   const handleLogoMove = (
     logoId: string, 
     position: {x: number, y: number}, 
@@ -504,7 +433,7 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
       if (logo.id === logoId) {
         return {
           ...logo,
-          position: position,
+          position,
           size: size || logo.size,
           textStyle: textStyle || logo.textStyle
         };
@@ -513,25 +442,28 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
     }));
   };
   
-  // Start editing dimensions
-  const startEditingDimensions = () => {
-    setIsEditingDimensions(true);
-  };
-    
-  // Confirm dimension changes
-  const handleDimensionChange = (newDimensions: BagDimensions) => {
-    setDimensions(newDimensions);
-    setIsEditingDimensions(false);
+  // UI interaction handlers
+  const toggleDragMode = (logoId: string) => {
+    setActiveLogoId(logoId);
+    setIsActive(true);
+    if (activeLogoId !== logoId || !draggable) {
+      setDraggable(true);
+    }
   };
   
-  // Handle clicking outside any logo (in the bag area)
   const handleBagClick = (e: React.MouseEvent) => {
-    // Only handle the click if it's directly on the bag container (not on a logo)
     if (e.currentTarget === e.target) {
       setActiveLogoId(null);
       setDraggable(false);
       setIsActive(false);
     }
+  };
+  
+  // Dimensions editing
+  const startEditingDimensions = () => setIsEditingDimensions(true);
+  const handleDimensionChange = (newDimensions: BagDimensions) => {
+    setDimensions(newDimensions);
+    setIsEditingDimensions(false);
   };
   
   return (
@@ -577,75 +509,117 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
                 size={{ width: logo.size.width, height: logo.size.height }}
                 bounds="parent"
                 disableDragging={!(isLogoActive && draggable)}
-                enableResizing={isLogoActive && draggable ? { 
-                  bottomRight: true, 
-                } : false}
-                // Add min/max size constraints based on logo type
+                enableResizing={isLogoActive && draggable ? { bottomRight: true } : false}
                 minWidth={logo.type === 'text' ? 
-                  Math.max(100, ((logo.text?.length || 10) * (logo.textStyle?.fontSize || 24) * 0.5)) :
-                  50
+                  (() => {
+                    if (logo.text) {
+                      const lineBreaks = (logo.text.match(/\n/g) || []).length;
+                      if (lineBreaks > 0) {
+                        const lines = logo.text.split('\n');
+                        const longestLineLength = Math.max(...lines.map(line => line.length));
+                        return Math.max(100, longestLineLength * (logo.textStyle?.fontSize || 24) * 0.4);
+                      }
+                    }
+                    return Math.max(100, ((logo.text?.length || 10) * (logo.textStyle?.fontSize || 24) * 0.5));
+                  })() : 50
                 }
                 maxWidth={logo.type === 'text' ? 
-                  Math.min(500, ((logo.text?.length || 10) * (logo.textStyle?.fontSize || 24) * 1.2)) :
-                  800
+                  (() => {
+                    if (logo.text) {
+                      const lineBreaks = (logo.text.match(/\n/g) || []).length;
+                      if (lineBreaks > 0) {
+                        const lines = logo.text.split('\n');
+                        const longestLineLength = Math.max(...lines.map(line => line.length));
+                        return Math.min(600, longestLineLength * (logo.textStyle?.fontSize || 24) * 1.2);
+                      }
+                    }
+                    return Math.min(500, ((logo.text?.length || 10) * (logo.textStyle?.fontSize || 24) * 1.2));
+                  })() : 800
                 }
                 minHeight={logo.type === 'text' ? 
-                  Math.max(40, ((logo.textStyle?.fontSize || 24) * 1.5)) :
-                  50
+                  (() => {
+                    if (logo.text) {
+                      const lineBreaks = (logo.text.match(/\n/g) || []).length;
+                      if (lineBreaks > 0) {
+                        return Math.max(60, (lineBreaks + 1) * (logo.textStyle?.fontSize || 24) * 1.2);
+                      }
+                    }
+                    return Math.max(40, ((logo.textStyle?.fontSize || 24) * 1.5));
+                  })() : 50
                 }
                 maxHeight={logo.type === 'text' ? 
-                  Math.min(300, ((logo.textStyle?.fontSize || 24) * 5)) :
-                  800
+                  (() => {
+                    if (logo.text) {
+                      const lineBreaks = (logo.text.match(/\n/g) || []).length;
+                      if (lineBreaks > 0) {
+                        return Math.min(500, (lineBreaks + 1) * (logo.textStyle?.fontSize || 24) * 3);
+                      }
+                    }
+                    return Math.min(300, ((logo.textStyle?.fontSize || 24) * 5));
+                  })() : 800
                 }
-                onDragStart={() => {
-                  setIsDragging(true);
-                }}
-                // Use onDrag for live updates instead of just onDragStop
-                onDrag={(e, d) => {
-                  // Update position in real-time during dragging
-                  handleLogoMove(logo.id, {x: d.x, y: d.y});
-                }}
-                onDragStop={(e, d) => {
-                  handleLogoMove(logo.id, {x: d.x, y: d.y});
-                  disableDrag();
-                }}
-                // Also update in real-time during resizing
+                onDragStart={() => {}}
+                onDrag={(e, d) => handleLogoMove(logo.id, {x: d.x, y: d.y})}
+                onDragStop={(e, d) => handleLogoMove(logo.id, {x: d.x, y: d.y})}
                 onResize={(e, direction, ref, delta, position) => {
-                  // Get current dimensions from the ref
                   const newWidth = parseInt(ref.style.width);
                   const newHeight = parseInt(ref.style.height);
-                  
-                  // Find the logo being resized
                   const resizedLogo = logos.find(l => l.id === logo.id);
                   
-                  if (resizedLogo && resizedLogo.type === 'text' && resizedLogo.textStyle) {
-                    // Better text sizing constraints
-                    const originalWidth = resizedLogo.size.width;
-                    const widthRatio = newWidth / originalWidth;
+                  if (resizedLogo?.type === 'text' && resizedLogo.textStyle) {
+                    const text = resizedLogo.text || '';
+                    const lineBreaks = (text.match(/\n/g) || []).length;
+                    const hasLineBreaks = lineBreaks > 0;
                     
-                    // 7. Apply a more controlled scaling - limit to reasonable bounds
-                    const scaleFactor = Math.min(1.5, Math.max(0.8, widthRatio));
-                    
-                    // 8. Create updated text style with new font size (use more conservative scaling)
-                    const updatedTextStyle = {
-                      ...resizedLogo.textStyle,
-                      fontSize: Math.max(12, Math.min(60, Math.round(resizedLogo.textStyle.fontSize * scaleFactor)))
-                    };
-                    
-                    // 9. Update both position/size and text style with constrained values
-                    handleLogoMove(
-                      logo.id,
-                      position,
-                      { width: newWidth, height: newHeight },
-                      updatedTextStyle
-                    );
+                    // Different scaling strategy based on whether text has line breaks
+                    if (hasLineBreaks) {
+                      // For multi-line text, preserve font size more but allow height to adjust
+                      const heightRatio = newHeight / resizedLogo.size.height;
+                      const widthRatio = newWidth / resizedLogo.size.width;
+                      
+                      // Scale font size more conservatively for multi-line text
+                      // Prefer scaling based on height for multi-line text
+                      const scaleFactor = Math.min(1.3, Math.max(0.85, heightRatio));
+                      
+                      const updatedTextStyle = {
+                        ...resizedLogo.textStyle,
+                        fontSize: Math.max(12, Math.min(48, Math.round(resizedLogo.textStyle.fontSize * scaleFactor)))
+                      };
+                      
+                      // Adjust width to maintain good text wrapping
+                      const lines = text.split('\n');
+                      const longestLine = Math.max(...lines.map(line => line.length));
+                      const idealWidth = Math.max(newWidth, longestLine * updatedTextStyle.fontSize * 0.6);
+                      
+                      handleLogoMove(
+                        logo.id, 
+                        position,
+                        { 
+                          width: Math.min(idealWidth, newWidth), 
+                          height: newHeight 
+                        },
+                        updatedTextStyle
+                      );
+                    } else {
+                      // For single-line text, use width-based scaling (original behavior)
+                      const widthRatio = newWidth / resizedLogo.size.width;
+                      const scaleFactor = Math.min(1.5, Math.max(0.8, widthRatio));
+                      
+                      const updatedTextStyle = {
+                        ...resizedLogo.textStyle,
+                        fontSize: Math.max(12, Math.min(60, Math.round(resizedLogo.textStyle.fontSize * scaleFactor)))
+                      };
+                      
+                      handleLogoMove(
+                        logo.id, 
+                        position,
+                        { width: newWidth, height: newHeight },
+                        updatedTextStyle
+                      );
+                    }
                   } else {
-                    // For images, just update without additional calculations since we're using min/max constraints
-                    handleLogoMove(
-                      logo.id,
-                      position,
-                      { width: newWidth, height: newHeight }
-                    );
+                    // For images, use the existing behavior
+                    handleLogoMove(logo.id, position, { width: newWidth, height: newHeight });
                   }
                 }}
                 onResizeStop={(e, direction, ref, delta, position) => {
@@ -654,11 +628,9 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
                     position,
                     { width: parseInt(ref.style.width), height: parseInt(ref.style.height) }
                   );
-                  disableDrag();
                 }}
                 ref={logoRefs.current.get(logo.id)}
                 cancel=".logoControlButtons, .duplicateLogoButton, .removeLogoButton, .dragButton, .resizeButton"
-                // Set this to make dragging more responsive
                 dragHandleClassName={styles.logoOverlay}
               >
               <div
@@ -675,7 +647,7 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
                 className={`${styles.logoOverlay} ${isLogoActive && isActive ? styles.active : ""}`}
               >
                 {logo.type === 'text' ? (
-                  <div 
+                    <div 
                     style={{
                       width: "100%",
                       height: "100%",
@@ -688,11 +660,13 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
                       color: logo.textStyle?.color || '#000000',
                       pointerEvents: "none",
                       userSelect: "none",
-                      whiteSpace: "pre-wrap",   // Changed from break-word to pre-wrap
+                      whiteSpace: "pre-wrap",
                       textAlign: "center",
                       overflow: "hidden",
-                      padding: "5px",
-                      boxSizing: "border-box"
+                      padding: "8px",
+                      boxSizing: "border-box",
+                      lineHeight: logo.text?.includes('\n') ? 1.3 : 'normal',
+                      wordBreak: "break-word"
                     }}
                   >
                     {logo.text || "Text"}
@@ -704,15 +678,14 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
                     style={{ 
                       width: "100%", 
                       height: "100%",
-                      pointerEvents: "none" // This prevents the image from interfering with drag
+                      pointerEvents: "none"
                     }}
-                    draggable={false} // Prevent browser's native drag
+                    draggable={false}
                   />
                 )}
                 
                 {isLogoActive && isActive && (
                   <>
-                    {/* Resize handle at bottom-right */}
                     <div className={styles.customResizeHandle}>
                       <Image
                         src={resizeIcon}
@@ -723,7 +696,6 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
                       />
                     </div>
                     
-                    {/* Delete button - positioned at top-left */}
                     <button 
                       className={styles.removeLogoButton}
                       onMouseDown={(e) => {
@@ -755,7 +727,6 @@ const DesignPage: React.FC<DesignPageProps> = ({ handleNavigation }) => {
                       &times;
                     </button>
                     
-                    {/* Duplicate button - positioned at bottom-left */}
                     <button 
                       className={styles.duplicateLogoButton}
                       onMouseDown={(e) => {
