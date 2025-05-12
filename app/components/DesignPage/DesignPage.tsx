@@ -69,10 +69,42 @@ const DesignPage: React.FC<DesignPageProps> = () => {
     }
   };
   
-  // Generate PDF function
-  const handleGeneratePDF = async () => {
-    return await generatePDF(dimensions, logos, bagContainerRef);
-  };
+  const [isZoomed, setIsZoomed] = useState(false);
+
+// Add this handler for toggling zoom
+const toggleZoom = () => {
+  // If we're about to zoom in, deselect any active logo
+  if (!isZoomed) {
+    handleLogoDeselect();
+  }
+  
+  // Toggle zoom state
+  setIsZoomed(prev => !prev);
+};
+
+// Modify your PDF generation function to temporarily reset zoom
+const handleGeneratePDF = async () => {
+  // Store current zoom state
+  const wasZoomed = isZoomed;
+  
+  if (wasZoomed) {
+    // Temporarily reset zoom
+    setIsZoomed(false);
+    
+    // Wait a moment for the UI to update before generating PDF
+    await new Promise(resolve => setTimeout(resolve, 50));
+  }
+  
+  // Generate the PDF with the original viewbox
+  const result = await generatePDF(dimensions, logos, bagContainerRef);
+  
+  // Restore zoom if it was active before
+  if (wasZoomed) {
+    setIsZoomed(true);
+  }
+  
+  return result;
+};
   
   // Handle logo upload
   const handleLogoUpload = (files: FileList) => {
