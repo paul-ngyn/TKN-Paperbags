@@ -10,7 +10,7 @@ import { BagDimensions, mmToInches} from "../../util/BagDimensions";
 // Extended props to support text customization
 interface SidebarProps {
   handleLogoUpload: (files: FileList) => void;
-  handleAddText: (text?: string, style?: TextStyle) => void; // Modified to receive text and style
+  handleAddText: (text?: string, style?: TextStyle) => void;
   fileInputRef: React.RefObject<HTMLInputElement>;
   dimensions: BagDimensions;
   handleDimensionChange: (dimensions: BagDimensions) => void;
@@ -21,6 +21,7 @@ interface SidebarProps {
   activeLogoText?: string;
   activeLogoTextStyle?: TextStyle;
   updateTextContent?: (id: string, text: string, style: TextStyle) => void;
+  onLogoDeselect?: () => void; // Add this new prop
 }
 
 interface TextStyle {
@@ -42,7 +43,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   activeLogoId = null,
   activeLogoText = "",
   activeLogoTextStyle,
-  updateTextContent
+  updateTextContent,
+  onLogoDeselect
 }) => {
   // Add state for showing/hiding the blueprint example modal
   const [showBlueprintExample, setShowBlueprintExample] = useState(false);
@@ -339,19 +341,25 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Tab Navigation */}
       <div className={styles.tabNavigation}>
-        <button 
-          className={`${styles.tabButton} ${sidebarMode === 'default' ? styles.activeTab : ''}`}
-          onClick={() => setSidebarMode('default')}
-        >
-          Upload
-        </button>
-        <button 
-          className={`${styles.tabButton} ${sidebarMode === 'text' ? styles.activeTab : ''}`}
-          onClick={handleAddTextClick}
-        >
-          Text
-        </button>
-      </div>
+      <button 
+        className={`${styles.tabButton} ${sidebarMode === 'default' ? styles.activeTab : ''}`}
+        onClick={() => {
+          setSidebarMode('default');
+          // Deselect active logo when switching to upload tab
+          if (activeLogoId && onLogoDeselect) {
+            onLogoDeselect();
+          }
+        }}
+      >
+        Upload
+      </button>
+      <button 
+        className={`${styles.tabButton} ${sidebarMode === 'text' ? styles.activeTab : ''}`}
+        onClick={handleAddTextClick}
+      >
+        Text
+      </button>
+    </div>
 
       {/* Default Upload Section */}
       {sidebarMode === 'default' && (

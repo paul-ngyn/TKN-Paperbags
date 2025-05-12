@@ -493,6 +493,12 @@ const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: nu
     setDimensions(newDimensions);
     setIsEditingDimensions(false);
   };
+
+  const handleLogoDeselect = () => {
+    setActiveLogoId(null);
+    setDraggable(false);
+    setIsActive(false);
+  };
   
   return (
     <div className={styles.pageContainer}>
@@ -509,6 +515,7 @@ const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: nu
         activeLogoText={logos.find(logo => logo.id === activeLogoId && logo.type === 'text')?.text || ''}
         activeLogoTextStyle={logos.find(logo => logo.id === activeLogoId && logo.type === 'text')?.textStyle}
         updateTextContent={updateTextContent}
+        onLogoDeselect={handleLogoDeselect}
       />
       
       <div 
@@ -598,51 +605,90 @@ const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: nu
                     const text = resizedLogo.text || '';
                     const lineBreaks = (text.match(/\n/g) || []).length;
                     const hasLineBreaks = lineBreaks > 0;
+                    const fontSize = resizedLogo.textStyle.fontSize;
                     
-                    // Different scaling strategy based on whether text has line breaks
+                    // Get the current text aspect ratio and dimensions to maintain proportion
+                    const currentRatio = resizedLogo.size.width / resizedLogo.size.height;
+                    
+                    // Calculate optimal font size based on container dimensions
+                    let newFontSize = fontSize;
+                    let optimalWidth = newWidth;
+                    let optimalHeight = newHeight;
+                    
                     if (hasLineBreaks) {
-                      // For multi-line text, preserve font size more but allow height to adjust
-                      const heightRatio = newHeight / resizedLogo.size.height;
-                      
-                      // Scale font size more conservatively for multi-line text
-                      // Prefer scaling based on height for multi-line text
-                      const scaleFactor = Math.min(1.3, Math.max(0.85, heightRatio));
-                      
-                      const updatedTextStyle = {
-                        ...resizedLogo.textStyle,
-                        fontSize: Math.max(12, Math.min(64, Math.round(resizedLogo.textStyle.fontSize * scaleFactor)))
-                      };
-                      
-                      // Adjust width to maintain good text wrapping
+                      // For multi-line text, calculate differently
                       const lines = text.split('\n');
+                      const lineCount = lines.length;
                       const longestLine = Math.max(...lines.map(line => line.length));
-                      const idealWidth = Math.max(newWidth, longestLine * updatedTextStyle.fontSize * 0.6);
                       
-                      handleLogoMove(
-                        logo.id, 
-                        position,
-                        { 
-                          width: Math.min(idealWidth, newWidth), 
-                          height: newHeight 
-                        },
-                        updatedTextStyle
+                      // Determine font size from height first for multi-line text
+                      const heightBasedFontSize = Math.max(12, Math.min(64, 
+                        Math.floor(newHeight / (lineCount * 1.5))
+                      ));
+                      
+                      // Check if width is sufficient for this font size
+                      const requiredWidth = longestLine * heightBasedFontSize * 0.6;
+                      
+                      if (requiredWidth > newWidth) {
+                        // If width is too small, adjust font size based on width
+                        newFontSize = Math.max(12, Math.min(heightBasedFontSize, 
+                          Math.floor((newWidth / longestLine) * 1.6)
+                        ));
+                      } else {
+                        newFontSize = heightBasedFontSize;
+                      }
+                      
+                      // Ensure minimum height for readability
+                      optimalHeight = Math.max(
+                        newHeight, 
+                        (lineCount * newFontSize * 1.5)
                       );
                     } else {
-                      // For single-line text, use width-based scaling (original behavior)
+                      // For single-line text, use primarily width-based sizing
+                      // but maintain a reasonable height-to-width ratio
+                      const textLength = text.length || 10;
                       const widthRatio = newWidth / resizedLogo.size.width;
-                      const scaleFactor = Math.min(1.5, Math.max(0.8, widthRatio));
                       
-                      const updatedTextStyle = {
-                        ...resizedLogo.textStyle,
-                        fontSize: Math.max(12, Math.min(64, Math.round(resizedLogo.textStyle.fontSize * scaleFactor)))
-                      };
+                      // Start with width-based font size
+                      newFontSize = Math.max(12, Math.min(64, 
+                        Math.floor(fontSize * widthRatio)
+                      ));
                       
-                      handleLogoMove(
-                        logo.id, 
-                        position,
-                        { width: newWidth, height: newHeight },
-                        updatedTextStyle
+                      // Check if height is sufficient for this font size
+                      const requiredHeight = newFontSize * 1.5;
+                      
+                      if (requiredHeight > newHeight) {
+                        // If height is too small, adjust
+                        newFontSize = Math.max(12, Math.floor(newHeight / 1.5));
+                      }
+                      
+                      // Ensure box isn't too tall for single line text
+                      optimalHeight = Math.min(
+                        newHeight,
+                        Math.max(newFontSize * 2, newHeight)
                       );
+                    }
+                    
+                    // Create updated style and size objects
+                    const updatedTextStyle = {
+                      ...resizedLogo.textStyle,
+                      fontSize: newFontSize
+                    };
+                
+                    // Apply the changes
+                    handleLogoMove(
+                      logo.id,
+                      position,
+                      { width: optimalWidth, height: optimalHeight },
+                      updatedTextStyle
+                    );
+                    
+                    // Update the Rnd component's size directly for immediate visual feedback
+                    if (logoRefs.current.get(logo.id)?.current) {
+                      logoRefs.current.get(logo.id)?.current?.updateSize({
+                        width: optimalWidth,
+                        height: optimalHeight
+                      });
                     }
                   } else {
                     // For images, use the existing behavior
@@ -693,7 +739,9 @@ const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: nu
                       padding: "8px",
                       boxSizing: "border-box",
                       lineHeight: logo.text?.includes('\n') ? 1.3 : 'normal',
-                      wordBreak: "break-word"
+                      wordBreak: "break-word",
+                      textOverflow: "ellipsis",
+                      maxHeight: "100%"
                     }}
                   >
                     {logo.text || "Text"}
