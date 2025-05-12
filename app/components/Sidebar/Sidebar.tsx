@@ -7,6 +7,7 @@ import downloadicon from "../../public/downloadicon.png";
 import BlueprintExample from "../../public/BlueprintExample.png";
 import { BagDimensions, mmToInches} from "../../util/BagDimensions";
 
+
 // Extended props to support text customization
 interface SidebarProps {
   handleLogoUpload: (files: FileList) => void;
@@ -15,7 +16,7 @@ interface SidebarProps {
   dimensions: BagDimensions;
   handleDimensionChange: (dimensions: BagDimensions) => void;
   startEditingDimensions?: () => void;
-  downloadDesign?: () => void;
+  downloadDesign: () => Promise<boolean> | void;
   logoCount?: number;
   activeLogoId?: string | null;
   activeLogoText?: string;

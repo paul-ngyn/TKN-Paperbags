@@ -3,13 +3,10 @@ import React, { useState, useRef } from "react";
 import { Rnd } from "react-rnd";
 import Sidebar from "../Sidebar/Sidebar";
 import BagBlueprint from "../BagBlueprint/BagBlueprint";
+import LogoItem, { Logo } from "../LogoItem/LogoItem";
 import styles from "./DesignPage.module.css";
-import resizeIcon from "../../public/resize-68.png";
-import duplicateIcon from "../../public/duplicate-icon.png";
-import Image from "next/image";
-import jsPDF from "jspdf";
-import {svg2pdf} from "svg2pdf.js";
-import { BagDimensions, calculateBagDimensions } from "../../util/BagDimensions";
+import { BagDimensions } from "../../util/BagDimensions";
+import { generatePDF } from "../../util/pdfGenerator";
 
 interface DesignPageProps {
   handleNavigation: (page: string) => void;
@@ -20,16 +17,6 @@ interface TextStyle {
   fontSize: number;
   color: string;
   fontWeight: string;
-}
-
-interface Logo {
-  id: string;
-  type: 'image' | 'text';
-  src?: string;
-  text?: string;
-  textStyle?: TextStyle;
-  position: { x: number, y: number };
-  size: { width: number, height: number };
 }
 
 const DesignPage: React.FC<DesignPageProps> = () => {
@@ -51,246 +38,40 @@ const DesignPage: React.FC<DesignPageProps> = () => {
   const bagContainerRef = useRef<HTMLDivElement>(null);
   
   // Calculate size constraints for text elements
-  // Replace the existing calculateTextConstraints function with this improved version
-const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: number = 0) => {
-  const charWidthFactor = fontSize * 0.6;
-  
-  // Handle multi-line text differently than single-line text
-  const hasLineBreaks = lineBreaks > 0;
-  
-  if (hasLineBreaks) {
-    // For multi-line text, calculate based on the longest line
-    const lines = text.split('\n');
-    const longestLineLength = Math.max(...lines.map(line => line.length));
-    const longestLineWidth = longestLineLength * charWidthFactor;
+  const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: number = 0) => {
+    const charWidthFactor = fontSize * 0.6;
     
-    return {
-      minWidth: Math.max(100, Math.min(300, longestLineWidth * 0.8)),
-      maxWidth: Math.min(600, Math.max(200, longestLineWidth * 1.5)),
-      minHeight: Math.max(60, (lineBreaks + 1) * fontSize * 1.5),
-      maxHeight: Math.min(500, (lineBreaks + 1) * fontSize * 3)
-    };
-  } else {
-    // For single-line text, use the original logic
-    const textWidth = text.length * charWidthFactor;
+    // Handle multi-line text differently than single-line text
+    const hasLineBreaks = lineBreaks > 0;
     
-    return {
-      minWidth: Math.max(100, Math.min(300, textWidth * 0.8)),
-      maxWidth: Math.min(500, Math.max(200, textWidth * 1.5)),
-      minHeight: Math.max(40, fontSize * 1.5),
-      maxHeight: Math.min(300, fontSize * 3)
-    };
-  }
-};
-  
-  // Generate PDF function
-  const generatePDF = async () => {
-    console.log("Starting PDF generation with accurate physical dimensions...");
-    
-    try {
-      // Use the BagDimensions utility for calculations
-      const calculatedDim = calculateBagDimensions(dimensions);
+    if (hasLineBreaks) {
+      // For multi-line text, calculate based on the longest line
+      const lines = text.split('\n');
+      const longestLineLength = Math.max(...lines.map(line => line.length));
+      const longestLineWidth = longestLineLength * charWidthFactor;
       
-      // Get SVG viewBox dimensions
-      const tempSvgElement = document.querySelector(".bagBlueprint svg") || document.querySelector("svg");
-      let svgViewBoxWidth = calculatedDim.totalWidthMM + 150;
-      let svgViewBoxHeight = calculatedDim.totalHeightMM + 150;
+      return {
+        minWidth: Math.max(100, Math.min(300, longestLineWidth * 0.8)),
+        maxWidth: Math.min(600, Math.max(200, longestLineWidth * 1.5)),
+        minHeight: Math.max(60, (lineBreaks + 1) * fontSize * 1.5),
+        maxHeight: Math.min(500, (lineBreaks + 1) * fontSize * 3)
+      };
+    } else {
+      // For single-line text, use the original logic
+      const textWidth = text.length * charWidthFactor;
       
-      if (tempSvgElement instanceof SVGElement) {
-        const tempViewBox = tempSvgElement.getAttribute('viewBox');
-        const tempViewBoxValues = tempViewBox ? tempViewBox.split(' ').map(Number) : [0, 0, svgViewBoxWidth, svgViewBoxHeight];
-        svgViewBoxWidth = tempViewBoxValues[2];
-        svgViewBoxHeight = tempViewBoxValues[3];
-      }
-      
-      // Calculate PDF dimensions
-      const MM_TO_INCHES = 1 / 25.4;
-      const requiredBlueprintWidthInches = svgViewBoxWidth * MM_TO_INCHES;
-      const requiredBlueprintHeightInches = svgViewBoxHeight * MM_TO_INCHES;
-      const marginInches = 2;
-      
-      const pdfWidthInches = Math.ceil(requiredBlueprintWidthInches + (marginInches * 2));
-      const pdfHeightInches = Math.ceil(requiredBlueprintHeightInches + (marginInches * 2));
-      const pdfOrientation = pdfWidthInches > pdfHeightInches ? "landscape" as const : "portrait" as const;
-      const xPos = (pdfWidthInches - requiredBlueprintWidthInches) / 2;
-      const yPos = (pdfHeightInches - requiredBlueprintHeightInches) / 2;
-
-      // Create PDF
-      const pdf = new jsPDF({
-        orientation: pdfOrientation,
-        unit: "in",
-        format: [pdfWidthInches, pdfHeightInches],
-        compress: false, 
-        hotfixes: ["scale_correction"] 
-      });
-      
-      // Add blueprint to PDF
-      const bagBlueprintElement = document.querySelector(".bagBlueprint svg") || document.querySelector("svg");
-      if (!(bagBlueprintElement instanceof SVGElement)) {
-        console.warn("SVG element not found");
-        return false;
-      }
-      
-      const svgClone = bagBlueprintElement.cloneNode(true) as SVGElement;
-      svgClone.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-
-      await svg2pdf(svgClone, pdf, {
-        x: xPos,
-        y: yPos,
-        width: requiredBlueprintWidthInches,
-        height: requiredBlueprintHeightInches
-      });
-                  
-      // Calculate logo positioning scales
-      const bagContainerRect = bagContainerRef.current?.getBoundingClientRect() || { width: 0, height: 0 };
-      const scaleX = requiredBlueprintWidthInches / bagContainerRect.width;
-      const scaleY = requiredBlueprintHeightInches / bagContainerRect.height;
-      
-      // Add logos to PDF
-      if (logos.length > 0) {
-        for (const logo of logos) {
-          try {
-            const logoXInPDF = xPos + (logo.position.x * scaleX);
-            const logoYInPDF = yPos + (logo.position.y * scaleY);
-            const logoWidthInPDF = logo.size.width * scaleX;
-            const logoHeightInPDF = logo.size.height * scaleY;
-            
-            // Process based on logo type
-            if (logo.type === 'text' && logo.text) {
-              addTextToPdf(pdf, logo, logoXInPDF, logoYInPDF, logoWidthInPDF, logoHeightInPDF, scaleX, scaleY);
-            } else if (logo.type === 'image' && logo.src) {
-              pdf.addImage(logo.src, 'PNG', logoXInPDF, logoYInPDF, logoWidthInPDF, logoHeightInPDF);
-            } else {
-              console.warn(`Skipping logo ${logo.id} - invalid type or missing content`);
-            }
-          } catch (err) {
-            console.error(`Failed to add logo/text ${logo.id}:`, err);
-          }
-        }
-      }
-      
-      // Save PDF
-      pdf.save(`MTC-Bag-Design-${calculatedDim.totalWidthInches.toFixed(2)}x${calculatedDim.totalHeightInches.toFixed(2)}-inches_Physical.pdf`);
-      return true;
-      
-    } catch (error) {
-      console.error("Failed to generate PDF:", error);
-      alert("Sorry, we couldn't generate your PDF. Please try again.");
-      return false;
+      return {
+        minWidth: Math.max(100, Math.min(300, textWidth * 0.8)),
+        maxWidth: Math.min(500, Math.max(200, textWidth * 1.5)),
+        minHeight: Math.max(40, fontSize * 1.5),
+        maxHeight: Math.min(300, fontSize * 3)
+      };
     }
   };
   
-  // Helper function to add text to PDF
-  const addTextToPdf = (pdf: jsPDF, logo: Logo, x: number, y: number, width: number, height: number, scaleX: number, scaleY: number) => {
-    try {
-      // Create canvas for text rendering
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      
-      if (!ctx) {
-        throw new Error("Could not create canvas context");
-      }
-      
-      // Set canvas properties - higher ratio for better quality
-      const pixelRatio = 5;
-      canvas.width = logo.size.width * pixelRatio;
-      canvas.height = logo.size.height * pixelRatio;
-      ctx.scale(pixelRatio, pixelRatio);
-      
-      // Clear canvas
-      ctx.clearRect(0, 0, logo.size.width, logo.size.height);
-      
-      // Set text styling
-      const fontWeight = logo.textStyle?.fontWeight || 'normal';
-      const fontSize = logo.textStyle?.fontSize || 24;
-      const fontFamily = logo.textStyle?.fontFamily || 'Arial';
-      const color = logo.textStyle?.color || '#000000';
-      
-      ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
-      ctx.fillStyle = color;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      
-      const text = logo.text || '';
-      const hasLineBreaks = text.includes('\n');
-      
-      // Different rendering approach based on text type
-      if (hasLineBreaks) {
-        // For multi-line text, explicitly handle line positioning
-        const lineHeight = fontSize * 1.4;
-        const centerX = logo.size.width / 2 - (fontSize * 0.09); 
-        
-        // Calculate actual text bounds for proper vertical centering
-        const lines = text.split('\n');
-        const totalTextHeight = lines.length * lineHeight;
-        
-        // Start position for first line (centered vertically)
-        const startY = (logo.size.height - totalTextHeight) / 2 + lineHeight / 2;
-        
-        // Draw each line separately
-        lines.forEach((line, index) => {
-          ctx.fillText(line, centerX, startY + (index * lineHeight));
-        });
-      } else {
-        // For single-line text, simple centered positioning
-        const centerX = logo.size.width / 2 - (fontSize * 0.09);
-        const centerY = logo.size.height / 2 - (fontSize * 0.14);
-        // Add a small vertical offset (8% of font size) to visually center single-line text
-        const verticalOffset = fontSize * 0.08;
-        ctx.fillText(text, centerX, centerY + verticalOffset);
-      }
-      
-      // Convert to image and add to PDF
-      const textImageDataUrl = canvas.toDataURL('image/png');
-      pdf.addImage(textImageDataUrl, 'PNG', x, y, width, height);
-      
-    } catch (err) {
-      console.log("Falling back to standard text rendering:", err);
-      
-      // Standard PDF text rendering as fallback
-      const fontFamily = logo.textStyle?.fontFamily || 'helvetica';
-      let pdfFontName = 'helvetica';
-      
-      if (fontFamily.toLowerCase().includes('times')) {
-        pdfFontName = 'times';
-      } else if (fontFamily.toLowerCase().includes('courier')) {
-        pdfFontName = 'courier';
-      }
-      
-      const fontStyle = logo.textStyle?.fontWeight === 'bold' ? 'bold' : 'normal';
-      pdf.setFont(pdfFontName, fontStyle);
-      
-      const fontSize = logo.textStyle?.fontSize || 24;
-      const scaleFactor = Math.min(scaleX, scaleY);
-      const scaledFontSize = Math.max(16, fontSize * scaleFactor * 71);
-      pdf.setFontSize(scaledFontSize);
-      
-      // Set text color
-      const color = logo.textStyle?.color || '#000000';
-      const r = parseInt(color.slice(1, 3), 16);
-      const g = parseInt(color.slice(3, 5), 16);
-      const b = parseInt(color.slice(5, 7), 16);
-      pdf.setTextColor(r, g, b);
-      
-      // Position and render
-      const textX = x + (width / 2);
-      const textY = y + (height / 2);
-      
-      const text = logo.text || '';
-      if (text.includes('\n')) {
-        // For multi-line text in fallback mode
-        const lines = text.split('\n');
-        pdf.text(lines, textX, textY, {
-          align: 'center',
-          baseline: 'middle'
-        });
-      } else {
-        pdf.text(text, textX, textY, {
-          align: 'center',
-          baseline: 'middle'
-        });
-      }
-    }
+  // Generate PDF function
+  const handleGeneratePDF = async () => {
+    return await generatePDF(dimensions, logos, bagContainerRef);
   };
   
   // Handle logo upload
@@ -322,7 +103,7 @@ const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: nu
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  // New helper function to calculate optimal text box dimensions
+  // Calculate optimal text box dimensions
   const calculateOptimalTextSize = (text: string, fontSize: number): { width: number, height: number } => {
     // Get line details
     const lines = text.split('\n');
@@ -375,31 +156,31 @@ const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: nu
     setIsActive(true);
   };
   
-  // Update text content and styling with proper constraints
+  // Update text content and styling
   const updateTextContent = (id: string, text: string, style: TextStyle) => {
-  // Calculate optimal size for text with new content and style
-  const { width, height } = calculateOptimalTextSize(text, style.fontSize);
-  
-  setLogos(prev => prev.map(logo => {
-    if (logo.id === id) {
-      return { 
-        ...logo, 
-        text, 
-        textStyle: style, 
-        size: { width, height } 
-      };
+    // Calculate optimal size for text with new content and style
+    const { width, height } = calculateOptimalTextSize(text, style.fontSize);
+    
+    setLogos(prev => prev.map(logo => {
+      if (logo.id === id) {
+        return { 
+          ...logo, 
+          text, 
+          textStyle: style, 
+          size: { width, height } 
+        };
+      }
+      return logo;
+    }));
+    
+    // Update the component size to match new content
+    const logo = logos.find(l => l.id === id);
+    if (logo && logoRefs.current.get(logo.id)?.current) {
+      logoRefs.current.get(logo.id)?.current?.updateSize({
+        width, height
+      });
     }
-    return logo;
-  }));
-  
-  // Update the component size to match new content
-  const logo = logos.find(l => l.id === id);
-  if (logo && logoRefs.current.get(logo.id)?.current) {
-    logoRefs.current.get(logo.id)?.current?.updateSize({
-      width, height
-    });
-  }
-};
+  };
 
   // Logo operations (delete, duplicate, move)
   const handleLogoDelete = (logoId: string, e?: React.MouseEvent) => {
@@ -530,7 +311,7 @@ const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: nu
         dimensions={dimensions}
         handleDimensionChange={handleDimensionChange}
         startEditingDimensions={startEditingDimensions}
-        downloadDesign={generatePDF}
+        downloadDesign={handleGeneratePDF}
         logoCount={logos.length}
         activeLogoId={activeLogoId}
         activeLogoText={logos.find(logo => logo.id === activeLogoId && logo.type === 'text')?.text || ''}
@@ -550,321 +331,20 @@ const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: nu
           currentEditValues={isEditingDimensions ? dimensions : undefined}
         />
 
-        {logos.map((logo) => {
-          const isLogoActive = logo.id === activeLogoId;
-          return (
-            <Rnd
-                key={logo.id}
-                default={{ 
-                  x: logo.position.x, 
-                  y: logo.position.y, 
-                  width: logo.size.width, 
-                  height: logo.size.height 
-                }}
-                position={{ x: logo.position.x, y: logo.position.y }}
-                size={{ width: logo.size.width, height: logo.size.height }}
-                bounds="parent"
-                disableDragging={!(isLogoActive && draggable)}
-                enableResizing={isLogoActive && draggable ? { bottomRight: true } : false}
-                minWidth={logo.type === 'text' ? 
-                  (() => {
-                    if (logo.text) {
-                      const lineBreaks = (logo.text.match(/\n/g) || []).length;
-                      if (lineBreaks > 0) {
-                        const lines = logo.text.split('\n');
-                        const longestLineLength = Math.max(...lines.map(line => line.length));
-                        return Math.max(100, longestLineLength * (logo.textStyle?.fontSize || 24) * 0.4);
-                      }
-                    }
-                    return Math.max(100, ((logo.text?.length || 10) * (logo.textStyle?.fontSize || 24) * 0.5));
-                  })() : 50
-                }
-                maxWidth={logo.type === 'text' ? 
-                  (() => {
-                    if (logo.text) {
-                      const lineBreaks = (logo.text.match(/\n/g) || []).length;
-                      if (lineBreaks > 0) {
-                        const lines = logo.text.split('\n');
-                        const longestLineLength = Math.max(...lines.map(line => line.length));
-                        return Math.min(600, longestLineLength * (logo.textStyle?.fontSize || 24) * 1.2);
-                      }
-                    }
-                    return Math.min(500, ((logo.text?.length || 10) * (logo.textStyle?.fontSize || 24) * 1.2));
-                  })() : 800
-                }
-                minHeight={logo.type === 'text' ? 
-                  (() => {
-                    if (logo.text) {
-                      const lineBreaks = (logo.text.match(/\n/g) || []).length;
-                      if (lineBreaks > 0) {
-                        return Math.max(60, (lineBreaks + 1) * (logo.textStyle?.fontSize || 24) * 1.2);
-                      }
-                    }
-                    return Math.max(40, ((logo.textStyle?.fontSize || 24) * 1.5));
-                  })() : 50
-                }
-                maxHeight={logo.type === 'text' ? 
-                  (() => {
-                    if (logo.text) {
-                      const lineBreaks = (logo.text.match(/\n/g) || []).length;
-                      if (lineBreaks > 0) {
-                        return Math.min(500, (lineBreaks + 1) * (logo.textStyle?.fontSize || 24) * 3);
-                      }
-                    }
-                    return Math.min(300, ((logo.textStyle?.fontSize || 24) * 5));
-                  })() : 800
-                }
-                onDragStart={() => {}}
-                onDrag={(e, d) => handleLogoMove(logo.id, {x: d.x, y: d.y})}
-                onDragStop={(e, d) => handleLogoMove(logo.id, {x: d.x, y: d.y})}
-                // Replace the existing onResize handler
-                onResize={(e, direction, ref, delta, position) => {
-                  const newWidth = parseInt(ref.style.width);
-                  const newHeight = parseInt(ref.style.height);
-                  const resizedLogo = logos.find(l => l.id === logo.id);
-                  
-                  if (resizedLogo?.type === 'text' && resizedLogo.textStyle) {
-                    const text = resizedLogo.text || '';
-                    
-                    // Store the current resize dimensions in a ref to avoid lost updates
-                    // This prevents visual flickering during resize
-                    if (!ref.dataset.isResizing) {
-                      ref.dataset.isResizing = 'true';
-                    }
-                    
-                    // During active resize, only update the font size but keep user's dimensions
-                    const lines = text.split('\n');
-                    const lineCount = lines.length;
-                    const longestLine = Math.max(...lines.map(line => line.length || 1));
-                    
-                    // Calculate new font size based on resize dimensions
-                    let newFontSize;
-                    
-                    // Determine which dimension is more important based on text configuration
-                    if (lineCount > 1) {
-                      // For multi-line text, height is more important for readability
-                      newFontSize = Math.max(12, Math.min(64, 
-                        Math.floor(newHeight / (lineCount * 1.4 + 0.8))
-                      ));
-                      
-                      // But also check if width is sufficient
-                      const minWidthNeeded = longestLine * newFontSize * 0.6;
-                      if (minWidthNeeded > newWidth) {
-                        // Adjust font size down if width is constraining
-                        newFontSize = Math.max(12, Math.min(newFontSize,
-                          Math.floor((newWidth - 20) / (longestLine * 0.6))
-                        ));
-                      }
-                    } else {
-                      // For single-line text, width is typically the key factor
-                      newFontSize = Math.max(12, Math.min(64,
-                        Math.floor((newWidth - 20) / (longestLine * 0.6 + 1))
-                      ));
-                      
-                      // But ensure height is sufficient
-                      if (newHeight < newFontSize * 1.8) {
-                        newFontSize = Math.max(12, Math.floor(newHeight / 1.8));
-                      }
-                    }
-                    
-                    // Create updated style with new font size
-                    const updatedTextStyle = {
-                      ...resizedLogo.textStyle,
-                      fontSize: newFontSize
-                    };
-
-                    // During active resize, just update the font size and use the user's dimensions
-                    handleLogoMove(
-                      logo.id,
-                      position,
-                      { width: newWidth, height: newHeight },
-                      updatedTextStyle
-                    );
-                  } else {
-                    // For images, use the existing behavior
-                    handleLogoMove(logo.id, position, { width: newWidth, height: newHeight });
-                  }
-                }}
-                onResizeStop={(e, direction, ref, delta, position) => {
-                  const resizedLogo = logos.find(l => l.id === logo.id);
-                  
-                  if (resizedLogo?.type === 'text' && resizedLogo.textStyle) {
-                    // Clear resizing flag
-                    if (ref.dataset.isResizing) {
-                      delete ref.dataset.isResizing;
-                    }
-                    
-                    // Now apply optimal sizing with a minimal delay to ensure smooth transition
-                    const text = resizedLogo.text || '';
-                    const fontSize = resizedLogo.textStyle.fontSize;
-                    
-                    // Use a RAF to ensure the UI updates smoothly
-                    requestAnimationFrame(() => {
-                      const { width, height } = calculateOptimalTextSize(text, fontSize);
-                      
-                      // Apply the optimal size to state
-                      handleLogoMove(
-                        logo.id,
-                        position,
-                        { width, height }
-                      );
-                      
-                      // Update the component size
-                      if (logoRefs.current.get(logo.id)?.current) {
-                        logoRefs.current.get(logo.id)?.current?.updateSize({
-                          width, height
-                        });
-                      }
-                    });
-                  } else {
-                    // For images, use the existing behavior
-                    handleLogoMove(
-                      logo.id, 
-                      position,
-                      { width: parseInt(ref.style.width), height: parseInt(ref.style.height) }
-                    );
-                  }
-                }}
-                ref={logoRefs.current.get(logo.id)}
-                cancel=".logoControlButtons, .duplicateLogoButton, .removeLogoButton, .dragButton, .resizeButton"
-                dragHandleClassName={styles.logoOverlay}
-              >
-              <div
-                style={{ 
-                  width: "100%", 
-                  height: "100%", 
-                  position: "relative",
-                  cursor: isLogoActive && draggable ? "move" : "pointer" 
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleDragMode(logo.id);
-                }}
-                className={`${styles.logoOverlay} ${isLogoActive && isActive ? styles.active : ""}`}
-              >
-                {logo.type === 'text' ? (
-                    <div 
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontFamily: logo.textStyle?.fontFamily || 'Arial',
-                      fontSize: `${logo.textStyle?.fontSize || 24}px`,
-                      fontWeight: logo.textStyle?.fontWeight || 'normal',
-                      color: logo.textStyle?.color || '#000000',
-                      pointerEvents: "none",
-                      userSelect: "none",
-                      whiteSpace: "pre-wrap",
-                      textAlign: "center",
-                      overflow: "hidden",
-                      // Use consistent padding based on font size
-                      padding: `${Math.max(4, (logo.textStyle?.fontSize || 24) * 0.15)}px`,
-                      boxSizing: "border-box",
-                      lineHeight: logo.text?.includes('\n') ? 1.3 : 1.1,
-                      wordBreak: "break-word",
-                      textOverflow: "ellipsis",
-                      maxHeight: "100%"
-                    }}
-                  >
-                    {logo.text || "Text"}
-                  </div>
-                ) : (
-                  <img
-                    src={logo.src}
-                    alt={`Logo ${logo.id}`}
-                    style={{ 
-                      width: "100%", 
-                      height: "100%",
-                      pointerEvents: "none"
-                    }}
-                    draggable={false}
-                  />
-                )}
-                
-                {isLogoActive && isActive && (
-                  <>
-                    <div className={styles.customResizeHandle}>
-                      <Image
-                        src={resizeIcon}
-                        alt="Resize Handle"
-                        width={24}
-                        height={24}
-                        style={{ objectFit: "contain" }}
-                      />
-                    </div>
-                    
-                    <button 
-                      className={styles.removeLogoButton}
-                      onMouseDown={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        handleLogoDelete(logo.id, e);
-                      }}
-                      style={{
-                        position: "absolute",
-                        top: "-15px",
-                        left: "-15px",
-                        backgroundColor: "white",
-                        border: "1px solid #ccc",
-                        borderRadius: "50%",
-                        width: "26px",
-                        height: "26px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        cursor: "pointer",
-                        color: "#ff3b30",
-                        fontWeight: "bold",
-                        fontSize: "18px",
-                        zIndex: 1002
-                      }}
-                      aria-label="Remove Logo"
-                      title="Remove Logo"
-                    >
-                      &times;
-                    </button>
-                    
-                    <button 
-                      className={styles.duplicateLogoButton}
-                      onMouseDown={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        handleDuplicateLogo(logo.id, e);
-                      }}
-                      style={{
-                        position: "absolute",
-                        bottom: "-15px",
-                        left: "-15px",
-                        backgroundColor: "white",
-                        border: "1px solid #ccc",
-                        borderRadius: "50%",
-                        width: "26px",
-                        height: "26px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        cursor: "pointer",
-                        zIndex: 1002
-                      }}
-                      aria-label="Duplicate Logo"
-                      title="Duplicate Logo"
-                    >
-                      <Image
-                        src={duplicateIcon}
-                        alt="Duplicate"
-                        width={20}
-                        height={20}
-                        style={{ objectFit: "contain" }}
-                      />
-                    </button>
-                  </>
-                )}
-              </div>
-            </Rnd>
-          );
-        })}
+        {logos.map((logo) => (
+          <LogoItem
+            key={logo.id}
+            logo={logo}
+            isActive={logo.id === activeLogoId && isActive}
+            isDraggable={draggable}
+            rndRef={logoRefs.current.get(logo.id) || React.createRef()}
+            onToggleDragMode={toggleDragMode}
+            onLogoMove={handleLogoMove}
+            onLogoDelete={handleLogoDelete}
+            onDuplicateLogo={handleDuplicateLogo}
+            calculateOptimalTextSize={calculateOptimalTextSize}
+          />
+        ))}
       </div>
     </div>
   );
