@@ -322,6 +322,30 @@ const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: nu
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  // New helper function to calculate optimal text box dimensions
+  const calculateOptimalTextSize = (text: string, fontSize: number): { width: number, height: number } => {
+    // Get line details
+    const lines = text.split('\n');
+    const lineCount = lines.length;
+    const longestLine = Math.max(...lines.map(line => line.length || 1));
+    
+    // Calculate dimensions based on text content with minimal padding
+    const charWidth = fontSize * 0.6;
+    const lineHeight = fontSize * 1.4;
+    
+    // Add just enough padding to make text look good
+    // For width: add horizontal padding of 1 character on each side
+    const widthPadding = fontSize * 1.2;
+    
+    // For height: add vertical padding of 0.8 line height total (0.4 top and bottom)
+    const heightPadding = fontSize * 0.8;
+    
+    const optimalWidth = Math.max(100, (longestLine * charWidth) + widthPadding);
+    const optimalHeight = Math.max(40, (lineCount * lineHeight) + heightPadding);
+    
+    return { width: optimalWidth, height: optimalHeight };
+  };
+
   // Handle adding text
   const handleAddText = (text?: string, style?: TextStyle) => {
     const textContent = text || "Your text here";
@@ -332,13 +356,16 @@ const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: nu
       fontWeight: 'normal'
     };
     
+    // Calculate optimal size for the new text
+    const { width, height } = calculateOptimalTextSize(textContent, textStyle.fontSize);
+    
     const newTextLogo: Logo = {
       id: `text-${Date.now()}`,
       type: 'text',
       text: textContent,
       textStyle: textStyle,
       position: { x: 50, y: 50 },
-      size: { width: 200, height: 60 }
+      size: { width, height }
     };
     
     logoRefs.current.set(newTextLogo.id, React.createRef<Rnd>());
@@ -350,35 +377,29 @@ const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: nu
   
   // Update text content and styling with proper constraints
   const updateTextContent = (id: string, text: string, style: TextStyle) => {
-    setLogos(prev => prev.map(logo => {
-      if (logo.id === id) {
-        // Calculate size constraints based on new text
-        const lineBreaks = (text.match(/\n/g) || []).length;
-        const constraints = calculateTextConstraints(text, style.fontSize, lineBreaks);
-        
-        // Ensure size is within new constraints
-        const newSize = {
-          width: Math.min(constraints.maxWidth, Math.max(constraints.minWidth, logo.size.width)),
-          height: Math.min(constraints.maxHeight, Math.max(constraints.minHeight, logo.size.height))
-        };
-        
-        return { ...logo, text, textStyle: style, size: newSize };
-      }
-      return logo;
-    }));
-    
-    // Update the component size if needed
-    const logo = logos.find(l => l.id === id);
-    if (logo && logoRefs.current.get(logo.id)?.current) {
-      const constraints = calculateTextConstraints(text, style.fontSize);
-      const newSize = {
-        width: Math.min(constraints.maxWidth, Math.max(constraints.minWidth, logo.size.width)),
-        height: Math.min(constraints.maxHeight, Math.max(constraints.minHeight, logo.size.height))
+  // Calculate optimal size for text with new content and style
+  const { width, height } = calculateOptimalTextSize(text, style.fontSize);
+  
+  setLogos(prev => prev.map(logo => {
+    if (logo.id === id) {
+      return { 
+        ...logo, 
+        text, 
+        textStyle: style, 
+        size: { width, height } 
       };
-      
-      logoRefs.current.get(logo.id)?.current?.updateSize(newSize);
     }
-  };
+    return logo;
+  }));
+  
+  // Update the component size to match new content
+  const logo = logos.find(l => l.id === id);
+  if (logo && logoRefs.current.get(logo.id)?.current) {
+    logoRefs.current.get(logo.id)?.current?.updateSize({
+      width, height
+    });
+  }
+};
 
   // Logo operations (delete, duplicate, move)
   const handleLogoDelete = (logoId: string, e?: React.MouseEvent) => {
@@ -596,6 +617,7 @@ const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: nu
                 onDragStart={() => {}}
                 onDrag={(e, d) => handleLogoMove(logo.id, {x: d.x, y: d.y})}
                 onDragStop={(e, d) => handleLogoMove(logo.id, {x: d.x, y: d.y})}
+                // Replace the existing onResize handler
                 onResize={(e, direction, ref, delta, position) => {
                   const newWidth = parseInt(ref.style.width);
                   const newHeight = parseInt(ref.style.height);
@@ -603,104 +625,106 @@ const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: nu
                   
                   if (resizedLogo?.type === 'text' && resizedLogo.textStyle) {
                     const text = resizedLogo.text || '';
-                    const lineBreaks = (text.match(/\n/g) || []).length;
-                    const hasLineBreaks = lineBreaks > 0;
-                    const fontSize = resizedLogo.textStyle.fontSize;
                     
-                    // Get the current text aspect ratio and dimensions to maintain proportion
-                    const currentRatio = resizedLogo.size.width / resizedLogo.size.height;
-                    
-                    // Calculate optimal font size based on container dimensions
-                    let newFontSize = fontSize;
-                    let optimalWidth = newWidth;
-                    let optimalHeight = newHeight;
-                    
-                    if (hasLineBreaks) {
-                      // For multi-line text, calculate differently
-                      const lines = text.split('\n');
-                      const lineCount = lines.length;
-                      const longestLine = Math.max(...lines.map(line => line.length));
-                      
-                      // Determine font size from height first for multi-line text
-                      const heightBasedFontSize = Math.max(12, Math.min(64, 
-                        Math.floor(newHeight / (lineCount * 1.5))
-                      ));
-                      
-                      // Check if width is sufficient for this font size
-                      const requiredWidth = longestLine * heightBasedFontSize * 0.6;
-                      
-                      if (requiredWidth > newWidth) {
-                        // If width is too small, adjust font size based on width
-                        newFontSize = Math.max(12, Math.min(heightBasedFontSize, 
-                          Math.floor((newWidth / longestLine) * 1.6)
-                        ));
-                      } else {
-                        newFontSize = heightBasedFontSize;
-                      }
-                      
-                      // Ensure minimum height for readability
-                      optimalHeight = Math.max(
-                        newHeight, 
-                        (lineCount * newFontSize * 1.5)
-                      );
-                    } else {
-                      // For single-line text, use primarily width-based sizing
-                      // but maintain a reasonable height-to-width ratio
-                      const textLength = text.length || 10;
-                      const widthRatio = newWidth / resizedLogo.size.width;
-                      
-                      // Start with width-based font size
-                      newFontSize = Math.max(12, Math.min(64, 
-                        Math.floor(fontSize * widthRatio)
-                      ));
-                      
-                      // Check if height is sufficient for this font size
-                      const requiredHeight = newFontSize * 1.5;
-                      
-                      if (requiredHeight > newHeight) {
-                        // If height is too small, adjust
-                        newFontSize = Math.max(12, Math.floor(newHeight / 1.5));
-                      }
-                      
-                      // Ensure box isn't too tall for single line text
-                      optimalHeight = Math.min(
-                        newHeight,
-                        Math.max(newFontSize * 2, newHeight)
-                      );
+                    // Store the current resize dimensions in a ref to avoid lost updates
+                    // This prevents visual flickering during resize
+                    if (!ref.dataset.isResizing) {
+                      ref.dataset.isResizing = 'true';
                     }
                     
-                    // Create updated style and size objects
+                    // During active resize, only update the font size but keep user's dimensions
+                    const fontSize = resizedLogo.textStyle.fontSize;
+                    const lines = text.split('\n');
+                    const lineCount = lines.length;
+                    const longestLine = Math.max(...lines.map(line => line.length || 1));
+                    
+                    // Calculate new font size based on resize dimensions
+                    let newFontSize;
+                    
+                    // Determine which dimension is more important based on text configuration
+                    if (lineCount > 1) {
+                      // For multi-line text, height is more important for readability
+                      newFontSize = Math.max(12, Math.min(64, 
+                        Math.floor(newHeight / (lineCount * 1.4 + 0.8))
+                      ));
+                      
+                      // But also check if width is sufficient
+                      const minWidthNeeded = longestLine * newFontSize * 0.6;
+                      if (minWidthNeeded > newWidth) {
+                        // Adjust font size down if width is constraining
+                        newFontSize = Math.max(12, Math.min(newFontSize,
+                          Math.floor((newWidth - 20) / (longestLine * 0.6))
+                        ));
+                      }
+                    } else {
+                      // For single-line text, width is typically the key factor
+                      newFontSize = Math.max(12, Math.min(64,
+                        Math.floor((newWidth - 20) / (longestLine * 0.6 + 1))
+                      ));
+                      
+                      // But ensure height is sufficient
+                      if (newHeight < newFontSize * 1.8) {
+                        newFontSize = Math.max(12, Math.floor(newHeight / 1.8));
+                      }
+                    }
+                    
+                    // Create updated style with new font size
                     const updatedTextStyle = {
                       ...resizedLogo.textStyle,
                       fontSize: newFontSize
                     };
-                
-                    // Apply the changes
+
+                    // During active resize, just update the font size and use the user's dimensions
                     handleLogoMove(
                       logo.id,
                       position,
-                      { width: optimalWidth, height: optimalHeight },
+                      { width: newWidth, height: newHeight },
                       updatedTextStyle
                     );
-                    
-                    // Update the Rnd component's size directly for immediate visual feedback
-                    if (logoRefs.current.get(logo.id)?.current) {
-                      logoRefs.current.get(logo.id)?.current?.updateSize({
-                        width: optimalWidth,
-                        height: optimalHeight
-                      });
-                    }
                   } else {
                     // For images, use the existing behavior
                     handleLogoMove(logo.id, position, { width: newWidth, height: newHeight });
                   }
                 }}
                 onResizeStop={(e, direction, ref, delta, position) => {
-                  handleLogoMove(
-                    logo.id, 
-                    position,
-                    { width: parseInt(ref.style.width), height: parseInt(ref.style.height) }
-                  );
+                  const resizedLogo = logos.find(l => l.id === logo.id);
+                  
+                  if (resizedLogo?.type === 'text' && resizedLogo.textStyle) {
+                    // Clear resizing flag
+                    if (ref.dataset.isResizing) {
+                      delete ref.dataset.isResizing;
+                    }
+                    
+                    // Now apply optimal sizing with a minimal delay to ensure smooth transition
+                    const text = resizedLogo.text || '';
+                    const fontSize = resizedLogo.textStyle.fontSize;
+                    
+                    // Use a RAF to ensure the UI updates smoothly
+                    requestAnimationFrame(() => {
+                      const { width, height } = calculateOptimalTextSize(text, fontSize);
+                      
+                      // Apply the optimal size to state
+                      handleLogoMove(
+                        logo.id,
+                        position,
+                        { width, height }
+                      );
+                      
+                      // Update the component size
+                      if (logoRefs.current.get(logo.id)?.current) {
+                        logoRefs.current.get(logo.id)?.current?.updateSize({
+                          width, height
+                        });
+                      }
+                    });
+                  } else {
+                    // For images, use the existing behavior
+                    handleLogoMove(
+                      logo.id, 
+                      position,
+                      { width: parseInt(ref.style.width), height: parseInt(ref.style.height) }
+                    );
+                  }
                 }}
                 ref={logoRefs.current.get(logo.id)}
                 cancel=".logoControlButtons, .duplicateLogoButton, .removeLogoButton, .dragButton, .resizeButton"
@@ -736,9 +760,10 @@ const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: nu
                       whiteSpace: "pre-wrap",
                       textAlign: "center",
                       overflow: "hidden",
-                      padding: "8px",
+                      // Use consistent padding based on font size
+                      padding: `${Math.max(4, (logo.textStyle?.fontSize || 24) * 0.15)}px`,
                       boxSizing: "border-box",
-                      lineHeight: logo.text?.includes('\n') ? 1.3 : 'normal',
+                      lineHeight: logo.text?.includes('\n') ? 1.3 : 1.1,
                       wordBreak: "break-word",
                       textOverflow: "ellipsis",
                       maxHeight: "100%"
