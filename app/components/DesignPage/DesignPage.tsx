@@ -633,7 +633,6 @@ const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: nu
                     }
                     
                     // During active resize, only update the font size but keep user's dimensions
-                    const fontSize = resizedLogo.textStyle.fontSize;
                     const lines = text.split('\n');
                     const lineCount = lines.length;
                     const longestLine = Math.max(...lines.map(line => line.length || 1));
