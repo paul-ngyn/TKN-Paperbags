@@ -241,6 +241,16 @@ const DesignPage: React.FC<DesignPageProps> = () => {
       return logo;
     }));
   };
+
+  const onLogoRotate = (logoId: string, rotation: number) => {
+    setLogos(prevLogos => 
+      prevLogos.map(logo => 
+        logo.id === logoId 
+          ? { ...logo, rotation } 
+          : logo
+      )
+    );
+  };
   
   // UI interaction handlers
   const toggleDragMode = (logoId: string) => {
@@ -344,6 +354,7 @@ const DesignPage: React.FC<DesignPageProps> = () => {
             onLogoDelete={handleLogoDelete}
             onDuplicateLogo={handleDuplicateLogo}
             calculateOptimalTextSize={calculateOptimalTextSize}
+            onLogoRotate={onLogoRotate}
           />
         ))}
       </div>

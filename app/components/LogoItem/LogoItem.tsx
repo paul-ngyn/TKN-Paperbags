@@ -5,6 +5,7 @@ import Image from "next/image";
 import styles from "../DesignPage/DesignPage.module.css";
 import resizeIcon from "../../public/resize-68.png";
 import duplicateIcon from "../../public/duplicate-icon.png";
+import rotateIcon from "../../public/rotate.png";
 
 interface TextStyle {
   fontFamily: string;
@@ -21,6 +22,7 @@ export interface Logo {
   textStyle?: TextStyle;
   position: { x: number, y: number };
   size: { width: number, height: number };
+  rotation?: number;
 }
 
 interface LogoItemProps {
@@ -38,6 +40,7 @@ interface LogoItemProps {
   onLogoDelete: (logoId: string, e?: React.MouseEvent) => void;
   onDuplicateLogo: (logoId: string, e?: React.MouseEvent) => void;
   calculateOptimalTextSize: (text: string, fontSize: number) => { width: number, height: number };
+  onLogoRotate?: (logoId: string, rotation: number) => void;
 }
 
 const LogoItem: React.FC<LogoItemProps> = ({
@@ -49,7 +52,8 @@ const LogoItem: React.FC<LogoItemProps> = ({
   onLogoMove,
   onLogoDelete,
   onDuplicateLogo,
-  calculateOptimalTextSize
+  calculateOptimalTextSize,
+  onLogoRotate
 }) => {
   // Calculate min/max constraints for text elements
   const calculateMinMaxWidth = () => {
@@ -70,10 +74,12 @@ const LogoItem: React.FC<LogoItemProps> = ({
       if (lineBreaks > 0) {
         const lines = logo.text.split('\n');
         const longestLineLength = Math.max(...lines.map(line => line.length));
-        return Math.min(600, longestLineLength * (logo.textStyle?.fontSize || 24) * 1.2);
+        // Allow wider text boxes - increase the multiplier
+        return Math.min(1200, longestLineLength * (logo.textStyle?.fontSize || 24) * 2.0);
       }
     }
-    return Math.min(500, ((logo.text?.length || 10) * (logo.textStyle?.fontSize || 24) * 1.2));
+    // Increase the maximum allowed width
+    return Math.min(1000, ((logo.text?.length || 10) * (logo.textStyle?.fontSize || 24) * 2.0));
   };
 
   const calculateMinHeight = () => {
@@ -94,6 +100,72 @@ const LogoItem: React.FC<LogoItemProps> = ({
       }
     }
     return Math.min(300, ((logo.textStyle?.fontSize || 24) * 5));
+  };
+
+  const rotation = logo.rotation || 0;
+
+  // Add state for tracking rotation gestures
+  const [isDraggingRotation, setIsDraggingRotation] = React.useState(false);
+  const [startAngle, setStartAngle] = React.useState(0);
+
+  // Function to calculate angle between two points
+  const calculateAngle = (centerX: number, centerY: number, pointX: number, pointY: number) => {
+    return Math.atan2(pointY - centerY, pointX - centerX) * (180 / Math.PI);
+  };
+
+  // Handle rotation start
+  const handleRotateStart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!isDraggable || !isActive || !onLogoRotate) return;
+
+    const element = e.currentTarget.parentElement?.parentElement;
+    if (!element) return;
+
+    setIsDraggingRotation(true);
+
+    // Calculate center point of the element
+    const rect = element.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    // Calculate initial angle
+    const initialAngle = calculateAngle(centerX, centerY, e.clientX, e.clientY);
+    setStartAngle(initialAngle - (rotation || 0));
+
+    // Add event listeners for move and up events
+    document.addEventListener('mousemove', handleRotateMove);
+    document.addEventListener('mouseup', handleRotateEnd);
+  };
+
+  // Handle rotation movement
+  const handleRotateMove = (e: MouseEvent) => {
+    if (!isDraggingRotation || !onLogoRotate) return;
+
+    const element = document.querySelector(`[data-rnd-id="${logo.id}"]`);
+    if (!element) return;
+
+    // Calculate center point of the element
+    const rect = element.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    // Calculate current angle
+    const currentAngle = calculateAngle(centerX, centerY, e.clientX, e.clientY);
+    
+    // Calculate new rotation (normalized to 0-360 degrees)
+    let newRotation = (currentAngle - startAngle) % 360;
+    if (newRotation < 0) newRotation += 360;
+
+    // Update the rotation
+    onLogoRotate(logo.id, newRotation);
+  };
+
+  const handleRotateEnd = () => {
+    setIsDraggingRotation(false);
+    document.removeEventListener('mousemove', handleRotateMove);
+    document.removeEventListener('mouseup', handleRotateEnd);
   };
 
   return (
@@ -135,42 +207,46 @@ const LogoItem: React.FC<LogoItemProps> = ({
           const longestLine = Math.max(...lines.map(line => line.length || 1));
           
           // Calculate new font size based on resize dimensions
+          // Increase the maximum font size limit
+          const MAX_FONT_SIZE = 64; // Allow much larger font sizes
+          
           let newFontSize;
           
-          // Determine which dimension is more important based on text configuration
+          // Scale font size more generously based on container dimensions
           if (lineCount > 1) {
-            // For multi-line text, height is more important for readability
-            newFontSize = Math.max(12, Math.min(64, 
-              Math.floor(newHeight / (lineCount * 1.4 + 0.8))
+            // For multi-line text
+            newFontSize = Math.max(12, Math.min(MAX_FONT_SIZE, 
+              Math.floor(newHeight / (lineCount * 1.2)) // Less restrictive height ratio
             ));
             
-            // But also check if width is sufficient
-            const minWidthNeeded = longestLine * newFontSize * 0.6;
+            // But still check if width is sufficient
+            const minWidthNeeded = longestLine * newFontSize * 0.5; // Lower ratio for wider text
             if (minWidthNeeded > newWidth) {
-              // Adjust font size down if width is constraining
               newFontSize = Math.max(12, Math.min(newFontSize,
-                Math.floor((newWidth - 20) / (longestLine * 0.6))
+                Math.floor(newWidth / (longestLine * 0.5)) // Allow wider text
               ));
             }
           } else {
-            // For single-line text, width is typically the key factor
-            newFontSize = Math.max(12, Math.min(64,
-              Math.floor((newWidth - 20) / (longestLine * 0.6 + 1))
+            // For single-line text, prioritize width but with a more generous ratio
+            newFontSize = Math.max(12, Math.min(MAX_FONT_SIZE,
+              Math.floor(newWidth / (longestLine * 0.5 + 0.5)) // More generous width calculation
             ));
             
-            // But ensure height is sufficient
-            if (newHeight < newFontSize * 1.8) {
-              newFontSize = Math.max(12, Math.floor(newHeight / 1.8));
+            // Make sure height is sufficient but less restrictive
+            if (newHeight < newFontSize * 1.3) {
+              newFontSize = Math.max(12, Math.floor(newHeight / 1.3));
             }
           }
+          
+          console.log(`Resizing: width=${newWidth}, height=${newHeight}, newFontSize=${newFontSize}`);
           
           // Create updated style with new font size
           const updatedTextStyle = {
             ...logo.textStyle,
             fontSize: newFontSize
           };
-
-          // During active resize, just update the font size and use the user's dimensions
+      
+          // Apply the changes immediately
           onLogoMove(
             logo.id,
             position,
@@ -221,8 +297,10 @@ const LogoItem: React.FC<LogoItemProps> = ({
         }
       }}
       ref={rndRef}
-      cancel=".logoControlButtons, .duplicateLogoButton, .removeLogoButton, .dragButton, .resizeButton"
+      cancel=".logoControlButtons, .duplicateLogoButton, .removeLogoButton, .dragButton, .resizeButton, .rotateButton"
       dragHandleClassName={styles.logoOverlay}
+      data-rnd-id={logo.id}
+      style={{ transform: `rotate(${rotation}deg)` }}
     >
       <div
         style={{ 
@@ -287,6 +365,52 @@ const LogoItem: React.FC<LogoItemProps> = ({
                 height={24}
                 style={{ objectFit: "contain" }}
               />
+            </div>
+            
+            {/* Rotation handle with lever */}
+            <div 
+              className="rotateButton"
+              style={{
+                position: "absolute",
+                top: "-50px", // Position above the element
+                left: "50%",
+                transform: "translateX(-50%)",
+                width: "2px", // The "lever" width
+                height: "50px", // The "lever" height
+                backgroundColor: "#666",
+                display: isDraggable ? "block" : "none",
+                zIndex: 1002
+              }}
+            >
+              <button
+                onMouseDown={handleRotateStart}
+                style={{
+                  position: "absolute",
+                  top: "-15px",
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  backgroundColor: "white",
+                  border: "1px solid #ccc",
+                  borderRadius: "50%",
+                  width: "30px",
+                  height: "30px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "grab",
+                  zIndex: 1003
+                }}
+                aria-label="Rotate Logo"
+                title="Rotate Logo"
+              >
+                <Image
+                  src={rotateIcon}
+                  alt="Rotate"
+                  width={18}
+                  height={18}
+                  style={{ objectFit: "contain" }}
+                />
+              </button>
             </div>
             
             <button 
