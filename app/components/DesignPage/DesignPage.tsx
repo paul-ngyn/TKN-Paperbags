@@ -7,7 +7,7 @@ import LogoItem, { Logo } from "../LogoItem/LogoItem";
 import styles from "./DesignPage.module.css";
 import { BagDimensions } from "../../util/BagDimensions";
 import { generatePDF } from "../../util/pdfGenerator";
-import Image from "next/image";
+
 
 interface DesignPageProps {
   handleNavigation: (page: string) => void;
