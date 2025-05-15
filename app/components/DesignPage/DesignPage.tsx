@@ -7,6 +7,7 @@ import LogoItem, { Logo } from "../LogoItem/LogoItem";
 import styles from "./DesignPage.module.css";
 import { BagDimensions } from "../../util/BagDimensions";
 import { generatePDF } from "../../util/pdfGenerator";
+import Image from "next/image";
 
 interface DesignPageProps {
   handleNavigation: (page: string) => void;
@@ -97,7 +98,7 @@ const DesignPage: React.FC<DesignPageProps> = () => {
         setDraggable(true);
         setIsActive(true);
       }
-    };
+    }; 
     
     reader.readAsDataURL(file);
     if (fileInputRef.current) fileInputRef.current.value = "";

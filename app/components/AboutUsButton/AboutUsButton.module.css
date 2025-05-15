@@ -5,10 +5,11 @@
     cursor: pointer;
     position: fixed;
     top: 2vh;
-    left: 24.25%;
+    left: 56%;
     font-weight: bold;
   }
   
   .navButton:hover {
-    color:#1c63cd
+    color:#1c63cd;
+    text-decoration: underline;
   }
