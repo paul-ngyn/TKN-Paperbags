@@ -11,6 +11,7 @@ import { BagDimensions, mmToInches} from "../../util/BagDimensions";
 // Extended props to support text customization
 interface SidebarProps {
   handleLogoUpload: (files: FileList) => void;
+  onUploadError?: (message: string) => void;
   handleAddText: (text?: string, style?: TextStyle) => void;
   fileInputRef: React.RefObject<HTMLInputElement>;
   dimensions: BagDimensions;
@@ -26,10 +27,11 @@ interface SidebarProps {
 }
 
 interface TextStyle {
-  fontFamily: string;
+  fontFamily: string;                   
   fontSize: number;
   color: string;
   fontWeight: string;
+  rotation?: number;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -45,7 +47,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   activeLogoText = "",
   activeLogoTextStyle,
   updateTextContent,
-  onLogoDeselect
+  onLogoDeselect,
+  onUploadError = (message) => alert(message)
 }) => {
   // Add state for showing/hiding the blueprint example modal
   const [showBlueprintExample, setShowBlueprintExample] = useState(false);
@@ -59,7 +62,8 @@ const Sidebar: React.FC<SidebarProps> = ({
     fontFamily: 'Arial',
     fontSize: 24,
     color: '#000000',
-    fontWeight: 'normal'
+    fontWeight: 'normal',
+    rotation: 0 // Add default rotation
   });
   
   // Update text editing mode when active text logo changes
@@ -67,7 +71,13 @@ const Sidebar: React.FC<SidebarProps> = ({
     if (activeLogoId && activeLogoText && activeLogoTextStyle) {
       // We're editing an existing text logo
       setTextInput(activeLogoText);
-      setTextStyle(activeLogoTextStyle);
+      setTextStyle({
+        fontFamily: activeLogoTextStyle.fontFamily,
+        fontSize: activeLogoTextStyle.fontSize, 
+        color: activeLogoTextStyle.color,
+        fontWeight: activeLogoTextStyle.fontWeight,
+        rotation: activeLogoTextStyle.rotation || 0 // Include rotation
+      });
       setSidebarMode('text');
     } else if (sidebarMode === 'text' && !activeLogoId) {
       // If we were in text mode but no active logo, reset
@@ -76,7 +86,8 @@ const Sidebar: React.FC<SidebarProps> = ({
         fontFamily: 'Arial',
         fontSize: 24, 
         color: '#000000',
-        fontWeight: 'normal'
+        fontWeight: 'normal',
+        rotation: 0 // Reset rotation
       });
     }
   }, [activeLogoId, activeLogoText, activeLogoTextStyle, sidebarMode]);
@@ -120,6 +131,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   
   const [dragActive, setDragActive] = useState(false);
   const [fileName, setFileName] = useState<string | null>(null);
+
+  
   
   // Update both states when props change
   useEffect(() => {
@@ -266,6 +279,11 @@ const Sidebar: React.FC<SidebarProps> = ({
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setTextInput(e.target.value);
   };
+
+  const handleRotationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rotationValue = parseInt(e.target.value, 10);
+    setTextStyle(prev => ({ ...prev, rotation: rotationValue }));
+  };
   
   const handleFontFamilyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setTextStyle(prev => ({ ...prev, fontFamily: e.target.value }));
@@ -284,13 +302,32 @@ const Sidebar: React.FC<SidebarProps> = ({
   };
   
   const applyTextChanges = () => {
+    // Preserve rotation if editing existing text
+    const currentRotation = activeLogoTextStyle?.rotation || textStyle.rotation || 0;
+    
+    const updatedStyle = {
+      ...textStyle,
+      rotation: currentRotation
+    };
+    
     if (activeLogoId && updateTextContent) {
-      // Update existing text
-      updateTextContent(activeLogoId, textInput, textStyle);
+      console.log("Updating text with rotation:", currentRotation);
+      updateTextContent(activeLogoId, textInput, updatedStyle);
     } else {
-      // Add new text
-      handleAddText(textInput, textStyle);
+      handleAddText(textInput, updatedStyle);
     }
+    
+    // Reset the form
+    setTextInput('');
+    setTextStyle({
+      fontFamily: 'Arial',
+      fontSize: 24,
+      color: '#000000',
+      fontWeight: 'normal',
+      rotation: 0
+    });
+    
+    // Exit text editing mode
     setSidebarMode('default');
   };
   
@@ -308,6 +345,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     
     // Use small epsilon for floating point comparison
     const epsilon = 0.005; // Allow 0.005 inch difference (rounding errors)
+
     
     return (
       Math.abs(originalInches.length - tempDimensionsInches.length) > epsilon ||
@@ -476,18 +514,33 @@ const Sidebar: React.FC<SidebarProps> = ({
               <option value="bold">Bold</option>
             </select>
           </div>
-          
-          <div 
-            className={styles.textPreview} 
-            style={{
-              fontFamily: textStyle.fontFamily,
-              fontSize: `${textStyle.fontSize}px`,
-              fontWeight: textStyle.fontWeight,
-              color: textStyle.color,
-            }}
-          >
-            {textInput || "Preview"}
-          </div>
+
+          <div className={styles.formGroup}>
+          <label htmlFor="text-rotation">Rotation: {textStyle.rotation}°</label>
+          <input
+            id="text-rotation"
+            type="range"
+            min="-180"
+            max="180"
+            value={textStyle.rotation || 0}
+            onChange={handleRotationChange}
+            className={styles.slider}
+          />
+        </div>
+
+        <div 
+        className={styles.textPreview} 
+        style={{
+          fontFamily: textStyle.fontFamily,
+          fontSize: `${textStyle.fontSize}px`,
+          fontWeight: textStyle.fontWeight,
+          color: textStyle.color,
+          transform: `rotate(${textStyle.rotation || 0}deg)`, // just for testing remove rotation preview after
+          transformOrigin: 'center center'
+        }}
+      >
+        {textInput || "Preview"}
+      </div>
 
           <div className={styles.buttonGroupText}>
             <button 

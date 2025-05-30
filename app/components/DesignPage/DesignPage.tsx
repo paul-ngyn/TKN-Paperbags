@@ -18,6 +18,7 @@ interface TextStyle {
   fontSize: number;
   color: string;
   fontWeight: string;
+  rotation?: number;
 }
 
 const DesignPage: React.FC<DesignPageProps> = () => {
@@ -135,7 +136,8 @@ const DesignPage: React.FC<DesignPageProps> = () => {
       fontFamily: 'Arial',
       fontSize: 24,
       color: '#000000',
-      fontWeight: 'normal'
+      fontWeight: 'normal',
+      rotation: 0
     };
     
     // Calculate optimal size for the new text
@@ -147,7 +149,8 @@ const DesignPage: React.FC<DesignPageProps> = () => {
       text: textContent,
       textStyle: textStyle,
       position: { x: 50, y: 50 },
-      size: { width, height }
+      size: { width, height },
+      rotation: textStyle.rotation || 0 // Use the rotation from textStyle
     };
     
     logoRefs.current.set(newTextLogo.id, React.createRef<Rnd>());
@@ -168,7 +171,8 @@ const DesignPage: React.FC<DesignPageProps> = () => {
           ...logo, 
           text, 
           textStyle: style, 
-          size: { width, height } 
+          size: { width, height },
+          rotation: style.rotation || logo.rotation || 0 // Preserve rotation
         };
       }
       return logo;
@@ -213,7 +217,8 @@ const DesignPage: React.FC<DesignPageProps> = () => {
         x: logoToDuplicate.position.x + 20, 
         y: logoToDuplicate.position.y + 20 
       },
-      size: { ...logoToDuplicate.size }
+      size: { ...logoToDuplicate.size },
+      rotation: logoToDuplicate.rotation || logoToDuplicate.textStyle?.rotation || 0 //
     };
     
     logoRefs.current.set(newLogo.id, React.createRef<Rnd>());
@@ -244,11 +249,24 @@ const DesignPage: React.FC<DesignPageProps> = () => {
 
   const onLogoRotate = (logoId: string, rotation: number) => {
     setLogos(prevLogos => 
-      prevLogos.map(logo => 
-        logo.id === logoId 
-          ? { ...logo, rotation } 
-          : logo
-      )
+      prevLogos.map(logo => {
+        if (logo.id === logoId) {
+          if (logo.type === 'text' && logo.textStyle) {
+            // For text elements, update both the logo rotation and textStyle.rotation
+            return {
+              ...logo,
+              rotation,
+              textStyle: {
+                ...logo.textStyle,
+                rotation
+              }
+            };
+          }
+          // For image elements
+          return { ...logo, rotation };
+        }
+        return logo;
+      })
     );
   };
   

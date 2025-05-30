@@ -12,6 +12,7 @@ interface TextStyle {
   fontSize: number;
   color: string;
   fontWeight: string;
+  rotation?: number; // Added rotation to text style
 }
 
 export interface Logo {
@@ -19,12 +20,23 @@ export interface Logo {
   type: 'image' | 'text';
   src?: string;
   text?: string;
-  textStyle?: TextStyle;
-  position: { x: number, y: number };
-  size: { width: number, height: number };
-  rotation?: number;
+  textStyle?: {
+    fontFamily: string;
+    fontSize: number;
+    color: string;
+    fontWeight: string;
+    rotation?: number; // Make sure rotation is included here
+  };
+  position: {
+    x: number;
+    y: number;
+  };
+  size: {
+    width: number;
+    height: number;
+  };
+  rotation?: number; // Store rotation at logo level as well
 }
-
 interface LogoItemProps {
   logo: Logo;
   isActive: boolean;
@@ -42,6 +54,8 @@ interface LogoItemProps {
   calculateOptimalTextSize: (text: string, fontSize: number) => { width: number, height: number };
   onLogoRotate?: (logoId: string, rotation: number) => void;
 }
+
+
 
 const LogoItem: React.FC<LogoItemProps> = ({
   logo,
@@ -142,22 +156,23 @@ const LogoItem: React.FC<LogoItemProps> = ({
   // Handle rotation movement
   const handleRotateMove = (e: MouseEvent) => {
     if (!isDraggingRotation || !onLogoRotate) return;
-
+  
     const element = document.querySelector(`[data-rnd-id="${logo.id}"]`);
     if (!element) return;
-
+  
     // Calculate center point of the element
     const rect = element.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
-
+  
     // Calculate current angle
     const currentAngle = calculateAngle(centerX, centerY, e.clientX, e.clientY);
     
-    // Calculate new rotation (normalized to 0-360 degrees)
+    // Calculate new rotation (normalized to -180 to 180 degrees for consistency with slider)
     let newRotation = (currentAngle - startAngle) % 360;
-    if (newRotation < 0) newRotation += 360;
-
+    if (newRotation > 180) newRotation -= 360;
+    if (newRotation < -180) newRotation += 360;
+  
     // Update the rotation
     onLogoRotate(logo.id, newRotation);
   };
@@ -167,6 +182,20 @@ const LogoItem: React.FC<LogoItemProps> = ({
     document.removeEventListener('mousemove', handleRotateMove);
     document.removeEventListener('mouseup', handleRotateEnd);
   };
+
+  // Add this inside your LogoItem component
+React.useEffect(() => {
+  // Force the rotation to be applied after render
+  const element = document.querySelector(`[data-rnd-id="${logo.id}"]`) as HTMLElement;
+  if (element) {
+    // Set the rotation transform directly on the element
+    const rotation = logo.rotation || 0;
+    element.style.transform = `rotate(${rotation}deg)`;
+    element.style.transformOrigin = 'center center';
+    
+    console.log(`Applied rotation ${rotation}° to element ${logo.id}`);
+  }
+}, [logo.id, logo.rotation, logo.text, logo.textStyle]); // Re-run when any of these change
 
   return (
     <Rnd
@@ -189,6 +218,7 @@ const LogoItem: React.FC<LogoItemProps> = ({
       onDragStart={() => {}}
       onDrag={(e, d) => onLogoMove(logo.id, {x: d.x, y: d.y})}
       onDragStop={(e, d) => onLogoMove(logo.id, {x: d.x, y: d.y})}
+      
       onResize={(e, direction, ref, delta, position) => {
         const newWidth = parseInt(ref.style.width);
         const newHeight = parseInt(ref.style.height);
