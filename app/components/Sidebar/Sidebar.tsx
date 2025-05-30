@@ -301,32 +301,13 @@ const Sidebar: React.FC<SidebarProps> = ({
   };
   
   const applyTextChanges = () => {
-    // Preserve rotation if editing existing text
-    const currentRotation = activeLogoTextStyle?.rotation || textStyle.rotation || 0;
-    
-    const updatedStyle = {
-      ...textStyle,
-      rotation: currentRotation
-    };
-    
     if (activeLogoId && updateTextContent) {
-      console.log("Updating text with rotation:", currentRotation);
-      updateTextContent(activeLogoId, textInput, updatedStyle);
+      // Update existing text
+      updateTextContent(activeLogoId, textInput, textStyle);
     } else {
-      handleAddText(textInput, updatedStyle);
+      // Add new text
+      handleAddText(textInput, textStyle);
     }
-    
-    // Reset the form
-    setTextInput('');
-    setTextStyle({
-      fontFamily: 'Arial',
-      fontSize: 24,
-      color: '#000000',
-      fontWeight: 'normal',
-      rotation: 0
-    });
-    
-    // Exit text editing mode
     setSidebarMode('default');
   };
   
