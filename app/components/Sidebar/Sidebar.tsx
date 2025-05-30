@@ -48,7 +48,6 @@ const Sidebar: React.FC<SidebarProps> = ({
   activeLogoTextStyle,
   updateTextContent,
   onLogoDeselect,
-  onUploadError = (message) => alert(message)
 }) => {
   // Add state for showing/hiding the blueprint example modal
   const [showBlueprintExample, setShowBlueprintExample] = useState(false);
