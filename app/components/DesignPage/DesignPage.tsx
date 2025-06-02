@@ -38,38 +38,6 @@ const DesignPage: React.FC<DesignPageProps> = () => {
   const logoRefs = useRef<Map<string, React.RefObject<Rnd>>>(new Map());
   const bagContainerRef = useRef<HTMLDivElement>(null);
   
-  // Calculate size constraints for text elements
-  const calculateTextConstraints = (text: string, fontSize: number, lineBreaks: number = 0) => {
-    const charWidthFactor = fontSize * 0.6;
-    
-    // Handle multi-line text differently than single-line text
-    const hasLineBreaks = lineBreaks > 0;
-    
-    if (hasLineBreaks) {
-      // For multi-line text, calculate based on the longest line
-      const lines = text.split('\n');
-      const longestLineLength = Math.max(...lines.map(line => line.length));
-      const longestLineWidth = longestLineLength * charWidthFactor;
-      
-      return {
-        minWidth: Math.max(100, Math.min(300, longestLineWidth * 0.8)),
-        maxWidth: Math.min(600, Math.max(200, longestLineWidth * 1.5)),
-        minHeight: Math.max(60, (lineBreaks + 1) * fontSize * 1.5),
-        maxHeight: Math.min(500, (lineBreaks + 1) * fontSize * 3)
-      };
-    } else {
-      // For single-line text, use the original logic
-      const textWidth = text.length * charWidthFactor;
-      
-      return {
-        minWidth: Math.max(100, Math.min(300, textWidth * 0.8)),
-        maxWidth: Math.min(500, Math.max(200, textWidth * 1.5)),
-        minHeight: Math.max(40, fontSize * 1.5),
-        maxHeight: Math.min(300, fontSize * 3)
-      };
-    }
-  };
-  
   // Generate PDF function
   const handleGeneratePDF = async () => {
     return await generatePDF(dimensions, logos, bagContainerRef);

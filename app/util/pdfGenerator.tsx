@@ -96,10 +96,6 @@ export const generatePDF = async (
           const logoYInPDF = yPos + (logo.position.y * scaleY);
           const logoWidthInPDF = logo.size.width * scaleX;
           const logoHeightInPDF = logo.size.height * scaleY;
-
-          const rotation = (logo.type === 'text' && logo.textStyle?.rotation !== undefined) 
-          ? logo.textStyle.rotation 
-          : (logo.rotation || 0);
           
           // Process based on logo type
           if (logo.type === 'text' && logo.text) {
