@@ -8,7 +8,6 @@ import styles from "./DesignPage.module.css";
 import { BagDimensions } from "../../util/BagDimensions";
 import { generatePDF } from "../../util/pdfGenerator";
 
-
 interface DesignPageProps {
   handleNavigation: (page: string) => void;
 }
@@ -90,7 +89,8 @@ const DesignPage: React.FC<DesignPageProps> = () => {
           type: 'image',
           src: e.target.result,
           position: { x: 50, y: 50 },
-          size: { width: 150, height: 150 }
+          size: { width: 150, height: 150 },
+          rotation: 0
         };
         
         logoRefs.current.set(newLogo.id, React.createRef<Rnd>());
@@ -150,7 +150,7 @@ const DesignPage: React.FC<DesignPageProps> = () => {
       textStyle: textStyle,
       position: { x: 50, y: 50 },
       size: { width, height },
-      rotation: textStyle.rotation || 0 // Use the rotation from textStyle
+      rotation: textStyle.rotation || 0
     };
     
     logoRefs.current.set(newTextLogo.id, React.createRef<Rnd>());
@@ -172,21 +172,13 @@ const DesignPage: React.FC<DesignPageProps> = () => {
           text, 
           textStyle: style, 
           size: { width, height },
-          rotation: style.rotation || logo.rotation || 0 // Preserve rotation
+          rotation: style.rotation !== undefined ? style.rotation : (logo.rotation || 0)
         };
       }
       return logo;
     }));
-    
-    // Update the component size to match new content
-    const logo = logos.find(l => l.id === id);
-    if (logo && logoRefs.current.get(logo.id)?.current) {
-      logoRefs.current.get(logo.id)?.current?.updateSize({
-        width, height
-      });
-    }
   };
-
+  
   // Logo operations (delete, duplicate, move)
   const handleLogoDelete = (logoId: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
@@ -218,7 +210,7 @@ const DesignPage: React.FC<DesignPageProps> = () => {
         y: logoToDuplicate.position.y + 20 
       },
       size: { ...logoToDuplicate.size },
-      rotation: logoToDuplicate.rotation || logoToDuplicate.textStyle?.rotation || 0 //
+      rotation: logoToDuplicate.rotation || (logoToDuplicate.textStyle?.rotation ?? 0)
     };
     
     logoRefs.current.set(newLogo.id, React.createRef<Rnd>());
@@ -229,23 +221,39 @@ const DesignPage: React.FC<DesignPageProps> = () => {
   };
 
   const handleLogoMove = (
-    logoId: string, 
-    position: {x: number, y: number}, 
-    size?: {width: number, height: number},
-    textStyle?: TextStyle
-  ) => {
-    setLogos(prev => prev.map(logo => {
-      if (logo.id === logoId) {
-        return {
-          ...logo,
-          position,
-          size: size || logo.size,
-          textStyle: textStyle || logo.textStyle
+  logoId: string, 
+  position: {x: number, y: number}, 
+  size?: {width: number, height: number},
+  textStyle?: TextStyle
+) => {
+  setLogos(prev => prev.map(logo => {
+    if (logo.id === logoId) {
+      // Always preserve existing rotation during move operations
+      const updatedLogo = {
+        ...logo,
+        position,
+        size: size || logo.size,
+        rotation: logo.rotation ?? (logo.textStyle?.rotation ?? 0)
+      };
+      
+      // Only update textStyle if explicitly provided, but preserve rotation
+      if (textStyle) {
+        const preservedRotation = textStyle.rotation !== undefined 
+          ? textStyle.rotation 
+          : (logo.rotation ?? (logo.textStyle?.rotation ?? 0));
+          
+        updatedLogo.textStyle = {
+          ...textStyle,
+          rotation: preservedRotation
         };
+        updatedLogo.rotation = preservedRotation;
       }
-      return logo;
-    }));
-  };
+      
+      return updatedLogo;
+    }
+    return logo;
+  }));
+};
 
   const onLogoRotate = (logoId: string, rotation: number) => {
     setLogos(prevLogos => 
@@ -270,44 +278,11 @@ const DesignPage: React.FC<DesignPageProps> = () => {
     );
   };
   
-  // UI interaction handlers
+  // UI interaction handlers - Simplified to prevent rotation resets
   const toggleDragMode = (logoId: string) => {
     setActiveLogoId(logoId);
     setIsActive(true);
-    if (activeLogoId !== logoId || !draggable) {
-      setDraggable(true);
-      
-      // Check if we need to validate text element's size constraints
-      const selectedLogo = logos.find(logo => logo.id === logoId);
-      if (selectedLogo?.type === 'text' && selectedLogo.textStyle) {
-        // Get the Rnd reference
-        const rndRef = logoRefs.current.get(logoId);
-        if (rndRef?.current) {
-          // Calculate proper constraints based on current text and font size
-          const text = selectedLogo.text || '';
-          const lineBreaks = (text.match(/\n/g) || []).length;
-          const fontSize = selectedLogo.textStyle.fontSize;
-          const constraints = calculateTextConstraints(text, fontSize, lineBreaks);
-          
-          // Check if current size meets constraints
-          const needsResize = 
-            selectedLogo.size.width < constraints.minWidth || 
-            selectedLogo.size.height < constraints.minHeight;
-          
-          if (needsResize) {
-            // Update element size to meet minimum constraints
-            const newSize = {
-              width: Math.max(constraints.minWidth, selectedLogo.size.width),
-              height: Math.max(constraints.minHeight, selectedLogo.size.height)
-            };
-            
-            // Update both the state and the component
-            handleLogoMove(logoId, selectedLogo.position, newSize);
-            rndRef.current.updateSize(newSize);
-          }
-        }
-      }
-    }
+    setDraggable(true);
   };
   
   const handleBagClick = (e: React.MouseEvent) => {

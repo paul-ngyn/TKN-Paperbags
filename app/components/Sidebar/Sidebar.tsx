@@ -301,15 +301,21 @@ const Sidebar: React.FC<SidebarProps> = ({
   };
   
   const applyTextChanges = () => {
-    if (activeLogoId && updateTextContent) {
-      // Update existing text
-      updateTextContent(activeLogoId, textInput, textStyle);
-    } else {
-      // Add new text
-      handleAddText(textInput, textStyle);
-    }
-    setSidebarMode('default');
+  // Ensure rotation is properly set in textStyle
+  const finalTextStyle = {
+    ...textStyle,
+    rotation: textStyle.rotation || 0 // Make sure rotation has a default value
   };
+  
+  if (activeLogoId && updateTextContent) {
+    // Update existing text
+    updateTextContent(activeLogoId, textInput, finalTextStyle);
+  } else {
+    // Add new text
+    handleAddText(textInput, finalTextStyle);
+  }
+  setSidebarMode('default');
+};
   
   const cancelTextChanges = () => {
     setSidebarMode('default');
