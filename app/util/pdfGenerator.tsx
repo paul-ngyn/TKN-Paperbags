@@ -133,14 +133,50 @@ const addTextToPdf = (pdf: jsPDF, logo: Logo, x: number, y: number, width: numbe
       throw new Error("Could not create canvas context");
     }
     
+    // Get rotation value from logo
+    const rotation = (logo.type === 'text' && logo.textStyle?.rotation !== undefined)
+      ? logo.textStyle.rotation
+      : (logo.rotation ?? 0);
+    
+    // Calculate expanded canvas size to accommodate rotation
+    let canvasWidth = logo.size.width;
+    let canvasHeight = logo.size.height;
+    
+    if (rotation !== 0) {
+      // Calculate the bounding box after rotation
+      const radians = (Math.abs(rotation) * Math.PI) / 180;
+      const cos = Math.abs(Math.cos(radians));
+      const sin = Math.abs(Math.sin(radians));
+      
+      // Expand canvas to fit rotated content
+      canvasWidth = Math.ceil(logo.size.width * cos + logo.size.height * sin);
+      canvasHeight = Math.ceil(logo.size.width * sin + logo.size.height * cos);
+    }
+    
     // Set canvas properties - higher ratio for better quality
     const pixelRatio = 5;
-    canvas.width = logo.size.width * pixelRatio;
-    canvas.height = logo.size.height * pixelRatio;
+    canvas.width = canvasWidth * pixelRatio;
+    canvas.height = canvasHeight * pixelRatio;
     ctx.scale(pixelRatio, pixelRatio);
     
     // Clear canvas
-    ctx.clearRect(0, 0, logo.size.width, logo.size.height);
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+    
+    // Apply rotation transformation if needed
+    if (rotation !== 0) {
+      // Save the current transformation matrix
+      ctx.save();
+      
+      // Move to center of expanded canvas, apply rotation
+      const centerX = canvasWidth / 2;
+      const centerY = canvasHeight / 2;
+      
+      ctx.translate(centerX, centerY);
+      ctx.rotate((rotation * Math.PI) / 180);
+      
+      // Translate back by original dimensions center
+      ctx.translate(-logo.size.width / 2, -logo.size.height / 2);
+    }
     
     // Set text styling
     const fontWeight = logo.textStyle?.fontWeight || 'normal';
@@ -182,55 +218,76 @@ const addTextToPdf = (pdf: jsPDF, logo: Logo, x: number, y: number, width: numbe
       ctx.fillText(text, centerX, centerY + verticalOffset);
     }
     
+    // Restore the transformation matrix if rotation was applied
+    if (rotation !== 0) {
+      ctx.restore();
+    }
+    
     // Convert to image and add to PDF
     const textImageDataUrl = canvas.toDataURL('image/png');
-    pdf.addImage(textImageDataUrl, 'PNG', x, y, width, height);
+    
+    // Adjust positioning to center the expanded canvas content
+    const adjustedX = rotation !== 0 ? x - (canvasWidth - logo.size.width) * scaleX / 2 : x;
+    const adjustedY = rotation !== 0 ? y - (canvasHeight - logo.size.height) * scaleY / 2 : y;
+    const adjustedWidth = canvasWidth * scaleX;
+    const adjustedHeight = canvasHeight * scaleY;
+    
+    pdf.addImage(textImageDataUrl, 'PNG', adjustedX, adjustedY, adjustedWidth, adjustedHeight);
     
   } catch (err) {
     console.log("Falling back to standard text rendering:", err);
-    
-    // Standard PDF text rendering as fallback
-    const fontFamily = logo.textStyle?.fontFamily || 'helvetica';
-    let pdfFontName = 'helvetica';
-    
-    if (fontFamily.toLowerCase().includes('times')) {
-      pdfFontName = 'times';
-    } else if (fontFamily.toLowerCase().includes('courier')) {
-      pdfFontName = 'courier';
-    }
-    
-    const fontStyle = logo.textStyle?.fontWeight === 'bold' ? 'bold' : 'normal';
-    pdf.setFont(pdfFontName, fontStyle);
-    
-    const fontSize = logo.textStyle?.fontSize || 24;
-    const scaleFactor = Math.min(scaleX, scaleY);
-    const scaledFontSize = Math.max(16, fontSize * scaleFactor * 71);
-    pdf.setFontSize(scaledFontSize);
-    
-    // Set text color
-    const color = logo.textStyle?.color || '#000000';
-    const r = parseInt(color.slice(1, 3), 16);
-    const g = parseInt(color.slice(3, 5), 16);
-    const b = parseInt(color.slice(5, 7), 16);
-    pdf.setTextColor(r, g, b);
-    
-    // Position and render
-    const textX = x + (width / 2);
-    const textY = y + (height / 2);
-    
-    const text = logo.text || '';
-    if (text.includes('\n')) {
-      // For multi-line text in fallback mode
-      const lines = text.split('\n');
-      pdf.text(lines, textX, textY, {
-        align: 'center',
-        baseline: 'middle'
-      });
-    } else {
-      pdf.text(text, textX, textY, {
-        align: 'center',
-        baseline: 'middle'
-      });
-    }
-  }
+   
+   // Standard PDF text rendering as fallback - also needs rotation support
+   const fontFamily = logo.textStyle?.fontFamily || 'helvetica';
+   let pdfFontName = 'helvetica';
+   
+   if (fontFamily.toLowerCase().includes('times')) {
+     pdfFontName = 'times';
+   } else if (fontFamily.toLowerCase().includes('courier')) {
+     pdfFontName = 'courier';
+   }
+   
+   const fontStyle = logo.textStyle?.fontWeight === 'bold' ? 'bold' : 'normal';
+   pdf.setFont(pdfFontName, fontStyle);
+   
+   const fontSize = logo.textStyle?.fontSize || 24;
+   const scaleFactor = Math.min(scaleX, scaleY);
+   const scaledFontSize = Math.max(16, fontSize * scaleFactor * 71);
+   pdf.setFontSize(scaledFontSize);
+   
+   // Set text color
+   const color = logo.textStyle?.color || '#000000';
+   const r = parseInt(color.slice(1, 3), 16);
+   const g = parseInt(color.slice(3, 5), 16);
+   const b = parseInt(color.slice(5, 7), 16);
+   pdf.setTextColor(r, g, b);
+   
+   // Get rotation for fallback mode
+   const rotation = (logo.type === 'text' && logo.textStyle?.rotation !== undefined)
+     ? logo.textStyle.rotation
+     : (logo.rotation ?? 0);
+   
+   // Position and render with rotation
+   const textX = x + (width / 2);
+   const textY = y + (height / 2);
+   
+   const text = logo.text || '';
+   const textOptions: any = {
+     align: 'center',
+     baseline: 'middle'
+   };
+   
+   // Add rotation to text options if needed
+   if (rotation !== 0) {
+     textOptions.angle = rotation;
+   }
+   
+   if (text.includes('\n')) {
+     // For multi-line text in fallback mode
+     const lines = text.split('\n');
+     pdf.text(lines, textX, textY, textOptions);
+   } else {
+     pdf.text(text, textX, textY, textOptions);
+   }
+ }
 };

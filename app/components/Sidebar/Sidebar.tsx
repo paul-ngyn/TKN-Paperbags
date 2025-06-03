@@ -513,21 +513,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             className={styles.slider}
           />
         </div>
-
-        <div 
-        className={styles.textPreview} 
-        style={{
-          fontFamily: textStyle.fontFamily,
-          fontSize: `${textStyle.fontSize}px`,
-          fontWeight: textStyle.fontWeight,
-          color: textStyle.color,
-          transform: `rotate(${textStyle.rotation || 0}deg)`, // just for testing remove rotation preview after
-          transformOrigin: 'center center'
-        }}
-      >
-        {textInput || "Preview"}
-      </div>
-
+        
           <div className={styles.buttonGroupText}>
             <button 
               onClick={applyTextChanges} 
