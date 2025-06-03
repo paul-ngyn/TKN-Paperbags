@@ -21,6 +21,11 @@ interface Logo {
   size: { width: number, height: number };
   rotation?: number;
 }
+interface TextOptions {
+  align: 'left' | 'center' | 'right';
+  baseline: 'top' | 'middle' | 'bottom';
+  angle?: number;
+}
 
 export const generatePDF = async (
   dimensions: BagDimensions,
@@ -272,7 +277,7 @@ const addTextToPdf = (pdf: jsPDF, logo: Logo, x: number, y: number, width: numbe
    const textY = y + (height / 2);
    
    const text = logo.text || '';
-   const textOptions: any = {
+   const textOptions: TextOptions = {
      align: 'center',
      baseline: 'middle'
    };
