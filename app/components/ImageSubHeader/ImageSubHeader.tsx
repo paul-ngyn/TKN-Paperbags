@@ -9,6 +9,7 @@ interface ImageSubHeaderProps {
   setPage: (page: string) => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ImageSubHeader: React.FC<ImageSubHeaderProps> = ({ setPage }) => {
   return (
     <div className={styles.subHeader}>
