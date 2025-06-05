@@ -1,34 +1,23 @@
 "use client";
 
-import React, {useState} from 'react';
+import React from 'react';
+import Link from 'next/link';
 import styles from './ImageSubHeader.module.css';
-import QuoteForm from '../QuoteForm/QuoteForm';
 
 interface ImageSubHeaderProps {
   text: string;
   setPage: (page: string) => void;
 }
 
-const ImageSubHeader: React.FC<ImageSubHeaderProps> = ({ }) => {
-  const [showModal, setShowModal] = useState(false);
-  const handleOpenModal = () => setShowModal(true);
-  const handleCloseModal = () => setShowModal(false);
+const ImageSubHeader: React.FC<ImageSubHeaderProps> = ({ setPage }) => {
   return (
     <div className={styles.subHeader}>
       <div className={styles.overlayText}>
         CUSTOM PAPER BAGS AT AFFORDABLE PRICES.<br /> INSTANTLY DESIGNED BY YOU.
       </div>
-      <button className={styles.designButton} onClick={handleOpenModal}>
+      <Link href="/design" className={styles.designButton}>
         START DESIGNING NOW
-      </button>
-
-      {showModal && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContent}>
-            <QuoteForm onClose={handleCloseModal} />
-          </div>
-        </div>
-      )}
+      </Link>
     </div>
   );
 };

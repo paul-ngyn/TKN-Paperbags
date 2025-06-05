@@ -51,21 +51,27 @@ const LogoPage: React.FC<LogoPageProps> = ({ handleNavigation }) => {
       </div>
       <section className="features">
         <div className="feature">
-          <Image src={biodegradable} alt="Feature 2" width={150} height={150} className="feature-image2" />
+          <div className="feature-image-container">
+            <Image src={biodegradable} alt="Feature 2" width={150} height={150} className="feature-image" />
+          </div>
           <p className="feature-text">Biodegradable and Recyclable</p>
           <div className="feature-description">
             <p>Our products are environmentally friendly, biodegradable, recyclable and compostable.</p>
           </div>
         </div>
         <div className="feature">
-          <Image src={baglogo} alt="Feature 1" width={150} height={150} className="feature-image" />
+          <div className="feature-image-container">
+            <Image src={baglogo} alt="Feature 1" width={150} height={150} className="feature-image" />
+          </div>
           <p className="feature-text">High Quality Paper Bags</p>
           <div className="feature-description">
             <p>Our paper bags are made in the U.S and sourced from the highest quality materials, ensuring durability and strength.</p>
           </div>
         </div>
         <div className="feature">
-          <Image src={timelogo} alt="Feature 3" width={150} height={150} className="feature-image3" />
+          <div className="feature-image-container">
+            <Image src={timelogo} alt="Feature 3" width={150} height={150} className="feature-image" />
+          </div>
           <p className="feature-text">Swift and Efficient Service</p>
           <div className="feature-description">
             <p>We provide fast, efficient, and personalized service to meet your needs promptly.</p>

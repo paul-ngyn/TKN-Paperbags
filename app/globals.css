@@ -86,64 +86,80 @@ html, body {
   width: 100%;
 }
 
-
+.attributionLink {
+  color:white;
+}
 .features {
   display: flex;
-  justify-content: normal;
-  width: 80%;
-  flex-wrap: nowrap; /* Optional: allows wrapping if there are too many items */
-  margin-bottom:10px;
-  margin-top: 50px; 
-  margin-left: 10%;
+  justify-content: space-around;
+  align-items: stretch; /* Makes all feature containers the same height */
+  gap: 2rem;
+  flex-wrap: wrap;
 }
 
 .feature {
+  flex: 1;
+  max-width: 300px;
+  min-width: 250px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%; /* Adjust width as needed */
-  margin: 0 80px;
+  text-align: center;
+  padding: 1.5rem;
+  box-sizing: border-box;
 }
 
+.feature-image-container {
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: white;
+}
 
 .feature-image {
-  width: 54%; /* Adjust width as needed */
-  height: auto;
-  max-width: 300px;
-}
-
-.feature-image2 {
-  padding-top: 2%;
-  width: 52%; /* Adjust width as needed */
-  height: auto;
-  max-width: 300px;
-}
-
-.feature-image3 {
-  padding-top: 3%;
-  width: 65%; /* Adjust width as needed */
-  height: auto;
-  max-width: 300px;
-}
-
-.attributionLink {
-  color: white;
-  font-size: 4px;
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* Maintains aspect ratio while fitting in container */
+  object-position: center;
 }
 
 .feature-text {
-  font-size: 24px;
-  text-align: center;
-  margin-top: 10px;
   font-weight: bold;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-size: 1.75rem;
+  margin: 0rem 0 1rem 0;
+  min-height: 2.5rem; /* Ensures consistent text height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .feature-description {
-  font-size: 16px; /* Smaller text for the description */
-  text-align: center;
-  margin-top: 10px;
-  color: #766; /* Optional: Lighter color for the description */
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+}
+
+.feature-description p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .features {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .feature {
+    max-width: 100%;
+    margin-bottom: 2rem;
+  }
 }
 
 .feature-button {
