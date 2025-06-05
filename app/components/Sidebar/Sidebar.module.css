@@ -422,3 +422,72 @@
   font-family: monospace;
 }
 
+.requirements {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px; /* Space between requirement lines */
+}
+
+.requirements small {
+  color: #666; /* Lighter text for requirements */
+  font-size: 12px; /* Smaller font size */
+  text-align: center;
+}
+
+.fileName {
+  color: #007bff; /* Or your theme's primary color */
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 8px;
+  text-align: center;
+}
+
+.errorMessage {
+  color: #ff3b30; /* A distinct error color */
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 8px;
+  text-align: center;
+  padding: 4px 8px;
+  background-color: #ffe6e6; /* Light red background for errors */
+  border-radius: 4px;
+  border: 1px solid #ffcccb; /* Light red border */
+}
+
+.dropZone.error {
+  border-color: #ff3b30; /* Red border for drop zone on error */
+  background-color: #fff5f5; /* Very light red background for drop zone on error */
+}
+
+.addLogoButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ... rest of your styles ... */
+.outOfRange {
+  border-color: #ff3b30 !important; /* Ensure this overrides other border styles */
+  background-color: #fff5f5 !important; /* Ensure this overrides other background styles */
+}
+
+.textPreviewContainer {
+  margin-bottom: 16px;
+  padding: 15px;
+  border: 1px dashed #ccc;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60px;
+  overflow: hidden;
+}
+
+.textPreview {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  word-break: break-word;
+  max-width: 100%;
+}

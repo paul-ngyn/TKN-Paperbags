@@ -439,11 +439,11 @@ const Sidebar: React.FC<SidebarProps> = ({
                   <small>
                     Min Dimensions: {IMAGE_REQUIREMENTS.minWidth} x {IMAGE_REQUIREMENTS.minHeight}px
                   </small>
-                  <br/>
+                  
                   <small>
                     Max Size: {IMAGE_REQUIREMENTS.maxFileSize / (1024 * 1024)}MB
                   </small>
-                  <br/>
+                  
                   <small>
                    Supported File Formats: {IMAGE_REQUIREMENTS.allowedTypes.map(type => type.split('/')[1].toUpperCase()).join(', ')}
                   </small>
@@ -584,6 +584,20 @@ const Sidebar: React.FC<SidebarProps> = ({
               Cancel
             </button>
           </div>
+          <div className={styles.textPreviewContainer}>
+          <p 
+            className={styles.textPreview}
+            style={{
+              fontFamily: textStyle.fontFamily,
+              fontSize: `${textStyle.fontSize}px`,
+              color: textStyle.color,
+              fontWeight: textStyle.fontWeight
+              // No rotation included
+            }}
+          >
+            {textInput || "Preview"}
+          </p>
+        </div>
           
           <div className={styles.downloadButtonContainer}>
             <button 
