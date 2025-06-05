@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
+import Image from "next/image"; // This is Next.js Image component
 import Link from "next/link";
 import styles from "./Sidebar.module.css";
 import downloadicon from "../../public/downloadicon.png";
@@ -11,7 +11,7 @@ import { BagDimensions, mmToInches} from "../../util/BagDimensions";
 // Extended props to support text customization
 interface SidebarProps {
   handleLogoUpload: (files: FileList) => void;
-  onUploadError?: (message: string) => void;
+  onUploadError?: (message: string) => void; // For parent component to handle errors
   handleAddText: (text?: string, style?: TextStyle) => void;
   fileInputRef: React.RefObject<HTMLInputElement>;
   dimensions: BagDimensions;
@@ -23,7 +23,7 @@ interface SidebarProps {
   activeLogoText?: string;
   activeLogoTextStyle?: TextStyle;
   updateTextContent?: (id: string, text: string, style: TextStyle) => void;
-  onLogoDeselect?: () => void; // Add this new prop
+  onLogoDeselect?: () => void;
 }
 
 interface TextStyle {
@@ -34,8 +34,65 @@ interface TextStyle {
   rotation?: number;
 }
 
+// Define image requirements
+const IMAGE_REQUIREMENTS = {
+  minWidth: 100,        // Minimum width in pixels
+  minHeight: 100,       // Minimum height in pixels
+  maxFileSize: 10 * 1024 * 1024, // 10MB in bytes
+  allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
+};
+
+// Helper function to validate the image file
+const validateImageFile = (file: File): Promise<{ isValid: boolean; error?: string }> => {
+  return new Promise((resolve) => {
+    // Check file type
+    if (!IMAGE_REQUIREMENTS.allowedTypes.includes(file.type)) {
+      resolve({ 
+        isValid: false, 
+        error: `Invalid file type. Please use: ${IMAGE_REQUIREMENTS.allowedTypes.map(type => type.split('/')[1].toUpperCase()).join(', ')}` 
+      });
+      return;
+    }
+
+    // Check file size
+    if (file.size > IMAGE_REQUIREMENTS.maxFileSize) {
+      resolve({ 
+        isValid: false, 
+        error: `File too large. Maximum size is ${IMAGE_REQUIREMENTS.maxFileSize / (1024 * 1024)}MB.` 
+      });
+      return;
+    }
+
+    // Check image dimensions using the native Image constructor
+    const img = new window.Image(); // Use window.Image to ensure native browser API
+    img.onload = () => {
+      if (img.width < IMAGE_REQUIREMENTS.minWidth || img.height < IMAGE_REQUIREMENTS.minHeight) {
+        resolve({ 
+          isValid: false, 
+          error: `Image too small. Minimum dimensions: ${IMAGE_REQUIREMENTS.minWidth}x${IMAGE_REQUIREMENTS.minHeight}px. Your image: ${img.width}x${img.height}px.` 
+        });
+      } else {
+        resolve({ isValid: true });
+      }
+      URL.revokeObjectURL(img.src); // Clean up object URL
+    };
+    
+    img.onerror = () => {
+      resolve({ 
+        isValid: false, 
+        error: 'Invalid image file or corrupted file. Could not read dimensions.' 
+      });
+      URL.revokeObjectURL(img.src); // Clean up object URL
+    };
+    
+    img.src = URL.createObjectURL(file);
+  });
+};
+
+
 const Sidebar: React.FC<SidebarProps> = ({
   handleLogoUpload,
+  onUploadError, // Make sure this is destructured
   handleAddText,
   fileInputRef,
   dimensions,
@@ -49,49 +106,63 @@ const Sidebar: React.FC<SidebarProps> = ({
   updateTextContent,
   onLogoDeselect,
 }) => {
-  // Add state for showing/hiding the blueprint example modal
+  // ... existing state ...
   const [showBlueprintExample, setShowBlueprintExample] = useState(false);
-  
-  // Add state for sidebar mode (default/text)
   const [sidebarMode, setSidebarMode] = useState<'default' | 'text'>('default');
-  
-  // State for text input and styling
   const [textInput, setTextInput] = useState('Your text here');
   const [textStyle, setTextStyle] = useState<TextStyle>({
     fontFamily: 'Arial',
     fontSize: 24,
     color: '#000000',
     fontWeight: 'normal',
-    rotation: 0 // Add default rotation
+    rotation: 0 
   });
+  const [inputValues, setInputValues] = useState({
+    length: "",
+    width: "",
+    height: ""
+  });
+  const [tempDimensionsInches, setTempDimensionsInches] = useState<{
+    length: number;
+    width: number;
+    height: number;
+  }>({
+    length: mmToInches(dimensions.length, 2),
+    width: mmToInches(dimensions.width, 2),
+    height: mmToInches(dimensions.height, 2)
+  });
+  const [dragActive, setDragActive] = useState(false);
+  const [fileName, setFileName] = useState<string | null>(null);
+
+  // Add state for upload validation
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [isValidating, setIsValidating] = useState(false);
   
-  // Update text editing mode when active text logo changes
+  // ... existing useEffect for text editing ...
   useEffect(() => {
     if (activeLogoId && activeLogoText && activeLogoTextStyle) {
-      // We're editing an existing text logo
       setTextInput(activeLogoText);
       setTextStyle({
         fontFamily: activeLogoTextStyle.fontFamily,
         fontSize: activeLogoTextStyle.fontSize, 
         color: activeLogoTextStyle.color,
         fontWeight: activeLogoTextStyle.fontWeight,
-        rotation: activeLogoTextStyle.rotation || 0 // Include rotation
+        rotation: activeLogoTextStyle.rotation || 0
       });
       setSidebarMode('text');
     } else if (sidebarMode === 'text' && !activeLogoId) {
-      // If we were in text mode but no active logo, reset
       setTextInput('Your text here');
       setTextStyle({
         fontFamily: 'Arial',
         fontSize: 24, 
         color: '#000000',
         fontWeight: 'normal',
-        rotation: 0 // Reset rotation
+        rotation: 0 
       });
     }
   }, [activeLogoId, activeLogoText, activeLogoTextStyle, sidebarMode]);
 
-  // Define max dimensions in inches
+  // ... existing MAX_DIMENSIONS, MIN_DIMENSIONS, inchesToMm ...
   const MAX_DIMENSIONS = {
     length: 21.65, 
     width: 11.81,
@@ -104,36 +175,11 @@ const Sidebar: React.FC<SidebarProps> = ({
     height: 6
   };
   
-  // Use the utility function for precise conversion from inches to mm
   const inchesToMm = (inches: number) => {
-    // Exact conversion - use decimal precision for millimeters
     return +(inches * 25.4).toFixed(2);
   };
   
-  // Store current input values as strings to preserve what user types exactly
-  const [inputValues, setInputValues] = useState({
-    length: "",
-    width: "",
-    height: ""
-  });
-  
-  // Store the actual numeric values (in inches) for calculations
-  const [tempDimensionsInches, setTempDimensionsInches] = useState<{
-    length: number;
-    width: number;
-    height: number;
-  }>({
-    length: mmToInches(dimensions.length, 2),
-    width: mmToInches(dimensions.width, 2),
-    height: mmToInches(dimensions.height, 2)
-  });
-  
-  const [dragActive, setDragActive] = useState(false);
-  const [fileName, setFileName] = useState<string | null>(null);
-
-  
-  
-  // Update both states when props change
+  // ... existing useEffect for dimensions ...
   useEffect(() => {
     const lengthInches = mmToInches(dimensions.length, 2);
     const widthInches = mmToInches(dimensions.width, 2);
@@ -145,7 +191,6 @@ const Sidebar: React.FC<SidebarProps> = ({
       height: tabsideHeightInches
     });
     
-    // Format display values
     setInputValues({
       length: lengthInches.toString(),
       width: widthInches.toString(),
@@ -153,57 +198,34 @@ const Sidebar: React.FC<SidebarProps> = ({
     });
   }, [dimensions]);
   
-  // Handler for dimension changes
+  // ... existing dimension handlers (onDimensionChange, applyDimensions, etc.) ...
   const onDimensionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    
-    // Always update the input value to exactly what user typed
-    setInputValues({
-      ...inputValues,
-      [name]: value
-    });
-    
-    // Only update numeric value if we have valid input
+    setInputValues({ ...inputValues, [name]: value });
     if (value && !isNaN(parseFloat(value))) {
       const numValue = parseFloat(value);
-      
-      // Store the user's value without enforcing limits
-      setTempDimensionsInches({
-        ...tempDimensionsInches,
-        [name]: numValue
-      });
-      
-      // Notify parent that we're in editing mode
+      setTempDimensionsInches({ ...tempDimensionsInches, [name]: numValue });
       startEditingDimensions();
     }
   };
   
-  // Apply dimension changes when button is clicked
   const applyDimensions = () => {
-    // First, enforce min/max limits before applying
     const clampedDimensions = {
       length: Math.min(Math.max(tempDimensionsInches.length, MIN_DIMENSIONS.length), MAX_DIMENSIONS.length),
       width: Math.min(Math.max(tempDimensionsInches.width, MIN_DIMENSIONS.width), MAX_DIMENSIONS.width),
       height: Math.min(Math.max(tempDimensionsInches.height, MIN_DIMENSIONS.height), MAX_DIMENSIONS.height)
     };
-    
-    // Update the input values to reflect any clamping
     setInputValues({
       length: clampedDimensions.length.toString(),
       width: clampedDimensions.width.toString(),
       height: clampedDimensions.height.toString()
     });
-    
-    // Update the temp dimensions with clamped values
     setTempDimensionsInches(clampedDimensions);
-    
-    // Convert inches back to mm when sending to parent component
     const newDimensions = {
       length: inchesToMm(clampedDimensions.length),
       width: inchesToMm(clampedDimensions.width),
       height: inchesToMm(clampedDimensions.height)
     };
-    
     handleDimensionChange(newDimensions);
   };
 
@@ -213,57 +235,74 @@ const Sidebar: React.FC<SidebarProps> = ({
     }
   };
   
-  // Reset to the original dimensions
   const resetDimensions = () => {
     const lengthInches = mmToInches(dimensions.length, 2);
     const widthInches = mmToInches(dimensions.width, 2);
     const heightInches = mmToInches(dimensions.height, 2);
-    
-    setTempDimensionsInches({
-      length: lengthInches,
-      width: widthInches,
-      height: heightInches
-    });
-    
-    setInputValues({
-      length: lengthInches.toString(),
-      width: widthInches.toString(),
-      height: heightInches.toString()
-    });
+    setTempDimensionsInches({ length: lengthInches, width: widthInches, height: heightInches });
+    setInputValues({ length: lengthInches.toString(), width: widthInches.toString(), height: heightInches.toString() });
   };
 
-  // Drag and drop handlers remain unchanged
+  // Function to handle file validation and upload
+  const validateAndUploadFiles = async (files: FileList) => {
+    if (!files || files.length === 0) return;
+    
+    setIsValidating(true);
+    setUploadError(null);
+    setFileName(null); // Clear previous file name
+
+    const file = files[0]; // Assuming single file upload for now
+    const validationResult = await validateImageFile(file);
+
+    if (!validationResult.isValid) {
+      setUploadError(validationResult.error || 'Invalid file.');
+      if (onUploadError) {
+        onUploadError(validationResult.error || 'Invalid file.');
+      }
+      setIsValidating(false);
+      return;
+    }
+
+    // If valid, proceed with upload
+    handleLogoUpload(files);
+    setFileName(file.name); // Set file name on successful validation
+    setIsValidating(false);
+  };
+
+  // Update drag and drop handlers
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setDragActive(true);
+    setUploadError(null); // Clear error on new drag over
   };
 
   const handleDragLeave = () => {
     setDragActive(false);
   };
-
   
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setDragActive(false);
     if (e.dataTransfer.files?.length) {
-      handleLogoUpload(e.dataTransfer.files);
-      setFileName(e.dataTransfer.files[0].name);
+      await validateAndUploadFiles(e.dataTransfer.files);
     }
   };
 
-  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Update file input change handler
+  const handleFileInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files?.length) {
-      handleLogoUpload(files);
+      await validateAndUploadFiles(files);
     }
   };
 
+  // Update click handler to clear errors
   const handleClick = () => {
+    setUploadError(null); // Clear errors when user clicks to browse
     fileInputRef.current?.click();
   };
 
-  // === New Text Handling Functions ===
+  // === Text Handling Functions (ensure rotation is in setTextStyle for handleAddTextClick) ===
   const handleAddTextClick = () => {
     setSidebarMode('text');
     setTextInput('Your text here');
@@ -271,10 +310,12 @@ const Sidebar: React.FC<SidebarProps> = ({
       fontFamily: 'Arial',
       fontSize: 24,
       color: '#000000',
-      fontWeight: 'normal'
+      fontWeight: 'normal',
+      rotation: 0 // Ensure rotation is set here
     });
   };
   
+  // ... rest of text handling functions (handleTextChange, etc.) ...
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setTextInput(e.target.value);
   };
@@ -301,38 +342,30 @@ const Sidebar: React.FC<SidebarProps> = ({
   };
   
   const applyTextChanges = () => {
-  // Ensure rotation is properly set in textStyle
-  const finalTextStyle = {
-    ...textStyle,
-    rotation: textStyle.rotation || 0 // Make sure rotation has a default value
+    const finalTextStyle = {
+      ...textStyle,
+      rotation: textStyle.rotation || 0 
+    };
+    if (activeLogoId && updateTextContent) {
+      updateTextContent(activeLogoId, textInput, finalTextStyle);
+    } else {
+      handleAddText(textInput, finalTextStyle);
+    }
+    setSidebarMode('default');
   };
-  
-  if (activeLogoId && updateTextContent) {
-    // Update existing text
-    updateTextContent(activeLogoId, textInput, finalTextStyle);
-  } else {
-    // Add new text
-    handleAddText(textInput, finalTextStyle);
-  }
-  setSidebarMode('default');
-};
   
   const cancelTextChanges = () => {
     setSidebarMode('default');
   };
 
-  // Check if current values differ from original values
+  // ... dimensionsChanged, dimensionOutOfRange, getInputClass ...
   const dimensionsChanged = () => {
     const originalInches = {
       length: mmToInches(dimensions.length, 2),
       width: mmToInches(dimensions.width, 2),
       height: mmToInches(dimensions.height, 2)
     };
-    
-    // Use small epsilon for floating point comparison
-    const epsilon = 0.005; // Allow 0.005 inch difference (rounding errors)
-
-    
+    const epsilon = 0.005; 
     return (
       Math.abs(originalInches.length - tempDimensionsInches.length) > epsilon ||
       Math.abs(originalInches.width - tempDimensionsInches.width) > epsilon ||
@@ -340,19 +373,13 @@ const Sidebar: React.FC<SidebarProps> = ({
     );
   };
 
-  // Check if values are outside min/max limits
   const dimensionOutOfRange = (name: string, value: number): boolean => {
-    if (name === 'length') {
-      return value < MIN_DIMENSIONS.length || value > MAX_DIMENSIONS.length;
-    } else if (name === 'width') {
-      return value < MIN_DIMENSIONS.width || value > MAX_DIMENSIONS.width;
-    } else if (name === 'height') {
-      return value < MIN_DIMENSIONS.height || value > MAX_DIMENSIONS.height;
-    }
+    if (name === 'length') return value < MIN_DIMENSIONS.length || value > MAX_DIMENSIONS.length;
+    if (name === 'width') return value < MIN_DIMENSIONS.width || value > MAX_DIMENSIONS.width;
+    if (name === 'height') return value < MIN_DIMENSIONS.height || value > MAX_DIMENSIONS.height;
     return false;
   };
 
-  // Visual feedback if value is outside limits
   const getInputClass = (name: string): string => {
     const value = tempDimensionsInches[name as keyof typeof tempDimensionsInches];
     return dimensionOutOfRange(name, value) 
@@ -370,7 +397,6 @@ const Sidebar: React.FC<SidebarProps> = ({
         className={`${styles.tabButton} ${sidebarMode === 'default' ? styles.activeTab : ''}`}
         onClick={() => {
           setSidebarMode('default');
-          // Deselect active logo when switching to upload tab
           if (activeLogoId && onLogoDeselect) {
             onLogoDeselect();
           }
@@ -380,7 +406,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       </button>
       <button 
         className={`${styles.tabButton} ${sidebarMode === 'text' ? styles.activeTab : ''}`}
-        onClick={handleAddTextClick}
+        onClick={handleAddTextClick} // This now correctly sets rotation
       >
         Text
       </button>
@@ -390,11 +416,11 @@ const Sidebar: React.FC<SidebarProps> = ({
       {sidebarMode === 'default' && (
         <div className={styles.uploadSection}>
           <div 
-            className={`${styles.dropZone} ${dragActive ? styles.dragOver : ""}`}
-            onClick={handleClick}
-            onDragOver={handleDragOver}
+            className={`${styles.dropZone} ${dragActive ? styles.dragOver : ""} ${uploadError ? styles.error : ""}`} // Add error class
+            onClick={handleClick} // Updated to clear errors
+            onDragOver={handleDragOver} // Updated to clear errors
             onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
+            onDrop={handleDrop} // Updated to use validation
           >
             <Image
               src={downloadicon}
@@ -403,12 +429,37 @@ const Sidebar: React.FC<SidebarProps> = ({
               height={40}
               className={styles.dropIcon}
             />
-            <p>Drag & drop your logos here, or click to browse</p>
-            {fileName && <p className={styles.fileName}>Selected: {fileName}</p>}
+            {isValidating ? (
+              <p>Validating image...</p>
+            ) : (
+              <>
+                <p>Drag & drop your logos here, or click to browse</p>
+                {/* Display requirements */}
+                <div className={styles.requirements}>
+                  <small>
+                    Min Dimensions: {IMAGE_REQUIREMENTS.minWidth} x {IMAGE_REQUIREMENTS.minHeight}px
+                  </small>
+                  <br/>
+                  <small>
+                    Max Size: {IMAGE_REQUIREMENTS.maxFileSize / (1024 * 1024)}MB
+                  </small>
+                  <br/>
+                  <small>
+                   Supported File Formats: {IMAGE_REQUIREMENTS.allowedTypes.map(type => type.split('/')[1].toUpperCase()).join(', ')}
+                  </small>
+                </div>
+              </>
+            )}
+            {fileName && !uploadError && (
+              <p className={styles.fileName}>Selected: {fileName}</p>
+            )}
+            {uploadError && (
+              <p className={styles.errorMessage}>{uploadError}</p>
+            )}
             <input
               type="file"
-              accept="image/*"
-              onChange={handleFileInputChange}
+              accept={IMAGE_REQUIREMENTS.allowedTypes.join(',')} // Set accept attribute
+              onChange={handleFileInputChange} // Updated to use validation
               ref={fileInputRef}
               style={{ display: "none" }}
             />
@@ -419,8 +470,12 @@ const Sidebar: React.FC<SidebarProps> = ({
                 {logoCount} logo{logoCount !== 1 ? 's' : ''} added
               </p>
             )}
-            <button onClick={handleClick} className={styles.addLogoButton}>
-              Add {logoCount > 0 ? 'Another' : 'New'} Logo
+            <button 
+              onClick={handleClick} // Updated to clear errors
+              className={styles.addLogoButton}
+              disabled={isValidating} // Disable button while validating
+            >
+              {isValidating ? 'Validating...' : `Add ${logoCount > 0 ? 'Another' : 'New'} Logo`}
             </button>
             <button onClick={handleAddTextClick} className={styles.textButton}>         
               Add Text
@@ -430,6 +485,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       )}
 
       {/* Text Input Section */}
+      {/* ... (rest of your JSX for text input, dimensions, modal remains the same) ... */}
       {sidebarMode === 'text' && (
         <div className={styles.textInputSection}>
           <h3>{activeLogoId ? 'Edit Text' : 'Add New Text:'}</h3>
@@ -529,7 +585,6 @@ const Sidebar: React.FC<SidebarProps> = ({
             </button>
           </div>
           
-          {/* Download Design Button - always visible regardless of mode */}
           <div className={styles.downloadButtonContainer}>
             <button 
               onClick={() => {
@@ -548,7 +603,6 @@ const Sidebar: React.FC<SidebarProps> = ({
         </div>
       )}
 
-      {/* Only show these sections in default mode */}
       {sidebarMode === 'default' && (
         <>
           <div className={styles.infoLinkContainer}>
@@ -628,7 +682,6 @@ const Sidebar: React.FC<SidebarProps> = ({
               </div>
             </div>
             
-            {/* Buttons to apply or reset dimensions */}
             <div className={styles.buttonGroup}>
               <button 
                 onClick={applyDimensions} 
@@ -646,7 +699,6 @@ const Sidebar: React.FC<SidebarProps> = ({
               </button>
             </div>
 
-            {/* Download Design Button */}
             <div className={styles.downloadButtonContainer}>
               <button 
                 onClick={() => {
@@ -666,7 +718,6 @@ const Sidebar: React.FC<SidebarProps> = ({
         </>
       )}
       
-      {/* Blueprint Example Modal - available regardless of mode */}
       {showBlueprintExample && (
         <div className={styles.modal}>
           <div className={styles.modalContent}>
