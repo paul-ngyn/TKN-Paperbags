@@ -19,7 +19,7 @@ const ImageSubHeader: React.FC<ImageSubHeaderProps> = ({ }) => {
         CUSTOM PAPER BAGS AT AFFORDABLE PRICES.<br /> INSTANTLY DESIGNED BY YOU.
       </div>
       <button className={styles.designButton} onClick={handleOpenModal}>
-        GET A QUOTE NOW
+        START DESIGNING NOW
       </button>
 
       {showModal && (

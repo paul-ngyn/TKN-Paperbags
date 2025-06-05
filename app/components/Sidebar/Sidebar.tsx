@@ -443,7 +443,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                   <small>
                     Max Size: {IMAGE_REQUIREMENTS.maxFileSize / (1024 * 1024)}MB
                   </small>
-                  
+  
                   <small>
                    Supported File Formats: {IMAGE_REQUIREMENTS.allowedTypes.map(type => type.split('/')[1].toUpperCase()).join(', ')}
                   </small>
@@ -514,6 +514,12 @@ const Sidebar: React.FC<SidebarProps> = ({
               <option value="Helvetica">Helvetica</option>
               <option value="Times New Roman">Times New Roman</option>
               <option value="Courier New">Courier New</option>
+              <option value="Georgia">Georgia</option>
+              <option value="Tahoma">Tahoma</option>
+              <option value="Trebuchet MS">Trebuchet MS</option>
+              <option value="Impact">Impact</option>
+              <option value="Comic Sans MS">Comic Sans MS</option>
+              
             </select>
           </div>
 

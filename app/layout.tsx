@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Inter, Montserrat, Playfair_Display } from "next/font/google"; // Import desired fonts
 import '../app/globals.css';
 import { SpeedInsights } from "@vercel/speed-insights/next"
 
@@ -18,6 +19,7 @@ const geistMono = localFont({
   variable: "--font-geist-mono",
   weight: "100 900",
 });
+
 
 export const metadata: Metadata = {
   title: "Create Next App",
