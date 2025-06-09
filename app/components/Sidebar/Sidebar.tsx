@@ -477,9 +477,6 @@ const Sidebar: React.FC<SidebarProps> = ({
             >
               {isValidating ? 'Validating...' : `Add ${logoCount > 0 ? 'Another' : 'New'} Logo`}
             </button>
-            <button onClick={handleAddTextClick} className={styles.textButton}>         
-              Add Text
-            </button>
           </div>
         </div>
       )}

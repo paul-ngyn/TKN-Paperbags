@@ -1,7 +1,7 @@
 .sidebarContainer {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
   padding: 1.5rem;
   border: 2px solid rgb(245, 240, 240);
   border-radius: 8px;
@@ -10,7 +10,7 @@
   width: 25%;
   max-width: 30%;
   margin-left: 2%;
-  margin-top: 4.5%;
+  margin-top: 3.75%;
   margin-bottom: 15%;
   padding-bottom: 2%;
   padding-right: 1.5%;
@@ -63,7 +63,7 @@
 .buttonGroup {
   display: flex;
   gap: 10px;
-  margin-top: 0.2rem;
+  margin-top: 0.1rem;
 }
 .buttonGroupText {
   display: flex;
@@ -74,7 +74,7 @@
 .buttonInfoGroup {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 1px;
   width: 100%;
 }
 
@@ -209,7 +209,7 @@
 .uploadSection {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .logoCount {
@@ -245,7 +245,8 @@
   cursor: pointer;
   text-align: center;
   transition: background-color 0.2s ease;
-  min-height: 150px;
+  min-height: 15vh;
+  max-height: 18vh;
 }
 
 .dropZone p {
@@ -369,11 +370,11 @@
 }
 
 .textInputSection {
-  padding: 5px 0;
+  padding: 1px 0;
 }
 
 .formGroup {
-  margin-bottom: 15px;
+  margin-bottom: 5px;
 }
 
 .formGroup label {
