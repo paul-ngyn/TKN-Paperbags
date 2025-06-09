@@ -92,7 +92,7 @@ const validateImageFile = (file: File): Promise<{ isValid: boolean; error?: stri
 
 const Sidebar: React.FC<SidebarProps> = ({
   handleLogoUpload,
-  onUploadError, // Make sure this is destructured
+  onUploadError, 
   handleAddText,
   fileInputRef,
   dimensions,
@@ -106,7 +106,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   updateTextContent,
   onLogoDeselect,
 }) => {
-  // ... existing state ...
+
   const [showBlueprintExample, setShowBlueprintExample] = useState(false);
   const [sidebarMode, setSidebarMode] = useState<'default' | 'text'>('default');
   const [textInput, setTextInput] = useState('Your text here');
@@ -138,7 +138,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isValidating, setIsValidating] = useState(false);
   
-  // ... existing useEffect for text editing ...
+
   useEffect(() => {
     if (activeLogoId && activeLogoText && activeLogoTextStyle) {
       setTextInput(activeLogoText);
@@ -162,7 +162,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     }
   }, [activeLogoId, activeLogoText, activeLogoTextStyle, sidebarMode]);
 
-  // ... existing MAX_DIMENSIONS, MIN_DIMENSIONS, inchesToMm ...
+
   const MAX_DIMENSIONS = {
     length: 21.65, 
     width: 11.81,
@@ -179,7 +179,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     return +(inches * 25.4).toFixed(2);
   };
   
-  // ... existing useEffect for dimensions ...
+
   useEffect(() => {
     const lengthInches = mmToInches(dimensions.length, 2);
     const widthInches = mmToInches(dimensions.width, 2);
@@ -198,7 +198,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     });
   }, [dimensions]);
   
-  // ... existing dimension handlers (onDimensionChange, applyDimensions, etc.) ...
+  
   const onDimensionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setInputValues({ ...inputValues, [name]: value });
@@ -263,17 +263,17 @@ const Sidebar: React.FC<SidebarProps> = ({
       return;
     }
 
-    // If valid, proceed with upload
+
     handleLogoUpload(files);
-    setFileName(file.name); // Set file name on successful validation
+    setFileName(file.name); 
     setIsValidating(false);
   };
 
-  // Update drag and drop handlers
+
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setDragActive(true);
-    setUploadError(null); // Clear error on new drag over
+    setUploadError(null); 
   };
 
   const handleDragLeave = () => {
@@ -288,7 +288,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
-  // Update file input change handler
+
   const handleFileInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files?.length) {
@@ -296,13 +296,13 @@ const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
-  // Update click handler to clear errors
+
   const handleClick = () => {
     setUploadError(null); // Clear errors when user clicks to browse
     fileInputRef.current?.click();
   };
 
-  // === Text Handling Functions (ensure rotation is in setTextStyle for handleAddTextClick) ===
+
   const handleAddTextClick = () => {
     setSidebarMode('text');
     setTextInput('Your text here');
@@ -315,7 +315,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     });
   };
   
-  // ... rest of text handling functions (handleTextChange, etc.) ...
+  
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setTextInput(e.target.value);
   };
@@ -358,7 +358,6 @@ const Sidebar: React.FC<SidebarProps> = ({
     setSidebarMode('default');
   };
 
-  // ... dimensionsChanged, dimensionOutOfRange, getInputClass ...
   const dimensionsChanged = () => {
     const originalInches = {
       length: mmToInches(dimensions.length, 2),
@@ -391,7 +390,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     <div className={styles.sidebarContainer}>
       <h2 className={styles.sidebarTitle}>Design Your Bag</h2>
 
-      {/* Tab Navigation */}
+ 
       <div className={styles.tabNavigation}>
       <button 
         className={`${styles.tabButton} ${sidebarMode === 'default' ? styles.activeTab : ''}`}
@@ -406,21 +405,21 @@ const Sidebar: React.FC<SidebarProps> = ({
       </button>
       <button 
         className={`${styles.tabButton} ${sidebarMode === 'text' ? styles.activeTab : ''}`}
-        onClick={handleAddTextClick} // This now correctly sets rotation
+        onClick={handleAddTextClick} 
       >
         Text
       </button>
     </div>
 
-      {/* Default Upload Section */}
+   
       {sidebarMode === 'default' && (
         <div className={styles.uploadSection}>
           <div 
             className={`${styles.dropZone} ${dragActive ? styles.dragOver : ""} ${uploadError ? styles.error : ""}`} // Add error class
-            onClick={handleClick} // Updated to clear errors
-            onDragOver={handleDragOver} // Updated to clear errors
+            onClick={handleClick}
+            onDragOver={handleDragOver} 
             onDragLeave={handleDragLeave}
-            onDrop={handleDrop} // Updated to use validation
+            onDrop={handleDrop} 
           >
             <Image
               src={downloadicon}
@@ -434,7 +433,6 @@ const Sidebar: React.FC<SidebarProps> = ({
             ) : (
               <>
                 <p>Drag & drop your logos here, or click to browse</p>
-                {/* Display requirements */}
                 <div className={styles.requirements}>
                   <small>
                     Min Dimensions: {IMAGE_REQUIREMENTS.minWidth} x {IMAGE_REQUIREMENTS.minHeight}px
@@ -481,8 +479,6 @@ const Sidebar: React.FC<SidebarProps> = ({
         </div>
       )}
 
-      {/* Text Input Section */}
-      {/* ... (rest of your JSX for text input, dimensions, modal remains the same) ... */}
       {sidebarMode === 'text' && (
         <div className={styles.textInputSection}>
           <h3>{activeLogoId ? 'Edit Text' : 'Add New Text:'}</h3>
@@ -504,7 +500,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           id="font-family" 
           value={textStyle.fontFamily}
           onChange={handleFontFamilyChange}
-          className={styles.fontSelect} // Changed from styles.select to styles.fontSelect
+          className={styles.fontSelect} 
         >
           <optgroup label="Classic & Web Safe">
             <option value="Arial">Arial</option>
@@ -552,7 +548,6 @@ const Sidebar: React.FC<SidebarProps> = ({
             <option value="Cormorant Garamond">Cormorant Garamond</option>
             <option value="EB Garamond">EB Garamond</option>
           </optgroup>
-
           <optgroup label="Script & Handwritten">
             <option value="Pacifico">Pacifico</option>
             <option value="Dancing Script">Dancing Script</option>

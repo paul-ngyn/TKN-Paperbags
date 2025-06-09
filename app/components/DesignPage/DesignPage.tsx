@@ -84,7 +84,7 @@ const DesignPage: React.FC<DesignPageProps> = () => {
     const charWidth = fontSize * 0.6;
     const lineHeight = fontSize * 1.4;
     
-    // Add just enough padding to make text look good
+ 
     // For width: add horizontal padding of 1 character on each side
     const widthPadding = fontSize * 1.2;
     
@@ -261,7 +261,7 @@ const DesignPage: React.FC<DesignPageProps> = () => {
     }
   };
   
-  // Dimensions editing
+  
   const startEditingDimensions = () => setIsEditingDimensions(true);
   const handleDimensionChange = (newDimensions: BagDimensions) => {
     setDimensions(newDimensions);

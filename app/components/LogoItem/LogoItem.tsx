@@ -293,10 +293,9 @@ const LogoItem: React.FC<LogoItemProps> = ({
           )}
         </div>
         
-        {/* Control buttons positioned outside the rotated content */}
+
         {isActive && (
           <>
-            {/* Delete Button - Always top-left, counter-rotated */}
             <button 
               className={styles.removeLogoButton}
               onMouseDown={(e) => {
@@ -329,8 +328,7 @@ const LogoItem: React.FC<LogoItemProps> = ({
             >
               &times;
             </button>
-            
-            {/* Duplicate Button - Always bottom-left, counter-rotated */}
+  
             <button 
               className={styles.duplicateLogoButton}
               onMouseDown={(e) => {
