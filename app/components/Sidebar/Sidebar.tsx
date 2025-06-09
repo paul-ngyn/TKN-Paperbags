@@ -499,84 +499,86 @@ const Sidebar: React.FC<SidebarProps> = ({
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="font-family">Font:</label>
-            <select 
-              id="font-family" 
-              value={textStyle.fontFamily}
-              onChange={handleFontFamilyChange}
-              className={styles.select}
-            >
-              <optgroup label="Classic & Web Safe"></optgroup>
-              <option value="Arial">Arial</option>
-              <option value="Verdana">Verdana</option>
-              <option value="Helvetica">Helvetica</option>
-              <option value="Times New Roman">Times New Roman</option>
-              <option value="Courier New">Courier New</option>
-              <option value="Georgia">Georgia</option>
-              <option value="Tahoma">Tahoma</option>
-              <option value="Trebuchet MS">Trebuchet MS</option>
-              <option value="Impact">Impact</option>
-              <option value="Comic Sans MS">Comic Sans MS</option>
-              
-             <optgroup label="Modern Sans-Serif">
-                <option value="Inter">Inter</option>
-                <option value="Poppins">Poppins</option>
-                <option value="Montserrat">Montserrat</option>
-                <option value="Nunito">Nunito</option>
-                <option value="Rubik">Rubik</option>
-                <option value="Work Sans">Work Sans</option>
-                <option value="Exo 2">Exo 2</option>
-              </optgroup>
+        <label htmlFor="font-family">Font:</label>
+        <select 
+          id="font-family" 
+          value={textStyle.fontFamily}
+          onChange={handleFontFamilyChange}
+          className={styles.fontSelect} // Changed from styles.select to styles.fontSelect
+        >
+          <optgroup label="Classic & Web Safe">
+            <option value="Arial">Arial</option>
+            <option value="Verdana">Verdana</option>
+            <option value="Helvetica">Helvetica</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Courier New">Courier New</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Tahoma">Tahoma</option>
+            <option value="Trebuchet MS">Trebuchet MS</option>
+            <option value="Impact">Impact</option>
+            <option value="Comic Sans MS">Comic Sans MS</option>
+          </optgroup>
 
-              <optgroup label="Display & Impact">
-                <option value="Oswald">Oswald</option>
-                <option value="Bebas Neue">Bebas Neue</option>
-                <option value="Anton">Anton</option>
-                <option value="Raleway">Raleway (Elegant Sans)</option>
-                <option value="Fredoka One">Fredoka One (Rounded)</option>
-                <option value="Righteous">Righteous (Art Deco)</option>
-                <option value="Alfa Slab One">Alfa Slab One (Slab Serif)</option>
-                <option value="Black Ops One">Black Ops One (Stencil)</option>
-                <option value="Bungee">Bungee (Vertical Display)</option>
-                <option value="Orbitron">Orbitron (Sci-Fi)</option>
-                <option value="Russo One">Russo One (Bold Sans)</option>
-                <option value="Staatliches">Staatliches (Condensed)</option>
-              </optgroup>
+          <optgroup label="Modern Sans-Serif">
+            <option value="Inter">Inter</option>
+            <option value="Poppins">Poppins</option>
+            <option value="Montserrat">Montserrat</option>
+            <option value="Nunito">Nunito</option>
+            <option value="Rubik">Rubik</option>
+            <option value="Work Sans">Work Sans</option>
+            <option value="Exo 2">Exo 2</option>
+          </optgroup>
 
-              <optgroup label="Elegant Serif">
-                <option value="Playfair Display">Playfair Display</option>
-                <option value="Merriweather">Merriweather</option>
-                <option value="Crimson Text">Crimson Text</option>
-                <option value="Libre Baskerville">Libre Baskerville</option>
-                <option value="Cormorant Garamond">Cormorant Garamond</option>
-                <option value="EB Garamond">EB Garamond</option>
-              </optgroup>
+          <optgroup label="Display & Impact">
+            <option value="Oswald">Oswald</option>
+            <option value="Bebas Neue">Bebas Neue</option>
+            <option value="Anton">Anton</option>
+            <option value="Raleway">Raleway</option>
+            <option value="Fredoka One">Fredoka One</option>
+            <option value="Righteous">Righteous</option>
+            <option value="Alfa Slab One">Alfa Slab One</option>
+            <option value="Black Ops One">Black Ops One</option>
+            <option value="Bungee">Bungee</option>
+            <option value="Orbitron">Orbitron</option>
+            <option value="Russo One">Russo One</option>
+            <option value="Staatliches">Staatliches</option>
+          </optgroup>
 
-              <optgroup label="Script & Handwritten">
-                <option value="Pacifico">Pacifico</option>
-                <option value="Dancing Script">Dancing Script</option>
-                <option value="Great Vibes">Great Vibes</option>
-                <option value="Satisfy">Satisfy</option>
-                <option value="Kaushan Script">Kaushan Script</option>
-                <option value="Caveat">Caveat</option>
-                <option value="Indie Flower">Indie Flower</option>
-                <option value="Shadows Into Light">Shadows Into Light</option>
-                <option value="Permanent Marker">Permanent Marker</option>
-                <option value="Architects Daughter">Architects Daughter</option>
-                <option value="Kalam">Kalam</option>
-              </optgroup>
-              
-              <optgroup label="Unique & Thematic">
-                <option value="Amatic SC">Amatic SC (Narrow Hand)</option>
-              </optgroup>
+          <optgroup label="Elegant Serif">
+            <option value="Playfair Display">Playfair Display</option>
+            <option value="Merriweather">Merriweather</option>
+            <option value="Crimson Text">Crimson Text</option>
+            <option value="Libre Baskerville">Libre Baskerville</option>
+            <option value="Cormorant Garamond">Cormorant Garamond</option>
+            <option value="EB Garamond">EB Garamond</option>
+          </optgroup>
 
-              <optgroup label="Monospace & Code">
-                <option value="Fira Code">Fira Code</option>
-                <option value="Space Mono">Space Mono</option>
-                <option value="JetBrains Mono">JetBrains Mono</option>
-              </optgroup>
-            </select>
-          </div>
+          <optgroup label="Script & Handwritten">
+            <option value="Pacifico">Pacifico</option>
+            <option value="Dancing Script">Dancing Script</option>
+            <option value="Great Vibes">Great Vibes</option>
+            <option value="Satisfy">Satisfy</option>
+            <option value="Kaushan Script">Kaushan Script</option>
+            <option value="Caveat">Caveat</option>
+            <option value="Indie Flower">Indie Flower</option>
+            <option value="Shadows Into Light">Shadows Into Light</option>
+            <option value="Permanent Marker">Permanent Marker</option>
+            <option value="Architects Daughter">Architects Daughter</option>
+            <option value="Kalam">Kalam</option>
+          </optgroup>
+          
+          <optgroup label="Unique & Thematic">
+            <option value="Amatic SC">Amatic SC</option>
+          </optgroup>
+
+          <optgroup label="Monospace & Code">
+            <option value="Fira Code">Fira Code</option>
+            <option value="Space Mono">Space Mono</option>
+            <option value="JetBrains Mono">JetBrains Mono</option>
+          </optgroup>
+        </select>
+      </div>
+
 
           <div className={styles.formGroup}>
             <label htmlFor="font-size">Size: {textStyle.fontSize}px</label>

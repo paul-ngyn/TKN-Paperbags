@@ -472,6 +472,105 @@
   background-color: #fff5f5 !important; /* Ensure this overrides other background styles */
 }
 
+.fontSelect {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+  font-size: 14px;
+}
+
+.fontSelect optgroup {
+  font-weight: bold;
+  color: #666;
+  font-family: var(--font-geist-sans), Arial, sans-serif;
+  font-style: normal;
+}
+
+/* Classic & Web Safe Fonts */
+.fontSelect option[value="Arial"] { font-family: Arial, sans-serif; }
+.fontSelect option[value="Verdana"] { font-family: Verdana, sans-serif; }
+.fontSelect option[value="Helvetica"] { font-family: Helvetica, sans-serif; }
+.fontSelect option[value="Times New Roman"] { font-family: "Times New Roman", serif; }
+.fontSelect option[value="Courier New"] { font-family: "Courier New", monospace; }
+.fontSelect option[value="Georgia"] { font-family: Georgia, serif; }
+.fontSelect option[value="Tahoma"] { font-family: Tahoma, sans-serif; }
+.fontSelect option[value="Trebuchet MS"] { font-family: "Trebuchet MS", sans-serif; }
+.fontSelect option[value="Impact"] { font-family: Impact, sans-serif; }
+.fontSelect option[value="Comic Sans MS"] { font-family: "Comic Sans MS", cursive; }
+
+/* Modern Sans-Serif */
+.fontSelect option[value="Inter"] { font-family: "Inter", sans-serif; }
+.fontSelect option[value="Poppins"] { font-family: "Poppins", sans-serif; }
+.fontSelect option[value="Montserrat"] { font-family: "Montserrat", sans-serif; }
+.fontSelect option[value="Nunito"] { font-family: "Nunito", sans-serif; }
+.fontSelect option[value="Rubik"] { font-family: "Rubik", sans-serif; }
+.fontSelect option[value="Work Sans"] { font-family: "Work Sans", sans-serif; }
+.fontSelect option[value="Exo 2"] { font-family: "Exo 2", sans-serif; }
+
+/* Display & Impact */
+.fontSelect option[value="Oswald"] { font-family: "Oswald", sans-serif; }
+.fontSelect option[value="Bebas Neue"] { font-family: "Bebas Neue", sans-serif; }
+.fontSelect option[value="Anton"] { font-family: "Anton", sans-serif; }
+.fontSelect option[value="Raleway"] { font-family: "Raleway", sans-serif; }
+.fontSelect option[value="Fredoka One"] { font-family: "Fredoka One", sans-serif; }
+.fontSelect option[value="Righteous"] { font-family: "Righteous", sans-serif; }
+.fontSelect option[value="Alfa Slab One"] { font-family: "Alfa Slab One", serif; }
+.fontSelect option[value="Black Ops One"] { font-family: "Black Ops One", sans-serif; }
+.fontSelect option[value="Bungee"] { font-family: "Bungee", sans-serif; }
+.fontSelect option[value="Orbitron"] { font-family: "Orbitron", sans-serif; }
+.fontSelect option[value="Russo One"] { font-family: "Russo One", sans-serif; }
+.fontSelect option[value="Staatliches"] { font-family: "Staatliches", sans-serif; }
+
+/* Elegant Serif */
+.fontSelect option[value="Playfair Display"] { font-family: "Playfair Display", serif; }
+.fontSelect option[value="Merriweather"] { font-family: "Merriweather", serif; }
+.fontSelect option[value="Crimson Text"] { font-family: "Crimson Text", serif; }
+.fontSelect option[value="Libre Baskerville"] { font-family: "Libre Baskerville", serif; }
+.fontSelect option[value="Cormorant Garamond"] { font-family: "Cormorant Garamond", serif; }
+.fontSelect option[value="EB Garamond"] { font-family: "EB Garamond", serif; }
+
+/* Script & Handwritten */
+.fontSelect option[value="Pacifico"] { font-family: "Pacifico", cursive; }
+.fontSelect option[value="Dancing Script"] { font-family: "Dancing Script", cursive; }
+.fontSelect option[value="Great Vibes"] { font-family: "Great Vibes", cursive; }
+.fontSelect option[value="Satisfy"] { font-family: "Satisfy", cursive; }
+.fontSelect option[value="Kaushan Script"] { font-family: "Kaushan Script", cursive; }
+.fontSelect option[value="Caveat"] { font-family: "Caveat", cursive; }
+.fontSelect option[value="Indie Flower"] { font-family: "Indie Flower", cursive; }
+.fontSelect option[value="Shadows Into Light"] { font-family: "Shadows Into Light", cursive; }
+.fontSelect option[value="Permanent Marker"] { font-family: "Permanent Marker", cursive; }
+.fontSelect option[value="Architects Daughter"] { font-family: "Architects Daughter", cursive; }
+.fontSelect option[value="Kalam"] { font-family: "Kalam", cursive; }
+.fontSelect option[value="Amatic SC"] { font-family: "Amatic SC", sans-serif; }
+
+/* Monospace & Code */
+.fontSelect option[value="Fira Code"] { font-family: "Fira Code", monospace; }
+.fontSelect option[value="Space Mono"] { font-family: "Space Mono", monospace; }
+.fontSelect option[value="JetBrains Mono"] { font-family: "JetBrains Mono", monospace; }
+
+.fontPreview {
+  margin-top: 8px;
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  font-size: 16px;
+  text-align: center;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.fontPreview:hover {
+  background-color: #f0f8ff;
+  border-color: #1c51a3;
+}
 .textPreviewContainer {
   margin-bottom: 16px;
   padding: 15px;
