@@ -432,7 +432,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               <p>Validating image...</p>
             ) : (
               <>
-                <p>Drag & drop your logos here, or click to browse</p>
+                <small>Drag & drop your logos here, or click to browse</small>
                 <div className={styles.requirements}>
                   <small>
                     Min Dimensions: {IMAGE_REQUIREMENTS.minWidth} x {IMAGE_REQUIREMENTS.minHeight}px
@@ -502,7 +502,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           onChange={handleFontFamilyChange}
           className={styles.fontSelect} 
         >
-          <optgroup label="Classic & Web Safe">
+          <optgroup label="- Classic -">
             <option value="Arial">Arial</option>
             <option value="Verdana">Verdana</option>
             <option value="Helvetica">Helvetica</option>
@@ -515,7 +515,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             <option value="Comic Sans MS">Comic Sans MS</option>
           </optgroup>
 
-          <optgroup label="Modern Sans-Serif">
+          <optgroup label="- Modern Sans-Serif -">
             <option value="Inter">Inter</option>
             <option value="Poppins">Poppins</option>
             <option value="Montserrat">Montserrat</option>
@@ -525,7 +525,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             <option value="Exo 2">Exo 2</option>
           </optgroup>
 
-          <optgroup label="Display & Impact">
+          <optgroup label="- Display & Impact -">
             <option value="Oswald">Oswald</option>
             <option value="Bebas Neue">Bebas Neue</option>
             <option value="Anton">Anton</option>
@@ -540,7 +540,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             <option value="Staatliches">Staatliches</option>
           </optgroup>
 
-          <optgroup label="Elegant Serif">
+          <optgroup label="- Elegant Serif -">
             <option value="Playfair Display">Playfair Display</option>
             <option value="Merriweather">Merriweather</option>
             <option value="Crimson Text">Crimson Text</option>
@@ -548,7 +548,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             <option value="Cormorant Garamond">Cormorant Garamond</option>
             <option value="EB Garamond">EB Garamond</option>
           </optgroup>
-          <optgroup label="Script & Handwritten">
+          <optgroup label="- Script & Handwritten -">
             <option value="Pacifico">Pacifico</option>
             <option value="Dancing Script">Dancing Script</option>
             <option value="Great Vibes">Great Vibes</option>
@@ -562,11 +562,11 @@ const Sidebar: React.FC<SidebarProps> = ({
             <option value="Kalam">Kalam</option>
           </optgroup>
           
-          <optgroup label="Unique & Thematic">
+          <optgroup label="- Unique & Thematic -">
             <option value="Amatic SC">Amatic SC</option>
           </optgroup>
 
-          <optgroup label="Monospace & Code">
+          <optgroup label="- Monospace & Code -">
             <option value="Fira Code">Fira Code</option>
             <option value="Space Mono">Space Mono</option>
             <option value="JetBrains Mono">JetBrains Mono</option>

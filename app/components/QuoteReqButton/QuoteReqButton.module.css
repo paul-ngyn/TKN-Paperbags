@@ -5,8 +5,8 @@
   cursor: pointer;
   position: fixed;
   top: 1vh;
-  left: 92.2%;
-  padding: 8px 11px; /* Add padding for better appearance */
+  left: 92.5%;
+  padding: 9px 12px; /* Add padding for better appearance */
   border-radius: 8px; /* Border radius */
   transition: background-color 0.3s ease; /* Smooth transition for hover effect */
 }

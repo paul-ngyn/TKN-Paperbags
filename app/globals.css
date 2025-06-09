@@ -100,7 +100,6 @@ html, body {
   display: flex;
   justify-content: space-around;
   align-items: stretch; /* Makes all feature containers the same height */
-  gap: 2rem;
   flex-wrap: wrap;
 }
 

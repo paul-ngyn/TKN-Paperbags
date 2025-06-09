@@ -241,7 +241,7 @@
   justify-content: center;
   border: 2px dashed #ccc;
   border-radius: 6px;
-  padding: 1.5rem;
+  padding: 0.5rem;
   cursor: pointer;
   text-align: center;
   transition: background-color 0.2s ease;
@@ -258,7 +258,7 @@
 .dropIcon {
   width: 40px;
   height: 40px;
-  opacity: 0.7;
+  opacity: 0.85;
 }
 
 .dragOver {
@@ -267,7 +267,7 @@
 }
 
 .fileName {
-  margin-top: 10px;
+  margin-top: 2px;
   font-size: 0.9rem;
   color: #333;
   word-break: break-all;
@@ -374,7 +374,7 @@
 }
 
 .formGroup {
-  margin-bottom: 5px;
+  margin-bottom: 8px;
 }
 
 .formGroup label {
@@ -440,7 +440,7 @@
   color: #007bff; /* Or your theme's primary color */
   font-size: 12px;
   font-weight: 500;
-  margin-top: 8px;
+  margin-top: 2px;
   text-align: center;
 }
 
@@ -457,8 +457,8 @@
 }
 
 .dropZone.error {
-  border-color: #ff3b30; /* Red border for drop zone on error */
-  background-color: #fff5f5; /* Very light red background for drop zone on error */
+  border-color: #ff3b30; 
+  background-color: #fff5f5; 
 }
 
 .addLogoButton:disabled {
@@ -466,10 +466,9 @@
   cursor: not-allowed;
 }
 
-/* ... rest of your styles ... */
 .outOfRange {
-  border-color: #ff3b30 !important; /* Ensure this overrides other border styles */
-  background-color: #fff5f5 !important; /* Ensure this overrides other background styles */
+  border-color: #ff3b30 !important; 
+  background-color: #fff5f5 !important; 
 }
 
 .fontSelect {
@@ -478,16 +477,24 @@
   border: 1px solid #ccc;
   border-radius: 4px;
   background-color: white;
-  font-size: 14px;
+  font-size: 16px;
+  margin-bottom: 2px;
 }
 
 .fontSelect optgroup {
   font-weight: bold;
-  color: #666;
+  color: #1c51a3;
   font-family: var(--font-geist-sans), Arial, sans-serif;
   font-style: normal;
+  font-size: 18px;
 }
 
+.fontSelect option {
+  text-decoration: none !important;
+  font-weight: normal;
+  color: #333;
+  font-size: 16px;
+}
 /* Classic & Web Safe Fonts */
 .fontSelect option[value="Arial"] { font-family: Arial, sans-serif; }
 .fontSelect option[value="Verdana"] { font-family: Verdana, sans-serif; }
