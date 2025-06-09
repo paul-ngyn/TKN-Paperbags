@@ -6,7 +6,7 @@ import styles from "./Sidebar.module.css";
 import downloadicon from "../../public/downloadicon.png";
 import BlueprintExample from "../../public/BlueprintExample.png";
 import { BagDimensions, mmToInches} from "../../util/BagDimensions";
-import { removeBackground } from '@imgly/background-removal';
+/* import { removeBackground } from '@imgly/background-removal'; */
 
 
 // Extended props to support text customization
