@@ -6,6 +6,7 @@ import styles from "./Sidebar.module.css";
 import downloadicon from "../../public/downloadicon.png";
 import BlueprintExample from "../../public/BlueprintExample.png";
 import { BagDimensions, mmToInches} from "../../util/BagDimensions";
+import { removeBackground } from '@imgly/background-removal';
 
 
 // Extended props to support text customization
@@ -287,7 +288,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       await validateAndUploadFiles(e.dataTransfer.files);
     }
   };
-
+  
 
   const handleFileInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -295,6 +296,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       await validateAndUploadFiles(files);
     }
   };
+
 
 
   const handleClick = () => {

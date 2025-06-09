@@ -8,6 +8,7 @@
     "start": "next start -p 3001"
   },
   "dependencies": {
+    "@imgly/background-removal": "^1.6.0",
     "@react-pdf/renderer": "^4.3.0",
     "@vercel/speed-insights": "^1.2.0",
     "blob-stream": "^0.1.3",
