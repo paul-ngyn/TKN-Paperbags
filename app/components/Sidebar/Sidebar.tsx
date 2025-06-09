@@ -509,6 +509,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               onChange={handleFontFamilyChange}
               className={styles.select}
             >
+              <optgroup label="Classic & Web Safe"></optgroup>
               <option value="Arial">Arial</option>
               <option value="Verdana">Verdana</option>
               <option value="Helvetica">Helvetica</option>
@@ -520,6 +521,63 @@ const Sidebar: React.FC<SidebarProps> = ({
               <option value="Impact">Impact</option>
               <option value="Comic Sans MS">Comic Sans MS</option>
               
+             <optgroup label="Modern Sans-Serif">
+                <option value="Inter">Inter</option>
+                <option value="Poppins">Poppins</option>
+                <option value="Montserrat">Montserrat</option>
+                <option value="Nunito">Nunito</option>
+                <option value="Rubik">Rubik</option>
+                <option value="Work Sans">Work Sans</option>
+                <option value="Exo 2">Exo 2</option>
+              </optgroup>
+
+              <optgroup label="Display & Impact">
+                <option value="Oswald">Oswald</option>
+                <option value="Bebas Neue">Bebas Neue</option>
+                <option value="Anton">Anton</option>
+                <option value="Raleway">Raleway (Elegant Sans)</option>
+                <option value="Fredoka One">Fredoka One (Rounded)</option>
+                <option value="Righteous">Righteous (Art Deco)</option>
+                <option value="Alfa Slab One">Alfa Slab One (Slab Serif)</option>
+                <option value="Black Ops One">Black Ops One (Stencil)</option>
+                <option value="Bungee">Bungee (Vertical Display)</option>
+                <option value="Orbitron">Orbitron (Sci-Fi)</option>
+                <option value="Russo One">Russo One (Bold Sans)</option>
+                <option value="Staatliches">Staatliches (Condensed)</option>
+              </optgroup>
+
+              <optgroup label="Elegant Serif">
+                <option value="Playfair Display">Playfair Display</option>
+                <option value="Merriweather">Merriweather</option>
+                <option value="Crimson Text">Crimson Text</option>
+                <option value="Libre Baskerville">Libre Baskerville</option>
+                <option value="Cormorant Garamond">Cormorant Garamond</option>
+                <option value="EB Garamond">EB Garamond</option>
+              </optgroup>
+
+              <optgroup label="Script & Handwritten">
+                <option value="Pacifico">Pacifico</option>
+                <option value="Dancing Script">Dancing Script</option>
+                <option value="Great Vibes">Great Vibes</option>
+                <option value="Satisfy">Satisfy</option>
+                <option value="Kaushan Script">Kaushan Script</option>
+                <option value="Caveat">Caveat</option>
+                <option value="Indie Flower">Indie Flower</option>
+                <option value="Shadows Into Light">Shadows Into Light</option>
+                <option value="Permanent Marker">Permanent Marker</option>
+                <option value="Architects Daughter">Architects Daughter</option>
+                <option value="Kalam">Kalam</option>
+              </optgroup>
+              
+              <optgroup label="Unique & Thematic">
+                <option value="Amatic SC">Amatic SC (Narrow Hand)</option>
+              </optgroup>
+
+              <optgroup label="Monospace & Code">
+                <option value="Fira Code">Fira Code</option>
+                <option value="Space Mono">Space Mono</option>
+                <option value="JetBrains Mono">JetBrains Mono</option>
+              </optgroup>
             </select>
           </div>
 

@@ -3,7 +3,6 @@ import localFont from "next/font/local";
 import '../app/globals.css';
 import { SpeedInsights } from "@vercel/speed-insights/next"
 
-
 // Add these two imports
 import NavBar from './components/NavBar/NavBar';
 import Footer from './components/Footer/Footer';
@@ -33,7 +32,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={geistSans.variable}>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <NavBar />
         <div className="container">
