@@ -644,5 +644,25 @@
   gap: 10px; /* More gap between buttons */
 }
 
+.loader {
+  border: 4px solid #f3f3f3; /* Light grey */
+  border-top: 4px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 20px; /* Adjust size as needed */
+  height: 20px; /* Adjust size as needed */
+  animation: spin 1s linear infinite;
+  display: inline-block; /* To sit next to text if ever needed, or center in button */
+  margin-right: 8px; /* If you want space next to text (not used in this button case) */
+}
 
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 
+/* Adjust button styles when loading */
+.applyButton.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

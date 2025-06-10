@@ -73,10 +73,10 @@ html, body {
 .section-title::before,
 .section-title::after, .section-title2::before, .section-title2::after {
   content: "";
-  flex: 0 0 60px; /* Set a fixed width for the lines */
+  flex: 0 0 50px; /* Set a fixed width for the lines */
   border-bottom: 3px solid black;
   border-radius: 20px;
-  margin: 0 10px; /* Adjust the margin to bring the lines closer to the title */
+  margin: 0 40px; /* Adjust the margin to bring the lines closer to the title */
 }
 
 .section-title h2, .section-title2 h2 {

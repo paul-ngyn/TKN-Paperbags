@@ -898,19 +898,26 @@ const Sidebar: React.FC<SidebarProps> = ({
           <div className={styles.modalContent}>
             <h3>Background Image Options</h3>
             <p>This image is a {pendingFileUpload[0].type.split('/')[1].toUpperCase()} and contains a non-transparent background. Do you want to attempt to remove its background?</p>
-            <p><small>Choose Remove Background for logos or images. Choose Keep Original for photographs or complex images.</small></p>
+            <p><small>Choose <strong>Remove Background</strong> for plain logos or images. Choose <strong> Keep Original </strong> for photographs or complex images.</small></p>
             <div className={styles.buttonGroup} style={{ marginTop: '20px', justifyContent: 'center' }}>
               <button 
                 onClick={() => processFileWithBackgroundRemoval(pendingFileUpload)} 
-                className={styles.applyButton}
+                className={`${styles.applyButton} ${isProcessingBackground ? styles.loading : ''}`}
                 disabled={isProcessingBackground}
               >
-                {isProcessingBackground ? 'Processing...' : 'Remove Background'}
+                {isProcessingBackground ? (
+                  <>
+                    <span className={styles.loader}></span>
+                    Processing...
+                  </>
+                ) : (
+                  'Remove Background'
+                )}
               </button>
               <button 
                 onClick={() => processFileWithoutBackgroundRemoval(pendingFileUpload)} 
                 className={styles.resetButton}
-                disabled={isProcessingBackground}
+                disabled={isProcessingBackground} // Also disable this button during processing
               >
                 Keep Original
               </button>
