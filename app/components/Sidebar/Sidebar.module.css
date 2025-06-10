@@ -598,3 +598,51 @@
   word-break: break-word;
   max-width: 100%;
 }
+
+
+.modalContent {
+  background-color: white;
+  padding: 25px 30px; /* Increased padding */
+  border-radius: 8px;
+  position: relative;
+  max-width: 500px; /* Max width for content */
+  width: 90%; /* Responsive width */
+  max-height: 90vh; /* Max height */
+  overflow-y: auto; /* Scroll if content overflows */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  text-align: center; /* Center align text for choice modal */
+  padding-top: 30px;
+  bottom: 7.5vh;
+}
+
+.modalContent h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1.4rem;
+  color: #333;
+}
+
+.modalContent p {
+  margin-bottom: 10px;
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.6;
+}
+
+.modalContent p small {
+  display: block;
+  margin-top: 5px; /* Space out the small text */
+  margin-bottom: 20px; /* More space before buttons */
+  font-size: 0.85rem;
+  color: #777;
+}
+
+.modalContent .buttonGroup {
+  margin-top: 25px; /* More space above buttons */
+  display: flex;
+  justify-content: center; /* Center buttons */
+  gap: 10px; /* More gap between buttons */
+}
+
+
+

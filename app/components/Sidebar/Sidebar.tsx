@@ -138,8 +138,11 @@ const Sidebar: React.FC<SidebarProps> = ({
   // Add state for upload validation
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isValidating, setIsValidating] = useState(false);
-  const [isProcessingBackground, setIsProcessingBackground] = useState(false); // New state for background removal
+  const [isProcessingBackground, setIsProcessingBackground] = useState(false); 
 
+  // State for user choice on background removal
+  const [showBackgroundChoiceModal, setShowBackgroundChoiceModal] = useState(false);
+  const [pendingFileUpload, setPendingFileUpload] = useState<FileList | null>(null);
   
 
   useEffect(() => {
@@ -248,6 +251,50 @@ const Sidebar: React.FC<SidebarProps> = ({
     setInputValues({ length: lengthInches.toString(), width: widthInches.toString(), height: heightInches.toString() });
   };
 
+  const processFileWithBackgroundRemoval = async (filesToProcess: FileList) => {
+    if (!filesToProcess) return;
+    const file = filesToProcess[0];
+    setIsProcessingBackground(true);
+    try {
+      const imageUrl = URL.createObjectURL(file);
+      console.log('Starting background removal for:', file.name, file.type);
+      const processedBlob = await removeBackground(imageUrl);
+      URL.revokeObjectURL(imageUrl);
+      console.log('Background removal successful. Blob size:', processedBlob.size);
+      const processedFile = new File(
+        [processedBlob],
+        file.name.replace(/\.[^/.]+$/, "") + "_bg_removed.png",
+        { type: 'image/png' }
+      );
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(processedFile);
+      handleLogoUpload(dataTransfer.files);
+      setFileName(`${processedFile.name} (background removed)`);
+    } catch (error) {
+      console.error("Background removal failed:", error);
+      setUploadError("Background removal failed. Using original image.");
+      if (onUploadError) {
+        onUploadError("Background removal failed. Using original image.");
+      }
+      handleLogoUpload(filesToProcess); // Fallback to original
+      setFileName(file.name);
+    } finally {
+      setIsProcessingBackground(false);
+      setPendingFileUpload(null);
+      setShowBackgroundChoiceModal(false);
+    }
+  };
+
+  const processFileWithoutBackgroundRemoval = (filesToProcess: FileList) => {
+    if (!filesToProcess) return;
+    const file = filesToProcess[0];
+    handleLogoUpload(filesToProcess);
+    setFileName(`${file.name} (original)`);
+    setPendingFileUpload(null);
+    setShowBackgroundChoiceModal(false);
+  };
+
+
   // Function to handle file validation and upload
   const validateAndUploadFiles = async (files: FileList) => {
     if (!files || files.length === 0) return;
@@ -255,6 +302,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     setIsValidating(true);
     setUploadError(null);
     setFileName(null);
+    setShowBackgroundChoiceModal(false); // Reset modal state
   
     const file = files[0];
     const validationResult = await validateImageFile(file);
@@ -270,55 +318,21 @@ const Sidebar: React.FC<SidebarProps> = ({
     
     setIsValidating(false);
   
-    // Skip background removal for PNGs (they likely already have transparency)
+    // For PNGs, assume they might have transparency and upload as is.
     if (file.type === 'image/png') {
-      console.log('PNG detected, using original file (likely already has transparent background)');
-      handleLogoUpload(files);
-      setFileName(`${file.name} (PNG - original)`);
+      console.log('PNG detected, using original file.');
+      processFileWithoutBackgroundRemoval(files); // Use helper to set filename correctly
       return;
     }
   
-    setIsProcessingBackground(true);
-  
-    try {
-      // Create object URL for the file
-      const imageUrl = URL.createObjectURL(file);
-      
-      console.log('Starting background removal for:', file.name, file.type);
-  
-      // Remove background for non-PNG files
-      const processedBlob = await removeBackground(imageUrl);
-      URL.revokeObjectURL(imageUrl);
-  
-      console.log('Background removal successful. Blob size:', processedBlob.size);
-  
-      // Create new file with processed image
-      const processedFile = new File(
-        [processedBlob], 
-        file.name.replace(/\.[^/.]+$/, "") + "_bg_removed.png", 
-        { type: 'image/png' }
-      );
-      
-      // Create FileList for upload
-      const dataTransfer = new DataTransfer();
-      dataTransfer.items.add(processedFile);
-      
-      handleLogoUpload(dataTransfer.files);
-      setFileName(`${processedFile.name} (background removed)`);
-  
-    } catch (error) {
-      console.error("Background removal failed:", error);
-      
-      setUploadError("Background removal failed. Using original image.");
-      if (onUploadError) {
-        onUploadError("Background removal failed. Using original image.");
-      }
-      
-      // Fallback to original file
-      handleLogoUpload(files);
-      setFileName(file.name);
-    } finally {
-      setIsProcessingBackground(false);
+    // For JPEGs and other types where background removal might be desired, ask the user.
+    if (file.type === 'image/jpeg' || file.type === 'image/jpg' || file.type === 'image/webp' || file.type === 'image/gif') {
+      setPendingFileUpload(files);
+      setShowBackgroundChoiceModal(true);
+    } else {
+      // For any other unexpected types that passed validation (if any), upload as is.
+      console.log(`Unsupported type for background removal choice: ${file.type}, uploading as original.`);
+      processFileWithoutBackgroundRemoval(files);
     }
   };
 
@@ -495,7 +509,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             {isValidating ? (
               <p>Validating image...</p>
             ) : isProcessingBackground ? (
-              <p>Uploading Image...</p>
+              <p>Processing image...</p>
             ) : (
               <>
                 <small>Drag & drop your logos here, or click to browse</small>
@@ -537,7 +551,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             <button 
               onClick={handleClick}
               className={styles.addLogoButton}
-              disabled={isValidating || isProcessingBackground}
+              disabled={isValidating || isProcessingBackground || showBackgroundChoiceModal}
             >
               {isValidating ? 'Validating...' : isProcessingBackground ? 'Processing...' : `Add ${logoCount > 0 ? 'Another' : 'New'} Logo`}
             </button>
@@ -623,7 +637,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             <option value="Caveat">Caveat</option>
             <option value="Indie Flower">Indie Flower</option>
             <option value="Shadows Into Light">Shadows Into Light</option>
-            <option value="Permanent Marker">Permanent Marker</option>
+            <option value="Permanent Marker">Permanent Marker</option>            
             <option value="Architects Daughter">Architects Daughter</option>
             <option value="Kalam">Kalam</option>
           </optgroup>
@@ -873,6 +887,33 @@ const Sidebar: React.FC<SidebarProps> = ({
                 height={1200}
                 className={styles.blueprintImage}
               />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal for background removal choice */}
+      {showBackgroundChoiceModal && pendingFileUpload && (
+        <div className={styles.modal}>
+          <div className={styles.modalContent}>
+            <h3>Background Image Options</h3>
+            <p>This image is a {pendingFileUpload[0].type.split('/')[1].toUpperCase()} and contains a non-transparent background. Do you want to attempt to remove its background?</p>
+            <p><small>Choose "Remove Background" for logos or images. Choose "Keep Original" for photographs or complex images.</small></p>
+            <div className={styles.buttonGroup} style={{ marginTop: '20px', justifyContent: 'center' }}>
+              <button 
+                onClick={() => processFileWithBackgroundRemoval(pendingFileUpload)} 
+                className={styles.applyButton}
+                disabled={isProcessingBackground}
+              >
+                {isProcessingBackground ? 'Processing...' : 'Remove Background'}
+              </button>
+              <button 
+                onClick={() => processFileWithoutBackgroundRemoval(pendingFileUpload)} 
+                className={styles.resetButton}
+                disabled={isProcessingBackground}
+              >
+                Keep Original
+              </button>
             </div>
           </div>
         </div>
