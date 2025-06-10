@@ -23,4 +23,4 @@ const ImageSubHeader: React.FC<ImageSubHeaderProps> = ({ setPage }) => {
   );
 };
 
-export default ImageSubHeader;
+export default ImageSubHeader; 

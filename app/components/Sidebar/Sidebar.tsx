@@ -6,7 +6,7 @@ import styles from "./Sidebar.module.css";
 import downloadicon from "../../public/downloadicon.png";
 import BlueprintExample from "../../public/BlueprintExample.png";
 import { BagDimensions, mmToInches} from "../../util/BagDimensions";
-/* import { removeBackground } from '@imgly/background-removal'; */
+import { removeBackground } from '@imgly/background-removal';
 
 
 // Extended props to support text customization
@@ -138,6 +138,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   // Add state for upload validation
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isValidating, setIsValidating] = useState(false);
+  const [isProcessingBackground, setIsProcessingBackground] = useState(false); // New state for background removal
+
   
 
   useEffect(() => {
@@ -206,7 +208,9 @@ const Sidebar: React.FC<SidebarProps> = ({
     if (value && !isNaN(parseFloat(value))) {
       const numValue = parseFloat(value);
       setTempDimensionsInches({ ...tempDimensionsInches, [name]: numValue });
-      startEditingDimensions();
+      if (startEditingDimensions) {
+        startEditingDimensions();
+      }
     }
   };
   
@@ -250,11 +254,11 @@ const Sidebar: React.FC<SidebarProps> = ({
     
     setIsValidating(true);
     setUploadError(null);
-    setFileName(null); // Clear previous file name
-
-    const file = files[0]; // Assuming single file upload for now
+    setFileName(null);
+  
+    const file = files[0];
     const validationResult = await validateImageFile(file);
-
+  
     if (!validationResult.isValid) {
       setUploadError(validationResult.error || 'Invalid file.');
       if (onUploadError) {
@@ -263,11 +267,59 @@ const Sidebar: React.FC<SidebarProps> = ({
       setIsValidating(false);
       return;
     }
-
-
-    handleLogoUpload(files);
-    setFileName(file.name); 
+    
     setIsValidating(false);
+  
+    // Skip background removal for PNGs (they likely already have transparency)
+    if (file.type === 'image/png') {
+      console.log('PNG detected, using original file (likely already has transparent background)');
+      handleLogoUpload(files);
+      setFileName(`${file.name} (PNG - original)`);
+      return;
+    }
+  
+    setIsProcessingBackground(true);
+  
+    try {
+      // Create object URL for the file
+      const imageUrl = URL.createObjectURL(file);
+      
+      console.log('Starting background removal for:', file.name, file.type);
+  
+      // Remove background for non-PNG files
+      const processedBlob = await removeBackground(imageUrl);
+      URL.revokeObjectURL(imageUrl);
+  
+      console.log('Background removal successful. Blob size:', processedBlob.size);
+  
+      // Create new file with processed image
+      const processedFile = new File(
+        [processedBlob], 
+        file.name.replace(/\.[^/.]+$/, "") + "_bg_removed.png", 
+        { type: 'image/png' }
+      );
+      
+      // Create FileList for upload
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(processedFile);
+      
+      handleLogoUpload(dataTransfer.files);
+      setFileName(`${processedFile.name} (background removed)`);
+  
+    } catch (error) {
+      console.error("Background removal failed:", error);
+      
+      setUploadError("Background removal failed. Using original image.");
+      if (onUploadError) {
+        onUploadError("Background removal failed. Using original image.");
+      }
+      
+      // Fallback to original file
+      handleLogoUpload(files);
+      setFileName(file.name);
+    } finally {
+      setIsProcessingBackground(false);
+    }
   };
 
 
@@ -307,13 +359,17 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   const handleAddTextClick = () => {
     setSidebarMode('text');
-    setTextInput('Your text here');
-    setTextStyle({
+    // If deselecting an active logo when switching to text mode for a *new* text
+    if (activeLogoId && onLogoDeselect) {
+        onLogoDeselect(); 
+    }
+    setTextInput('Your text here'); // Reset for new text
+    setTextStyle({ // Reset style for new text
       fontFamily: 'Arial',
       fontSize: 24,
       color: '#000000',
       fontWeight: 'normal',
-      rotation: 0 // Ensure rotation is set here
+      rotation: 0
     });
   };
   
@@ -354,10 +410,16 @@ const Sidebar: React.FC<SidebarProps> = ({
       handleAddText(textInput, finalTextStyle);
     }
     setSidebarMode('default');
+     if (onLogoDeselect) { // Deselect after applying/adding text
+        onLogoDeselect();
+    }
   };
   
   const cancelTextChanges = () => {
     setSidebarMode('default');
+    if (onLogoDeselect) { // Deselect if user cancels text editing
+        onLogoDeselect();
+    }
   };
 
   const dimensionsChanged = () => {
@@ -417,7 +479,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       {sidebarMode === 'default' && (
         <div className={styles.uploadSection}>
           <div 
-            className={`${styles.dropZone} ${dragActive ? styles.dragOver : ""} ${uploadError ? styles.error : ""}`} // Add error class
+            className={`${styles.dropZone} ${dragActive ? styles.dragOver : ""} ${uploadError ? styles.error : ""}`}
             onClick={handleClick}
             onDragOver={handleDragOver} 
             onDragLeave={handleDragLeave}
@@ -432,6 +494,8 @@ const Sidebar: React.FC<SidebarProps> = ({
             />
             {isValidating ? (
               <p>Validating image...</p>
+            ) : isProcessingBackground ? (
+              <p>Uploading Image...</p>
             ) : (
               <>
                 <small>Drag & drop your logos here, or click to browse</small>
@@ -458,8 +522,8 @@ const Sidebar: React.FC<SidebarProps> = ({
             )}
             <input
               type="file"
-              accept={IMAGE_REQUIREMENTS.allowedTypes.join(',')} // Set accept attribute
-              onChange={handleFileInputChange} // Updated to use validation
+              accept={IMAGE_REQUIREMENTS.allowedTypes.join(',')}
+              onChange={handleFileInputChange}
               ref={fileInputRef}
               style={{ display: "none" }}
             />
@@ -471,11 +535,11 @@ const Sidebar: React.FC<SidebarProps> = ({
               </p>
             )}
             <button 
-              onClick={handleClick} // Updated to clear errors
+              onClick={handleClick}
               className={styles.addLogoButton}
-              disabled={isValidating} // Disable button while validating
+              disabled={isValidating || isProcessingBackground}
             >
-              {isValidating ? 'Validating...' : `Add ${logoCount > 0 ? 'Another' : 'New'} Logo`}
+              {isValidating ? 'Validating...' : isProcessingBackground ? 'Processing...' : `Add ${logoCount > 0 ? 'Another' : 'New'} Logo`}
             </button>
           </div>
         </div>
@@ -618,7 +682,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           </div>
 
           <div className={styles.formGroup}>
-          <label htmlFor="text-rotation">Rotation: {textStyle.rotation}°</label>
+          <label htmlFor="text-rotation">Rotation: {textStyle.rotation || 0}°</label>
           <input
             id="text-rotation"
             type="range"
@@ -651,8 +715,8 @@ const Sidebar: React.FC<SidebarProps> = ({
               fontFamily: textStyle.fontFamily,
               fontSize: `${textStyle.fontSize}px`,
               color: textStyle.color,
-              fontWeight: textStyle.fontWeight
-              // No rotation included
+              fontWeight: textStyle.fontWeight,
+              transform: `rotate(${textStyle.rotation || 0}deg)`
             }}
           >
             {textInput || "Preview"}

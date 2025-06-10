@@ -26,15 +26,13 @@ export interface Logo {
     fontWeight: string;
     rotation?: number;
   };
-  position: {
-    x: number;
-    y: number;
-  };
+  position: { x: number; y: number; };
   size: {
     width: number;
     height: number;
   };
   rotation?: number;
+  hasTransparentBackground?: boolean;
 }
 
 interface LogoItemProps {
