@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import '../app/globals.css';
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import { AuthProvider } from './contexts/AuthContext'
 
 // Add these two imports
 import NavBar from './components/NavBar/NavBar';
@@ -34,13 +35,16 @@ export default function RootLayout({
   return (
     <html lang="en" className={geistSans.variable}>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <NavBar />
-        <div className="container">
-          {children}
-        </div>
-        <Footer />
-        <SpeedInsights/>
+        <AuthProvider>
+          <NavBar />
+          <div className="container">
+            {children}
+          </div>
+          <Footer />
+          <SpeedInsights/>
+        </AuthProvider>
       </body>
     </html>
   );
 }
+

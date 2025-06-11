@@ -7,14 +7,14 @@ import ProductButton from '../ProductButton/ProductButton';
 import AboutUsButton from '../AboutUsButton/AboutUsButton';
 import ContactUsButton from '../ContactUsButton/ContactUsButton';
 import OrderInfoButton from '../OrderInfoButton/OrderInfoButton';
-import styles from './NavBar.module.css';
-import QuoteReqButton from '../QuoteReqButton/QuoteReqButon';
 import DesignButton from '../DesignButton/DesignButton';
+import QuoteReqButton from '../QuoteReqButton/QuoteReqButon';
+import AuthButton from '../AuthButton/AuthButton';
+import styles from './NavBar.module.css';
 
 const NavBar: React.FC = () => {
   const router = useRouter();
 
-  // We'll navigate directly with Next.js router.
   const handleNavigation = (page: string) => {
     router.push(`/${page}`);
   };
@@ -23,7 +23,6 @@ const NavBar: React.FC = () => {
     <nav className={styles.navbar}>
       <ul className={styles.navlist}>
         <li className={styles.navItem}>
-          {/* Pass a callback to your button (instead of setPage). */}
           <LogoButton onClick={() => handleNavigation('logo')} />
         </li>
         <li className={styles.navItem}>
@@ -43,6 +42,9 @@ const NavBar: React.FC = () => {
         </li>
         <li className={styles.navItem}>
           <QuoteReqButton/>
+        </li>
+        <li className={styles.navItem}>
+          <AuthButton />
         </li>
       </ul>
     </nav>

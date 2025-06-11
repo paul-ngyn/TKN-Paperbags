@@ -1,0 +1,71 @@
+.authButton {
+  color: white; /* White text */
+  background-color: #1c51a3; /* Filled background color */
+  border: none;
+  cursor: pointer;
+  position: fixed;
+  top: 1vh;
+  left: 95%;
+  padding: 9px 12px; /* Add padding for better appearance */
+  border-radius: 8px; /* Border radius */
+  transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+  z-index: 1000;
+}
+
+.authButton:hover {
+  background-color: #0056b3;
+}
+
+.userMenu {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: white;
+  margin-right: 10px;
+  margin-left: 10px;
+}
+
+.signOutButton {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  cursor: pointer;
+  position: fixed;
+  top: 1vh;
+  left: 94%;
+  padding: 8px 10px; /* Add padding for better appearance */
+  border-radius: 8px; /* Border radius */
+  transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+  z-index: 1000;
+}
+
+.signOutButton:hover {
+  background-color: #c82333;
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  position: relative;
+  z-index: 1001;
+}
+
+.modalBackdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+}
