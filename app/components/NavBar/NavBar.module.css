@@ -1,6 +1,6 @@
 .navbar {
   background-color: #ffffff;
-  padding: 1.85rem;
+  padding: 0.6rem;
   width: 100%; /* Takes up the full width of the screen */
   margin: 0 auto; /* Centers the navbar horizontally */
   position: fixed;
@@ -14,7 +14,7 @@
 .navlist {
   list-style: none;
   display: flex;
-  gap: 6rem;
+  gap: 5rem;
   padding: 0;
   margin: 0;
   justify-content: space-between; /* Distribute space evenly between items */

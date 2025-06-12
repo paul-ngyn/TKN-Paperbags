@@ -15,10 +15,8 @@ const AuthButton: React.FC = () => {
  
   if (user) {
     return (
-      <div className={styles.userMenu}>
-        <span className={styles.userMenuText}>
-          Welcome, {userProfile?.name || user.email?.split('@')[0]}
-        </span>
+      // Added styles.authWrapper for consistent sizing
+      <div className={`${styles.authWrapper} ${styles.userMenu}`}>
         <button onClick={signOut} className={styles.signOutButton}>
           Sign Out
         </button>
@@ -27,7 +25,8 @@ const AuthButton: React.FC = () => {
   }
 
   return (
-    <div>
+    // Added styles.authWrapper for consistent sizing
+    <div className={styles.authWrapper}>
       <button onClick={handleOpenModal} className={styles.authButton}>
         Login
       </button>

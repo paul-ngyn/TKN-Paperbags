@@ -9,7 +9,7 @@ interface ProductButtonProps {
 const ProductButton: React.FC<ProductButtonProps> = ({ onClick }) => {
   return (
     <button onClick={() => onClick('product')} className={styles.navButton}>
-      Bags
+      Our Bags
     </button>
   );
 };

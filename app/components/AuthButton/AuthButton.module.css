@@ -1,46 +1,55 @@
-.authButton {
-  color: white; /* White text */
-  background-color: #1c51a3; /* Filled background color */
+.authWrapper {
+  display: flex;
+  align-items: center;
+  height: 105%; 
+  justify-content: center; 
+}
+
+.userMenu { 
+  width: 100%; 
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between; 
+  gap: 1rem; 
+  color: white; 
+}
+
+.userMenuText {
+  color: black; 
+  white-space: nowrap; 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+  font-size: 14px;
+  align-items: center;
+}
+
+.authButton,
+.signOutButton {
+  color: white;
   border: none;
   cursor: pointer;
-  position: fixed;
-  top: 1vh;
-  left: 95%;
-  padding: 9px 12px; /* Add padding for better appearance */
-  border-radius: 8px; /* Border radius */
-  transition: background-color 0.3s ease; /* Smooth transition for hover effect */
-  z-index: 1000;
+  padding: 9px 12px; 
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+  white-space: nowrap; 
+  font-size: 0.9rem; 
+  margin-left: 55%;
+}
+
+.authButton {
+  background-color: #1c51a3; 
 }
 
 .authButton:hover {
-  background-color: #0056b3;
-}
-
-.userMenu {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  color: white;
-  margin-right: 10px;
-  margin-left: 10px;
+  background-color: #0056b3; 
 }
 
 .signOutButton {
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  cursor: pointer;
-  position: fixed;
-  top: 1vh;
-  left: 94%;
-  padding: 8px 12px; /* Add padding for better appearance */
-  border-radius: 8px; /* Border radius */
-  transition: background-color 0.3s ease; /* Smooth transition for hover effect */
-  z-index: 1000;
+  background-color: #dc3545; 
 }
 
 .signOutButton:hover {
-  background-color: #c82333;
+  background-color: #c82333; 
 }
 
 .modalOverlay {
@@ -53,19 +62,22 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 1000; 
 }
 
 .modalContent {
-  position: relative;
-  z-index: 1001;
+  position: relative; 
+  z-index: 1001; 
+  background-color: white; 
+  padding: 20px;          
+  border-radius: 8px;     
 }
 
 .modalBackdrop {
-  position: absolute;
+  position: absolute; 
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 1000;
+  z-index: 1000; 
 }
