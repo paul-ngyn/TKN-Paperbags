@@ -20,7 +20,7 @@ export interface Design {
   id: string
   user_id: string
   name: string
-  design_data: any // This will store your design JSON
+  design_data: string // This will store your design JSON change later when exporting design
   created_at: string
   updated_at: string
 }

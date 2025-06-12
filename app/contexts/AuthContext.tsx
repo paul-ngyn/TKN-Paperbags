@@ -1,15 +1,34 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { User } from '@supabase/supabase-js'
+import { User, AuthError } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
+
+interface UserProfile {
+  id: string;
+  email: string;
+  name: string;
+  business_name: string;
+  phone_number: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+// Custom error type for non-auth errors
+interface CustomError {
+  message: string;
+  [key: string]: unknown;
+}
+
+// Union type for all possible errors
+type ErrorType = AuthError | CustomError | null;
 
 interface AuthContextType {
   user: User | null
-  userProfile: any | null
+  userProfile: UserProfile | null
   loading: boolean
-  signIn: (email: string, password: string) => Promise<{ error: any }>
-  signUp: (email: string, password: string, name: string, businessName: string, phoneNumber: string) => Promise<{ error: any }>
+  signIn: (email: string, password: string) => Promise<{ error: ErrorType }>
+  signUp: (email: string, password: string, name: string, businessName: string, phoneNumber: string) => Promise<{ error: ErrorType }>
   signOut: () => Promise<void>
 }
 
@@ -17,7 +36,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null)
-  const [userProfile, setUserProfile] = useState<any | null>(null)
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
 
   const createProfileIfNeeded = async (userId: string, email: string) => {
@@ -42,7 +61,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const storedData = localStorage.getItem(`signup_data_${email}`)
         if (storedData) {
-          const data = JSON.parse(storedData)
+          const data = JSON.parse(storedData) as { name?: string; businessName?: string; phoneNumber?: string }
           name = data.name || name
           businessName = data.businessName || businessName
           phoneNumber = data.phoneNumber || phoneNumber
@@ -115,7 +134,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       .single()
     
     if (!error && data) {
-      setUserProfile(data)
+      setUserProfile(data as UserProfile)
     } else {
       console.log('Error fetching user profile:', error)
     }
@@ -183,7 +202,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { error: null }
     } catch (unexpectedError) {
       console.error('Unexpected error in signUp:', unexpectedError)
-      return { error: { message: 'An unexpected error occurred. Please try again.' } }
+      return { error: { message: 'An unexpected error occurred. Please try again.' } as CustomError }
     }
   }
 
