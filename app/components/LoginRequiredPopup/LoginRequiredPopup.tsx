@@ -10,6 +10,7 @@ interface LoginRequiredPopupProps {
   action: 'download' | 'quote';
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const LoginRequiredPopup: React.FC<LoginRequiredPopupProps> = ({ 
   isOpen, 
   onClose, 
@@ -29,7 +30,7 @@ const LoginRequiredPopup: React.FC<LoginRequiredPopupProps> = ({
         <div className={styles.content}>
           <h2>Login Required</h2>
           <p>You need to be logged in to {actionText}.</p>
-          <p><strong>Don't worry!</strong> Your current design will be preserved.</p>
+          <p> Your current design will be preserved.</p>
           <p>Please log in or create an account to continue.</p>
           <div className={styles.buttonGroup}>
             <button className={styles.loginButton} onClick={onLogin}>
