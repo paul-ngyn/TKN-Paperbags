@@ -46,3 +46,5 @@ const LoginRequiredPopup: React.FC<LoginRequiredPopupProps> = ({
     </div>
   );
 };
+
+export default LoginRequiredPopup;

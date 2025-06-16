@@ -1,9 +1,12 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Rnd } from "react-rnd";
 import Sidebar from "../Sidebar/Sidebar";
 import BagBlueprint from "../BagBlueprint/BagBlueprint";
 import LogoItem, { Logo } from "../LogoItem/LogoItem";
+import LoginRequiredPopup from "../LoginRequiredPopup/LoginRequiredPopup";
+import AuthForm from "../AuthForm/AuthForm";
+import { useAuth } from "../../contexts/AuthContext";
 import styles from "./DesignPage.module.css";
 import { BagDimensions } from "../../util/BagDimensions";
 import { generatePDF } from "../../util/pdfGenerator";
@@ -21,6 +24,9 @@ interface TextStyle {
 }
 
 const DesignPage: React.FC<DesignPageProps> = () => {
+  // Get auth context
+  const { user } = useAuth();
+  
   // State declarations
   const [logos, setLogos] = useState<Logo[]>([]);
   const [activeLogoId, setActiveLogoId] = useState<string | null>(null);
@@ -33,14 +39,119 @@ const DesignPage: React.FC<DesignPageProps> = () => {
   });
   const [isEditingDimensions, setIsEditingDimensions] = useState(false);
   
+  // Auth popup states
+  const [showLoginRequiredPopup, setShowLoginRequiredPopup] = useState(false);
+  const [showAuthForm, setShowAuthForm] = useState(false);
+  const [pendingAction, setPendingAction] = useState<'download' | 'quote' | null>(null);
+  
   // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
   const logoRefs = useRef<Map<string, React.RefObject<Rnd>>>(new Map());
   const bagContainerRef = useRef<HTMLDivElement>(null);
-  
-  // Generate PDF function
+
+  // Save design state to localStorage
+  const saveDesignToStorage = () => {
+    const designState = {
+      logos,
+      dimensions,
+      timestamp: Date.now()
+    };
+    localStorage.setItem('unsaved_design', JSON.stringify(designState));
+  };
+
+  // Load design state from localStorage
+  const loadDesignFromStorage = () => {
+    try {
+      const savedDesign = localStorage.getItem('unsaved_design');
+      if (savedDesign) {
+        const designState = JSON.parse(savedDesign);
+        setLogos(designState.logos || []);
+        setDimensions(designState.dimensions || {
+          length: 310,
+          width: 155,
+          height: 428
+        });
+        
+        // Recreate refs for loaded logos
+        designState.logos?.forEach((logo: Logo) => {
+          logoRefs.current.set(logo.id, React.createRef<Rnd>());
+        });
+        
+        // Clear the saved design after loading
+        localStorage.removeItem('unsaved_design');
+      }
+    } catch (error) {
+      console.error('Error loading saved design:', error);
+    }
+  };
+
+  // Auto-save design state when logos or dimensions change
+  useEffect(() => {
+    if (logos.length > 0 || dimensions.length !== 310 || dimensions.width !== 155 || dimensions.height !== 428) {
+      saveDesignToStorage();
+    }
+  }, [logos, dimensions]);
+
+  // Load saved design on component mount (for non-authenticated users)
+  useEffect(() => {
+    if (!user) {
+      loadDesignFromStorage();
+    }
+  }, []);
+
+  // Handle authentication success - execute pending action
+  useEffect(() => {
+    if (user && pendingAction) {
+      if (pendingAction === 'download') {
+        handleGeneratePDF();
+      }
+      setPendingAction(null);
+    }
+  }, [user, pendingAction]);
+
+  // Generate PDF function with auth check
   const handleGeneratePDF = async () => {
-    return await generatePDF(dimensions, logos, bagContainerRef);
+    if (!user) {
+      setPendingAction('download');
+      setShowLoginRequiredPopup(true);
+      return false;
+    }
+    
+     try {
+    const result = await generatePDF(dimensions, logos, bagContainerRef);
+    return result || true; // Ensure we always return a boolean
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    return false;
+  }
+};
+
+  // Handle login required popup
+  const handleLoginRequiredClose = () => {
+    setShowLoginRequiredPopup(false);
+    setPendingAction(null);
+  };
+
+  const handleLoginRequiredLogin = () => {
+    setShowLoginRequiredPopup(false);
+    setShowAuthForm(true);
+    // Don't clear pendingAction - we want to execute it after login
+  };
+
+  const handleAuthFormClose = () => {
+    setShowAuthForm(false);
+    // Don't clear pendingAction here - let the useEffect handle it
+  };
+
+  // Clear saved design when user manually starts a new design
+  const handleNewDesign = () => {
+    setLogos([]);
+    setDimensions({
+      length: 310,
+      width: 155,
+      height: 428
+    });
+    localStorage.removeItem('unsaved_design');
   };
   
   // Handle logo upload
@@ -75,20 +186,14 @@ const DesignPage: React.FC<DesignPageProps> = () => {
 
   // Calculate optimal text box dimensions
   const calculateOptimalTextSize = (text: string, fontSize: number): { width: number, height: number } => {
-    // Get line details
     const lines = text.split('\n');
     const lineCount = lines.length;
     const longestLine = Math.max(...lines.map(line => line.length || 1));
     
-    // Calculate dimensions based on text content with minimal padding
     const charWidth = fontSize * 0.6;
     const lineHeight = fontSize * 1.4;
     
- 
-    // For width: add horizontal padding of 1 character on each side
     const widthPadding = fontSize * 1.2;
-    
-    // For height: add vertical padding of 0.8 line height total (0.4 top and bottom)
     const heightPadding = fontSize * 0.8;
     
     const optimalWidth = Math.max(100, (longestLine * charWidth) + widthPadding);
@@ -108,7 +213,6 @@ const DesignPage: React.FC<DesignPageProps> = () => {
       rotation: 0
     };
     
-    // Calculate optimal size for the new text
     const { width, height } = calculateOptimalTextSize(textContent, textStyle.fontSize);
     
     const newTextLogo: Logo = {
@@ -130,7 +234,6 @@ const DesignPage: React.FC<DesignPageProps> = () => {
   
   // Update text content and styling
   const updateTextContent = (id: string, text: string, style: TextStyle) => {
-    // Calculate optimal size for text with new content and style
     const { width, height } = calculateOptimalTextSize(text, style.fontSize);
     
     setLogos(prev => prev.map(logo => {
@@ -189,46 +292,43 @@ const DesignPage: React.FC<DesignPageProps> = () => {
   };
 
   const handleLogoMove = (
-  logoId: string, 
-  position: {x: number, y: number}, 
-  size?: {width: number, height: number},
-  textStyle?: TextStyle
-) => {
-  setLogos(prev => prev.map(logo => {
-    if (logo.id === logoId) {
-      // Always preserve existing rotation during move operations
-      const updatedLogo = {
-        ...logo,
-        position,
-        size: size || logo.size,
-        rotation: logo.rotation ?? (logo.textStyle?.rotation ?? 0)
-      };
-      
-      // Only update textStyle if explicitly provided, but preserve rotation
-      if (textStyle) {
-        const preservedRotation = textStyle.rotation !== undefined 
-          ? textStyle.rotation 
-          : (logo.rotation ?? (logo.textStyle?.rotation ?? 0));
-          
-        updatedLogo.textStyle = {
-          ...textStyle,
-          rotation: preservedRotation
+    logoId: string, 
+    position: {x: number, y: number}, 
+    size?: {width: number, height: number},
+    textStyle?: TextStyle
+  ) => {
+    setLogos(prev => prev.map(logo => {
+      if (logo.id === logoId) {
+        const updatedLogo = {
+          ...logo,
+          position,
+          size: size || logo.size,
+          rotation: logo.rotation ?? (logo.textStyle?.rotation ?? 0)
         };
-        updatedLogo.rotation = preservedRotation;
+        
+        if (textStyle) {
+          const preservedRotation = textStyle.rotation !== undefined 
+            ? textStyle.rotation 
+            : (logo.rotation ?? (logo.textStyle?.rotation ?? 0));
+            
+          updatedLogo.textStyle = {
+            ...textStyle,
+            rotation: preservedRotation
+          };
+          updatedLogo.rotation = preservedRotation;
+        }
+        
+        return updatedLogo;
       }
-      
-      return updatedLogo;
-    }
-    return logo;
-  }));
-};
+      return logo;
+    }));
+  };
 
   const onLogoRotate = (logoId: string, rotation: number) => {
     setLogos(prevLogos => 
       prevLogos.map(logo => {
         if (logo.id === logoId) {
           if (logo.type === 'text' && logo.textStyle) {
-            // For text elements, update both the logo rotation and textStyle.rotation
             return {
               ...logo,
               rotation,
@@ -238,7 +338,6 @@ const DesignPage: React.FC<DesignPageProps> = () => {
               }
             };
           }
-          // For image elements
           return { ...logo, rotation };
         }
         return logo;
@@ -246,7 +345,7 @@ const DesignPage: React.FC<DesignPageProps> = () => {
     );
   };
   
-  // UI interaction handlers - Simplified to prevent rotation resets
+  // UI interaction handlers
   const toggleDragMode = (logoId: string) => {
     setActiveLogoId(logoId);
     setIsActive(true);
@@ -260,7 +359,6 @@ const DesignPage: React.FC<DesignPageProps> = () => {
       setIsActive(false);
     }
   };
-  
   
   const startEditingDimensions = () => setIsEditingDimensions(true);
   const handleDimensionChange = (newDimensions: BagDimensions) => {
@@ -319,6 +417,24 @@ const DesignPage: React.FC<DesignPageProps> = () => {
           />
         ))}
       </div>
+
+      {/* Login Required Popup */}
+      <LoginRequiredPopup
+        isOpen={showLoginRequiredPopup}
+        onClose={handleLoginRequiredClose}
+        onLogin={handleLoginRequiredLogin}
+        action={pendingAction || 'download'}
+      />
+
+      {/* Auth Form Modal */}
+      {showAuthForm && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
+            <AuthForm onClose={handleAuthFormClose} />
+          </div>
+          <div className={styles.modalBackdrop} onClick={handleAuthFormClose}></div>
+        </div>
+      )}
     </div>
   );
 };
