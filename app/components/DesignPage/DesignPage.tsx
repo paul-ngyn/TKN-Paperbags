@@ -49,56 +49,6 @@ const DesignPage: React.FC<DesignPageProps> = () => {
   const logoRefs = useRef<Map<string, React.RefObject<Rnd>>>(new Map());
   const bagContainerRef = useRef<HTMLDivElement>(null);
 
-  // Save design state to localStorage
-  const saveDesignToStorage = () => {
-    const designState = {
-      logos,
-      dimensions,
-      timestamp: Date.now()
-    };
-    localStorage.setItem('unsaved_design', JSON.stringify(designState));
-  };
-
-  // Load design state from localStorage
-  const loadDesignFromStorage = () => {
-    try {
-      const savedDesign = localStorage.getItem('unsaved_design');
-      if (savedDesign) {
-        const designState = JSON.parse(savedDesign);
-        setLogos(designState.logos || []);
-        setDimensions(designState.dimensions || {
-          length: 310,
-          width: 155,
-          height: 428
-        });
-        
-        // Recreate refs for loaded logos
-        designState.logos?.forEach((logo: Logo) => {
-          logoRefs.current.set(logo.id, React.createRef<Rnd>());
-        });
-        
-        // Clear the saved design after loading
-        localStorage.removeItem('unsaved_design');
-      }
-    } catch (error) {
-      console.error('Error loading saved design:', error);
-    }
-  };
-
-  // Auto-save design state when logos or dimensions change
-  useEffect(() => {
-    if (logos.length > 0 || dimensions.length !== 310 || dimensions.width !== 155 || dimensions.height !== 428) {
-      saveDesignToStorage();
-    }
-  }, [logos, dimensions]);
-
-  // Load saved design on component mount (for non-authenticated users)
-  useEffect(() => {
-    if (!user) {
-      loadDesignFromStorage();
-    }
-  }, []);
-
   // Handle authentication success - execute pending action
   useEffect(() => {
     if (user && pendingAction) {
@@ -141,19 +91,7 @@ const DesignPage: React.FC<DesignPageProps> = () => {
   const handleAuthFormClose = () => {
     setShowAuthForm(false);
     // Don't clear pendingAction here - let the useEffect handle it
-  };
-
-  // Clear saved design when user manually starts a new design
-  const handleNewDesign = () => {
-    setLogos([]);
-    setDimensions({
-      length: 310,
-      width: 155,
-      height: 428
-    });
-    localStorage.removeItem('unsaved_design');
-  };
-  
+  }
   // Handle logo upload
   const handleLogoUpload = (files: FileList) => {
     if (!files.length) return;
