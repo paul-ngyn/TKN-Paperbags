@@ -245,12 +245,13 @@ html, body {
   justify-content: center;
   gap: 20px; /* Add space between brand logos */
   width: 100%;
-  margin-top: 10px;
-  padding-left: 15%;
+  margin-top: 40px;
+  padding-left: 26%;
 }
 
 .brand { /* brand logo */
   display: flex;
+  gap: 2%;
   flex-direction: row; /* Change to row to align items horizontally */
   align-items: center;
   margin-bottom: 20px;
@@ -274,21 +275,21 @@ html, body {
 }
 
 .design-paragraph {
-  font-size: 18px;
+  font-size: 20px;
   text-align: center; /* Align text to the left */
-  margin-left: 16%; /* Add space between the logo and the paragraph */
+  margin-left: 18%; /* Add space between the logo and the paragraph */
   color: #766; /* Optional: Lighter color for the description */
   width: 33%;
   margin-bottom: 5%;
-  margin-top: 2.5%;
+  margin-top: 4%;
 }
 
 .brand-paragraph {
-  font-size: 18px;
-  text-align: right; 
-  margin-left: 8%; /* Add space between the logo and the paragraph */
+  font-size: 20px;
+  text-align: center; 
+  margin-left: 3%; /* Add space between the logo and the paragraph */
   color: #766; /* Optional: Lighter color for the description */
-  width: 40%;
+  width: 35%;
   margin-bottom: 2%;
 }
 
@@ -315,7 +316,7 @@ html, body {
   display: flex;
   justify-content: normal;
   align-items: center;
-  gap: 140px;
+  gap: 1.75%;
 }
 
 .design-button {

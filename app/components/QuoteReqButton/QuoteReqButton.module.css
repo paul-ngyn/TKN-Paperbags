@@ -5,7 +5,7 @@
   cursor: pointer;
   position: fixed;
   top: 1.2vh;
-  left: 79%;
+  left: 78%;
   padding: 0; /* Remove padding */
   border-radius: 0; /* Remove border radius */
   transition: color 0.3s ease; /* Transition for text color only */
