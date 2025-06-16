@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import styles from "./InfoPage.module.css";
-import placeholder from "../../public/placeholder.png";
+import placeholder from "../../public/two-bag-christmas-white.png";
 import servicepic from "../../public/mtc_history-1.jpg"
 
 interface InfoPageProps {
@@ -29,8 +29,8 @@ const InfoPage: React.FC<InfoPageProps> = ({ handleNavigation }) => {
           <Image
             src={placeholder}
             alt="Placeholder"
-            width={300}
-            height={300}
+            width={550}
+            height={550}
           />
         </div>
       </div>

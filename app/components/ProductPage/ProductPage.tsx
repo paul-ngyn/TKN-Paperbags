@@ -13,9 +13,13 @@ import styles from './Productpage.module.css';
 import QuoteForm from '../QuoteForm/QuoteForm';
 import ProductTable from '../ProductTable/ProductTable';
 import ropehandle from '../../public/paperbagproduct.jpg';
-import flathandle from '../../public/flathandle1.jpeg';
-import flathandle2 from '../../public/flathandle2.jpg.jpeg';
-import nohandle from '../../public/nohandle.jpeg';
+import flathandle from '../../public/onebag-christmas-side-white.png';
+import thankyou from '../../public/onebag-thankyou-front-white.png';
+import smileRope from '../../public/one-bag-smile-side.png';
+import nohandle from '../../public/onebagnohandle.png';
+import twobag from '../../public/twobag-nohandle.png'
+import christmasFront from '../../public/onebag-white-front-christmas.png'
+
 
 interface ProductPageProps {
   handleNavigation: (page: string) => void;
@@ -39,7 +43,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ handleNavigation }) => {
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
-      <ProductImageCarousel images={[ropehandle, flathandle, flathandle2, nohandle]} />
+      <ProductImageCarousel images={[ropehandle, flathandle, christmasFront, twobag, thankyou, smileRope, nohandle]} />
       <div className="productDetailsContainer">
         <h2 className="productName">Kraft Paper Bag</h2>
         <div className="logoContainer">

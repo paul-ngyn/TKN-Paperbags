@@ -8,7 +8,7 @@ import timelogo from '../public/fastclock.jpg';
 import biodegradable from '../public/biodegradablelogo.jpg';
 import tknlogo from '../public/tkn_products.png';
 import paperbagheader from '../public/paperbagfullheader2.jpg';
-import custombag from '../public/paperbagproduct.jpg';
+import custombag from '../public/two-bag-homepage.png';
 import Link from 'next/link';
 
 interface LogoPageProps {
@@ -97,7 +97,7 @@ const LogoPage: React.FC<LogoPageProps> = ({ handleNavigation }) => {
             </p>
           </div>
           <div className="design-image">
-            <Image src={custombag} alt="Custom Bag" width={350} height={350} />
+            <Image src={custombag} alt="Custom Bag" width={750} height={750} />
           </div>
         </div>
         <div className="design-buttoncontainer">
