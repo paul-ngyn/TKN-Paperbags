@@ -9,7 +9,7 @@ interface DesignButtonProps {
 const DesignButton: React.FC<DesignButtonProps> = ({  onClick }) => {
   return (
     <button onClick={() =>  onClick('orderinfo')} className={styles.navButton}>
-      Design
+      Design Studio
     </button>
   );
 };

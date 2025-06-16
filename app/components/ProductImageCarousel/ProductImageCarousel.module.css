@@ -5,8 +5,8 @@
     justify-content: center;
     position: relative;
     width: 630px; /* Adjust to include arrow button spacing */
-    margin-top: 100px;
-    margin-left: 40px;
+    margin-top: 70px;
+    margin-left: 150px;
   }
   
   /* Vertical preview container on the left */
@@ -43,17 +43,18 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 90px;
+    margin-bottom: 100px;
     padding: 5px;
     border-radius: 10px;
+    margin-top: 20px;
   }
   
   .imageContainer {
     width: 550px;
     height: 700px; /* Set a fixed height to prevent resizing */
     overflow: hidden;
-    max-width: 420px;
-    min-width: 300px;
+    max-width: 450px;
+    min-width: 350px;
   }
   
   
@@ -66,9 +67,9 @@
     transform: translateY(-50%);
     z-index: 1;
     padding: 3px;
-    margin-top: 225px;
-    margin-left: -10px;
-    margin-right: 10px;
+    margin-top: 295px;
+    margin-left: 0px;
+    margin-right: 20px;
   }
   
   /* Position left arrow */
