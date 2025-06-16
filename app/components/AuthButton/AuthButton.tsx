@@ -6,7 +6,7 @@ import AuthForm from '../AuthForm/AuthForm'
 import styles from './AuthButton.module.css'
 
 const AuthButton: React.FC = () => {
-  const { user, userProfile, signOut } = useAuth()
+  const { user, signOut } = useAuth()
   const [showModal, setShowModal] = useState(false)
 
   const handleOpenModal = () => setShowModal(true)
