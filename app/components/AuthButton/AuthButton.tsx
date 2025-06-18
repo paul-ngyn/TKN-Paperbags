@@ -1,34 +1,100 @@
 "use client";
 
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import AuthForm from '../AuthForm/AuthForm'
 import styles from './AuthButton.module.css'
+import Image from 'next/image'
+import avatar from '../../public/avatar.png' 
 
 const AuthButton: React.FC = () => {
   const { user, signOut } = useAuth()
   const [showModal, setShowModal] = useState(false)
+  const [showDropdown, setShowDropdown] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+  const hoverTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   const handleOpenModal = () => setShowModal(true)
   const handleCloseModal = () => setShowModal(false)
+  
+  const showDropdownMenu = () => {
+    if (hoverTimerRef.current) {
+      clearTimeout(hoverTimerRef.current)
+    }
+    setShowDropdown(true)
+  }
+  
+  const hideDropdownMenu = () => {
+    hoverTimerRef.current = setTimeout(() => {
+      setShowDropdown(false)
+    }, 150) // Small delay to prevent flickering when moving between button and dropdown
+  }
 
- 
+  const handleSignOut = () => {
+    signOut()
+    setShowDropdown(false)
+  }
+
+  // Clean up timer on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverTimerRef.current) {
+        clearTimeout(hoverTimerRef.current)
+      }
+    }
+  }, [])
+
   if (user) {
     return (
-      // Added styles.authWrapper for consistent sizing
-      <div className={`${styles.authWrapper} ${styles.userMenu}`}>
-        <button onClick={signOut} className={styles.signOutButton}>
-          Sign Out
-        </button>
+      <div className={styles.authWrapper}>
+        <div 
+          className={styles.profileDropdown} 
+          ref={dropdownRef}
+          onMouseEnter={showDropdownMenu}
+          onMouseLeave={hideDropdownMenu}
+        >
+          <button 
+            className={styles.profileButton}
+            aria-expanded={showDropdown}
+          >
+            <Image 
+              src={avatar}
+              alt="Profile Avatar" 
+              width={26}
+              height={26}
+              className={styles.avatar}
+            />
+            My Profile
+            <span className={styles.dropdownArrow}>▼</span>
+          </button>
+          
+          {showDropdown && (
+            <div 
+              className={styles.dropdownMenu}
+              onMouseEnter={showDropdownMenu}
+              onMouseLeave={hideDropdownMenu}
+            >
+              <div className={styles.userInfo}>
+                <span className={styles.userEmail}>{user.email}</span>
+              </div>
+              <hr className={styles.divider} />
+              <button 
+                onClick={handleSignOut} 
+                className={styles.dropdownItem}
+              >
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     )
   }
 
   return (
-    // Added styles.authWrapper for consistent sizing
     <div className={styles.authWrapper}>
       <button onClick={handleOpenModal} className={styles.authButton}>
-        Login
+        Login/Sign Up
       </button>
       {showModal && (
         <div className={styles.modalOverlay}>
