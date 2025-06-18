@@ -65,7 +65,6 @@ const ContactPage: React.FC<ContactPageProps> = ({ handleNavigation }) => {
 
   return (
     <div className={styles.pageContainer}>
-      <h1 className={styles.mainTitle}>Contact Us Page</h1>
       <div className={styles.formContainer}>
         <h2 className={styles.formTitle}>How can we help?</h2>
         <p className={styles.subtitle}>

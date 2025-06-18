@@ -1,16 +1,15 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext'; // Verify this path matches your file structure
+import { useAuth } from '../../contexts/AuthContext';
 import styles from './AuthForm.module.css';
 
 interface AuthFormProps {
   onClose: () => void;
+  onSuccess?: () => void; // Add optional success callback
 }
 
-const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
-  console.log("AuthForm RENDERED");
-
+const AuthForm: React.FC<AuthFormProps> = ({ onClose, onSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     email: '',
@@ -22,33 +21,45 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, user } = useAuth(); // Add user to detect login success
 
+  // Auto-close when user becomes authenticated
   useEffect(() => {
-    console.log("AuthForm STATE UPDATE: isLogin:", isLogin, "success:", success, "error:", error, "loading:", loading);
-  }, [isLogin, success, error, loading]);
+    if (user && loading) {
+      console.log("AuthForm: User authenticated, closing modal");
+      setLoading(false);
+      setSuccess('Login successful!');
+      
+      // Call success callback if provided
+      if (onSuccess) {
+        onSuccess();
+      }
+      
+      // Close modal after short delay
+      setTimeout(() => {
+        onClose();
+      }, 500);
+    }
+  }, [user, loading, onSuccess, onClose]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("AuthForm: handleSubmit initiated. isLogin:", isLogin);
     setLoading(true);
     setError('');
-    setSuccess(''); // Reset messages at the start of a new submission
+    setSuccess('');
 
     try {
       if (isLogin) {
         console.log("AuthForm: Attempting LOGIN with email:", formData.email);
         const { error: signInError } = await signIn(formData.email, formData.password);
+        
         if (signInError) {
           console.error("AuthForm: LOGIN FAILED", signInError);
           setError(signInError.message);
-        } else {
-          console.log("AuthForm: LOGIN SUCCESSFUL");
-          setSuccess('Login successful!');
-          setTimeout(() => {
-            onClose();
-          }, 1000);
+          setLoading(false); // Reset loading on error
         }
+        // Don't set loading to false here - let the useEffect handle it when user state updates
       } else {
         // Sign Up logic
         console.log("AuthForm: Attempting SIGN UP with email:", formData.email);
@@ -64,24 +75,21 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
           console.error("AuthForm: SIGN UP FAILED", signUpError);
           setError(signUpError.message);
         } else {
-          console.log("AuthForm: SIGN UP SUCCESSFUL - setting success message.");
+          console.log("AuthForm: SIGN UP SUCCESSFUL");
           setSuccess('Success! Please check your email to confirm your account.');
-          setFormData({ // Clear form
+          setFormData({
             email: '',
             password: '',
             name: '',
             businessName: '',
             phoneNumber: '',
           });
-          // The success message should now persist.
-          // isLogin remains false.
         }
+        setLoading(false); // Reset loading for signup
       }
     } catch (err) {
       console.error("AuthForm: handleSubmit CATCH block error:", err);
       setError('An unexpected error occurred. Please try again.');
-    } finally {
-      console.log("AuthForm: handleSubmit finally block. Setting loading to false.");
       setLoading(false);
     }
   };
@@ -94,13 +102,12 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
   };
 
   const handleModeSwitch = () => {
-    console.log("AuthForm: handleModeSwitch. Current isLogin:", isLogin, "Switching to:", !isLogin);
+    console.log("AuthForm: handleModeSwitch. Current isLogin:", isLogin);
     setIsLogin(!isLogin);
     setError('');
-    setSuccess(''); // Clear messages when switching modes
+    setSuccess('');
+    setLoading(false); // Reset loading when switching modes
   };
-
-  console.log("AuthForm RENDERING with: isLogin:", isLogin, "success:", `"${success}"`, "error:", `"${error}"`);
 
   return (
     <div className={styles.authForm}>
@@ -112,10 +119,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
       {error && <div className={styles.error}>{error}</div>}
       {success && <div className={styles.success}>{success}</div>}
 
-      {/* Show form if:
-          1. No success message is active OR
-          2. There IS a success message, but we are in LOGIN mode (login success briefly shows before modal closes)
-      */}
       {(!success || (success && isLogin)) && !loading && (
         <form onSubmit={handleSubmit}>
           <input
@@ -164,18 +167,13 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
             </>
           )}
           <button type="submit" disabled={loading}>
-            {isLogin ? 'Login' : 'Sign Up'}
+            {loading ? 'Processing...' : (isLogin ? 'Login' : 'Sign Up')}
           </button>
         </form>
       )}
       
-      {loading && <p>Processing...</p>}
+      {loading && <div className={styles.loadingMessage}>Processing...</div>}
 
-      {/* Toggle between Login and Sign Up:
-          Show if:
-          1. Not loading AND
-          2. EITHER no success message OR (success message exists AND it's for login mode - though this case is brief)
-      */}
       {!loading && (!success || (success && isLogin)) && (
         <p>
           {isLogin ? "Don't have an account? " : 'Already have an account? '}
@@ -185,24 +183,16 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
         </p>
       )}
 
-      {/* "Go to Login" button after successful signup:
-          Show if:
-          1. Not loading AND
-          2. Success message exists AND
-          3. We are in SIGNUP mode (isLogin is false)
-      */}
       {!loading && success && !isLogin && (
         <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-          {/* The success message is already displayed above, no need to repeat <p>{success}</p> here */}
           <button
             type="button"
             onClick={() => {
-              console.log("AuthForm: 'Go to Login' clicked. Setting isLogin to true, clearing success.");
               setIsLogin(true);
               setSuccess('');
               setError('');
             }}
-            className={styles.switchButton} // Make sure this class is styled
+            className={styles.switchButton}
           >
             Go to Login
           </button>

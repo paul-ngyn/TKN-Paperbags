@@ -94,6 +94,13 @@ const AuthButton: React.FC = () => {
   return (
     <div className={styles.authWrapper}>
       <button onClick={handleOpenModal} className={styles.authButton}>
+           <Image 
+              src={avatar}
+              alt="Profile Avatar" 
+              width={26}
+              height={26}
+              className={styles.avatar}
+            />
         Login/Sign Up
       </button>
       {showModal && (

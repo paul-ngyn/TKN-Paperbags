@@ -1,7 +1,7 @@
 .authWrapper {
   display: flex;
   align-items: center;
-  height: 105%; 
+  height: 110%; 
   justify-content: center; 
 }
 
@@ -15,11 +15,15 @@
   transition: color 0.3s ease;
   white-space: nowrap; 
   font-size: 22px;
+  display: flex; /* Add this */
+  align-items: center; /* Add this */
+  gap: 5px; 
 }
 
 .authButton:hover {
   color: #1c63cd;
   background-color: transparent;
+  text-decoration: underline;
 }
 
 /* Profile Dropdown Styles */
