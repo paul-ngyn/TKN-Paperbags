@@ -5,11 +5,11 @@
   cursor: pointer;
   position: fixed;
   top: 1.2vh;
-  left: 53.5%;
+  left: 54%;
   padding: 0; /* Remove padding */
   border-radius: 0; /* Remove border radius */
   transition: color 0.3s ease; /* Transition for text color only */
-  font-size: 22px;
+  font-size: 21px;
 }
   
 .navButton:hover {
