@@ -18,7 +18,7 @@
   display: flex; /* Add this */
   align-items: center; /* Add this */
   gap: 5px; 
-  margin-right: 25px;
+  margin-right: 34px;
 }
 
 .authButton:hover {
