@@ -27,7 +27,7 @@ interface ProductPageProps {
   handleNavigation: (page: string) => void;
 }
 
-const ProductPage: React.FC<ProductPageProps> = ({ handleNavigation }) => {
+const ProductPage: React.FC<ProductPageProps> = () => {
   const { user } = useAuth(); // Add auth context
   
   const [showModal, setShowModal] = useState(false);
