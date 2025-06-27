@@ -34,10 +34,21 @@
     position: relative;
   }
 
+    .loginmodalContent {
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 400px;
+    width: 100%;
+    position: relative;
+  }
+
+
   .separator {
     font-weight: bold;
     font-size: 1.5rem; /* Increases the size of the hyphen */
     margin: 0 5px;
     color: #000;
   }
+
+  
 

@@ -16,13 +16,17 @@ const InfoPage: React.FC<InfoPageProps> = ({ handleNavigation }) => {
       {/* Section 1: Text on the left, image on the right make sure to put burma bag or other custom here*/}
       <div className={`${styles.section} ${styles.row}`}>
         <div className={styles.textContainer}>
-          <h2>Image Upload Details</h2>
+          <h2>Bag Customization and Image Upload Details</h2>
           <p>
-            When uploading an image for customization, please ensure that the image meets the formats of either .AI, .PSD, or .PNG
+            When uploading an image for customization, please ensure that the image meets the allowed formats of .png, .jpg, or .jpeg. 
           </p>
           <br />
           <p>
-            Images must also meet the minimum resolution of 300 DPI to ensure the highest quality of customization with a resolution of 500x500.
+            Images must also meet a minimum resolution of 100x100 and a maximum size of 10MB per image. All blueprints produced will be downloaded in a .pdf format and can easily be uploaded in your quote.
+          </p>
+          <br />
+            <p>
+            Please note that utilizing white ink on your design may result in adjustments to the price and minimum order quantity.
           </p>
         </div>
         <div className={styles.imageContainer}>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, {useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import ProductImageCarousel from '../ProductImageCarousel/ProductImageCarousel';
 import recyclelogo from '../../public/recyclelogo.png';
@@ -12,6 +12,9 @@ import shipicon from '../../public/shippingtruck.png';
 import styles from './Productpage.module.css';
 import QuoteForm from '../QuoteForm/QuoteForm';
 import ProductTable from '../ProductTable/ProductTable';
+import LoginRequiredPopup from '../LoginRequiredPopup/LoginRequiredPopup';
+import AuthForm from '../AuthForm/AuthForm';
+import { useAuth } from '../../contexts/AuthContext';
 import ropehandle from '../../public/paperbagproduct.jpg';
 import flathandle from '../../public/onebag-christmas-side-white.png';
 import thankyou from '../../public/onebag-thankyou-front-white.png';
@@ -20,17 +23,30 @@ import nohandle from '../../public/onebagnohandle.png';
 import twobag from '../../public/twobag-nohandle.png'
 import christmasFront from '../../public/onebag-white-front-christmas.png'
 
-
 interface ProductPageProps {
   handleNavigation: (page: string) => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ProductPage: React.FC<ProductPageProps> = ({ handleNavigation }) => {
+  const { user } = useAuth(); // Add auth context
+  
   const [showModal, setShowModal] = useState(false);
   const [selectedOption, setSelectedOption] = useState('small');
   const [selectedHandle, setSelectedHandle] = useState('flat');
-  const handleOpenModal = () => setShowModal(true);
+  
+  // Add auth-related state
+  const [showLoginRequiredPopup, setShowLoginRequiredPopup] = useState(false);
+  const [showAuthForm, setShowAuthForm] = useState(false);
+
+  const handleOpenModal = () => {
+    // Check if user is authenticated before opening quote form
+    if (!user) {
+      setShowLoginRequiredPopup(true);
+      return;
+    }
+    setShowModal(true);
+  };
+
   const handleCloseModal = () => setShowModal(false);
 
   const handleOptionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -40,6 +56,28 @@ const ProductPage: React.FC<ProductPageProps> = ({ handleNavigation }) => {
   const handleHandleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedHandle(e.target.value);
   };
+
+  // Auth popup handlers
+  const handleLoginRequiredClose = () => {
+    setShowLoginRequiredPopup(false);
+  };
+
+  const handleLoginRequiredLogin = () => {
+    setShowLoginRequiredPopup(false);
+    setShowAuthForm(true);
+  };
+
+  const handleAuthFormClose = () => {
+    setShowAuthForm(false);
+  };
+
+  // When user successfully logs in, automatically open quote form
+  useEffect(() => {
+    if (user && showAuthForm) {
+      setShowAuthForm(false);
+      setShowModal(true);
+    }
+  }, [user, showAuthForm]);
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
@@ -73,50 +111,74 @@ const ProductPage: React.FC<ProductPageProps> = ({ handleNavigation }) => {
           </select>
         </div>
         <div className={styles.navigation}>
-        <a href="/design" className="product-button-link">
-          Design Your Bag
-        </a>
-        <span className={styles.separator}> - </span>
-        <a href="/orderinfo" className="product-button-link">
-          Image Upload Details
-        </a>
-      </div>
+          <a href="/design" className="product-button-link">
+            Design Your Bag
+          </a>
+          <span className={styles.separator}> - </span>
+          <a href="/orderinfo" className="product-button-link">
+            Image Upload Details
+          </a>
+        </div>
         <ProductTable selectedOption={selectedOption} selectedHandle={selectedHandle} />
         <p className="productSubject">
           *Pricing may vary based on customization and quantity. Please request a quote for more information.
         </p>
         <div className="buttonContainer">
-          <button className="product-button" onClick={handleOpenModal}>Request a Quote</button>
+          <button className="product-button" onClick={handleOpenModal}>
+            {user ? 'Request a Quote' : 'Login to Request Quote'}
+          </button>
         </div>
         <div className="processlogoContainer">
           <div className={styles.logoWithDescription}>
-            <Image className = {styles.logoImage} src={quoteicon} alt="Quote Logo" width={50} height={35} />
+            <Image className={styles.logoImage} src={quoteicon} alt="Quote Logo" width={50} height={35} />
             <p className={styles.logoDescription}>QUOTE REQUESTED</p>
           </div>
           <div className="divider"></div>
           <div className={styles.logoWithDescription}>
-            <Image className = {styles.logoImage} src={customerserviceicon} alt="Service Logo" width={55} height={30} />
+            <Image className={styles.logoImage} src={customerserviceicon} alt="Service Logo" width={55} height={30} />
             <p className={styles.logoDescription}>CONFIRM YOUR ORDER</p>
           </div>
           <div className="divider"></div>
           <div className={styles.logoWithDescription}>
-            <Image className = {styles.logoImage} src={packicon} alt="Pack Logo" width={55} height={30} />
+            <Image className={styles.logoImage} src={packicon} alt="Pack Logo" width={55} height={30} />
             <p className={styles.logoDescription}>CUSTOMIZED & PACKED</p>
           </div>
           <div className="divider"></div>
           <div className={styles.logoWithDescription}>
-            <Image className = {styles.logoImage} src={shipicon} alt="Ship Logo" width={60} height={30} />
+            <Image className={styles.logoImage} src={shipicon} alt="Ship Logo" width={60} height={30} />
             <p className={styles.logoDescription}>DELIVERED TO YOU</p>
           </div>
         </div>
       </div>
-      {showModal && (
-        <div style={{ backgroundColor: 'rgba(0, 0, 0, 0.4)', position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
-          <div className={styles.modalContent}>
-            <QuoteForm onClose={handleCloseModal} />
-          </div>
-        </div>
-      )}
+
+      {/* Quote Form Modal */}
+   {showModal && (
+  <div className={styles.modalOverlay}>
+    <div className={styles.modalBackdrop} onClick={handleCloseModal}></div>
+    <div className={styles.modalContent}>
+      <QuoteForm onClose={handleCloseModal} />
+    </div>
+  </div>
+)}
+
+      {/* Login Required Popup */}
+      <LoginRequiredPopup
+        isOpen={showLoginRequiredPopup}
+        onClose={handleLoginRequiredClose}
+        onLogin={handleLoginRequiredLogin}
+        action="quote"
+      />
+
+      {/* Auth Form Modal */}
+    {showAuthForm && (
+  <div className={styles.modalOverlay}>
+    <div className={styles.modalBackdrop} onClick={handleAuthFormClose}></div>
+    <div className={styles.loginmodalContent}>
+      <AuthForm onClose={handleAuthFormClose} />
+    </div>
+  </div>
+)}
+
     </div>
   );
 };

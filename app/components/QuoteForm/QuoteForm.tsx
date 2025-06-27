@@ -25,6 +25,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
     lastName: '',
     email: '',
     phone: '',
+    quantity: '',
     dimension1: '',
     dimension2: '',
     dimension3: '',
@@ -120,6 +121,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
     data.append('lastName', formData.lastName);
     data.append('email', formData.email);
     data.append('phone', formData.phone);
+    data.append('quantity', formData.quantity);
     data.append('dimensions', `${formData.dimension1} x ${formData.dimension2} x ${formData.dimension3}`);
     data.append('handletype', formData.handletype);
     data.append('details', formData.details);
@@ -204,6 +206,18 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
             id="phone"
             name="phone"
             value={formData.phone}
+            onChange={handleChange}
+            required
+          />
+        </div>
+            <div className={styles.formGroup}>
+          <label htmlFor="quantity">Order Quantity</label>
+          <input
+            className={styles.inputField}
+            type="number"
+            id="quantity"
+            name="quantity"
+            value={formData.quantity}
             onChange={handleChange}
             required
           />

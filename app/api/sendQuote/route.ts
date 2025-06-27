@@ -50,6 +50,7 @@ export async function POST(request: Request): Promise<Response> {
         const lastName = fields.lastName || "";
         const email = fields.email || "";
         const phone = fields.phone || "";
+        const quantity = fields.quantity || "";
         const dimensions = fields.dimensions || "";
         const handletype = fields.handletype || "";
         const details = fields.details || "";
@@ -105,6 +106,7 @@ export async function POST(request: Request): Promise<Response> {
           Last Name: ${lastName}
           Email: ${email}
           Phone: ${phone}
+          Quantity: ${quantity}
           Dimensions: ${dimensions}
           Handle Type: ${handletype}
           Details: ${details}
