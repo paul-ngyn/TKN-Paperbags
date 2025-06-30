@@ -121,7 +121,7 @@ const DroneVideo: React.FC<DroneVideoProps> = ({ className = '' }) => {
           playsInline
           preload="auto"
           controls={false}
-          src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+          src="https://raw.githubusercontent.com/paul-ngyn/mtc-video-assets/main/mtc_commercial.mp4.mp4"
         >
           Your browser does not support the video tag.
         </video>
