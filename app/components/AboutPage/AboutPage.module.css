@@ -18,7 +18,14 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 125px;
+    gap: 205px;
+  }
+
+    .logoTextRow2 {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 105px;
   }
    
   .logoContainer {

@@ -121,7 +121,7 @@ const DroneVideo: React.FC<DroneVideoProps> = ({ className = '' }) => {
           playsInline
           preload="auto"
           controls={false}
-          src="https://raw.githubusercontent.com/paul-ngyn/mtc-video-assets/main/mtc_commercial.mp4.mp4"
+          src="https://raw.githubusercontent.com/paul-ngyn/mtc-video-assets/main/MTC_COMMERICIAL.mp4(1).mp4"
         >
           Your browser does not support the video tag.
         </video>
@@ -142,7 +142,7 @@ const DroneVideo: React.FC<DroneVideoProps> = ({ className = '' }) => {
         {/* Overlay content */}
         <div className={styles.videoOverlay}>
           <div className={styles.overlayContent}>
-            <h1 className={styles.overlayTitle}>About Us</h1>
+            <h1 className={styles.overlayTitle}></h1>
             <p className={styles.overlaySubtitle}></p>
           </div>
         </div>

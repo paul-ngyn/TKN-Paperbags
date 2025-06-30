@@ -251,7 +251,7 @@ html, body {
 
 .brand { /* brand logo */
   display: flex;
-  gap: 2%;
+  gap: 5.5%;
   flex-direction: row; /* Change to row to align items horizontally */
   align-items: center;
   margin-bottom: 20px;

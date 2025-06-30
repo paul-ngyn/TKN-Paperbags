@@ -17,12 +17,12 @@ const AboutPage: React.FC<AboutPageProps> = ({ handleNavigation }) => {
     
     <div className={styles.container}>
        <DroneVideo className={styles.videoHeader} />
-      <h2 style={{ fontSize: '32px', fontWeight: "bold", marginBottom: '3%', textAlign: 'center' }}></h2>
+      <h2 style={{ fontSize: '32px', fontWeight: "bold", marginBottom: '2%', textAlign: 'center' }}></h2>
       {/* MTC logo on the left, text on the right */}
       <div className={styles.section}>
         <div className={styles.logoTextRow}>
           <div className={`${styles.textContainer} `}>
-          <h2 style={{ fontSize: '26px', fontWeight: "bold", marginBottom: '20px' }}> Maple Trade Corporation (MTC)</h2>
+          <h2 style={{ fontSize: '32px', fontWeight: "bold", marginBottom: '35px' }}> About Us</h2>
             <p>
             MTC was founded in 2006 in the heart of San Francisco, expanding our operations and facilities to Hayward, California in 2019.
             </p>
@@ -48,7 +48,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ handleNavigation }) => {
       {/* logo on the right, text on the left */}
       <h2 style={{ fontSize: '32px',fontWeight: "bold", textAlign: 'center' }}>Our Brand</h2>
       <div className={styles.section}>
-        <div className={styles.logoTextRow}>
+        <div className={styles.logoTextRow2}>
         <div className={styles.logoContainer2}>
             <Image
               src={tknLogo}
