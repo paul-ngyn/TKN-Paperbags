@@ -142,8 +142,8 @@ const DroneVideo: React.FC<DroneVideoProps> = ({ className = '' }) => {
         {/* Overlay content */}
         <div className={styles.videoOverlay}>
           <div className={styles.overlayContent}>
-            <h1 className={styles.overlayTitle}>Welcome to MTC</h1>
-            <p className={styles.overlaySubtitle}>Quality, Sustainability, Excellence</p>
+            <h1 className={styles.overlayTitle}>About Us</h1>
+            <p className={styles.overlaySubtitle}></p>
           </div>
         </div>
       </div>
