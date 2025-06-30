@@ -5,6 +5,7 @@ import Image from "next/image";
 import styles from "./AboutPage.module.css";
 import tknLogo from "../../public/tkn_products.png";
 import locationplaceholda from "../../public/locationplaceholder1.png";
+import DroneVideo from "../DroneVideo/DroneVideo";
 
 interface AboutPageProps {
   handleNavigation?: (page: string) => void;
@@ -12,7 +13,10 @@ interface AboutPageProps {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const AboutPage: React.FC<AboutPageProps> = ({ handleNavigation }) => {
   return (
+
+    
     <div className={styles.container}>
+       <DroneVideo className={styles.videoHeader} />
       <h2 style={{ fontSize: '32px', fontWeight: "bold", marginBottom: '3%', textAlign: 'center' }}> About Us</h2>
       {/* MTC logo on the left, text on the right */}
       <div className={styles.section}>
