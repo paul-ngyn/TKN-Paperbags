@@ -5,7 +5,6 @@ import Image from "next/image";
 import styles from "./AboutPage.module.css";
 import tknLogo from "../../public/tkn_products.png";
 import locationplaceholda from "../../public/locationplaceholder1.png";
-import DroneVideo from "../DroneVideo/DroneVideo";
 
 interface AboutPageProps {
   handleNavigation?: (page: string) => void;
