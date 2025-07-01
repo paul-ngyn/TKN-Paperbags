@@ -482,7 +482,7 @@ code, pre {
 }
 
 .hero-image {
-  flex: 0 0 55%; /* Give image container more fixed space */
+  flex: 0 0 60%; /* Give image container more fixed space */
   display: flex;
   justify-content: flex-end; /* Push image to the right within its container */
   align-items: center;
