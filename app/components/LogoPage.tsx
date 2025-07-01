@@ -2,7 +2,6 @@
 
 import React, { useRef, useEffect } from 'react';
 import Image from 'next/image';
-import ImageSubHeader from './ImageSubHeader/ImageSubHeader';
 import baglogo from '../public/baglogo.jpg';
 import timelogo from '../public/fastclock.jpg';
 import biodegradable from '../public/biodegradablelogo.jpg';
@@ -10,6 +9,7 @@ import tknlogo from '../public/tkn_products.png';
 import paperbagheader from '../public/paperbagfullheader2.jpg';
 import custombag from '../public/two-bag-homepage.png';
 import Link from 'next/link';
+import DroneVideo from './DroneVideo/DroneVideo';
 
 interface LogoPageProps {
   handleNavigation: (page: string) => void;
@@ -18,7 +18,6 @@ interface LogoPageProps {
 const LogoPage: React.FC<LogoPageProps> = ({ handleNavigation }) => {
   const brandRef = useRef(null);
   const contactRef = useRef<HTMLDivElement | null>(null);
-  const designRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -32,7 +31,7 @@ const LogoPage: React.FC<LogoPageProps> = ({ handleNavigation }) => {
       { threshold: 0.1 }
     );
 
-    const elements = document.querySelectorAll(".brand, .contact-info, .design-content");
+    const elements = document.querySelectorAll(".brand, .contact-info");
 
     elements.forEach((el) => observer.observe(el));
 
@@ -43,12 +42,37 @@ const LogoPage: React.FC<LogoPageProps> = ({ handleNavigation }) => {
 
   return (
     <>
-      <ImageSubHeader text="Welcome to our Product WebApp" setPage={handleNavigation} />
+      <DroneVideo />
+      
+      {/* Combined ImageSubHeader and Design Instantly Section */}
+      <section className="combined-hero-section">
+        <div className="hero-content">
+          <div className="hero-text">
+            <h1 className="hero-title">
+              CUSTOM PAPER BAGS AT AFFORDABLE PRICES.<br />
+              INSTANTLY DESIGNED BY YOU.
+            </h1>
+            <p className="hero-description">
+              Instantly create your own custom bags using our design studio. Choose your bag type and upload your logo to get started. You can easily download your blueprint and send it to us in your quote!
+            </p>
+          </div>
+          <div className="hero-image">
+            <Image src={custombag} alt="Custom Bag" width={750} height={750} />
+          </div>
+        </div>
+        <div className="hero-button-container">
+          <Link href="/design" className="hero-button">
+            Start Designing Now
+          </Link>
+        </div>
+      </section>
+
       <div className="paragraph">
         <div className="section-title">
           <h2>Why Choose MTC?</h2>
         </div>
       </div>
+      
       <section className="features">
         <div className="feature">
           <div className="feature-image-container">
@@ -78,34 +102,12 @@ const LogoPage: React.FC<LogoPageProps> = ({ handleNavigation }) => {
           </div>
         </div>
       </section>
+      
       <div className="center-button-container">
         <button className="feature-button" onClick={() => handleNavigation('product')}>
           Check Out Our Products
         </button>
       </div>
-
-      <hr className="section-divider" />
-
-      <section className="design-instantly">
-        <div className="section-title2">
-          <h2>Design Instantly</h2>
-        </div>
-        <div className="design-content" ref={designRef}> 
-          <div className="design-paragraph">
-            <p>
-              Instantly create your own custom bags using our design studio. Choose your bag type and upload your logo to get started. You can easily download your blueprint and send it to us in your quote!
-            </p>
-          </div>
-          <div className="design-image">
-            <Image src={custombag} alt="Custom Bag" width={750} height={750} />
-          </div>
-        </div>
-        <div className="design-buttoncontainer">
-          <button className="design-button" onClick={() => handleNavigation('design')}>
-            Design Your Bags
-          </button>
-        </div>
-      </section>
 
       <hr className="section-divider" />
 
@@ -157,7 +159,6 @@ const LogoPage: React.FC<LogoPageProps> = ({ handleNavigation }) => {
       </section>
 
       <hr className="section-divider" />
-
     </>
   );
 };

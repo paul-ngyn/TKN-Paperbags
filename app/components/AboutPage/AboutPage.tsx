@@ -16,7 +16,6 @@ const AboutPage: React.FC<AboutPageProps> = ({ handleNavigation }) => {
 
     
     <div className={styles.container}>
-       <DroneVideo className={styles.videoHeader} />
       <h2 style={{ fontSize: '32px', fontWeight: "bold", marginBottom: '2%', textAlign: 'center' }}></h2>
       {/* MTC logo on the left, text on the right */}
       <div className={styles.section}>
