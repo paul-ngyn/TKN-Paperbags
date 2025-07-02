@@ -443,62 +443,75 @@ code, pre {
 /* Add to your global CSS file or create a new CSS module */
 
 .combined-hero-section {
-  background-color: #1c51a3;
-  width: 100%;
-  padding: 40px 40px 40px 90px;
-  margin: 0px 0;
+  background-color: #15458d;
+  width: 82vw; /* Use viewport width instead of percentage */
+  max-width: 1500px; /* Set a maximum width */
+  padding: 40px 90px 40px 90px;
+  margin: 40px auto 40px auto; /* Center horizontally with auto margins */
+  border-radius: 20px;
+  position: relative;
+  left: 0; /* Reset any left positioning */
+  box-sizing: border-box;
 }
-
 
 .hero-content {
   display: flex;
   align-items: center;
-  justify-content: flex-start; /* Change from space-between to flex-start */
-  max-width: 1200px;
-  margin: 0 auto;
-  gap: 40px; /* You can adjust this gap without affecting image size */
+  justify-content: flex-start;
+  max-width: 100%;
+  margin: 0;
+  gap: 4vw; /* Use viewport width for consistent gap */
+  position: relative;
+  box-sizing: border-box;
 }
 
 .hero-text {
-  flex: 0 0 44%; /* Fixed width instead of flex: 1 */
+  flex: 0 0 47%;
   text-align: left;
   color: white;
+  margin-bottom: 6.5%;
+  min-width: 300px; /* Ensure minimum width */
+  margin-left: 3%;
 }
 
 .hero-title {
-  font-size: 46px;
+  font-size: clamp(32px, 4vw, 46px); /* Responsive font size with clamp */
   font-weight: bold;
-  margin-bottom: 30px;
+  margin-bottom: 50px;
   line-height: 1.2;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
 .hero-description {
-  font-size: 18px;
+  font-size: clamp(16px, 1.5vw, 18px); /* Responsive font size */
   line-height: 1.6;
   color: rgba(255, 255, 255, 0.9);
   margin-bottom: 0;
+  max-width: 750px;
 }
 
 .hero-image {
-  flex: 0 0 60%; /* Give image container more fixed space */
+  flex: 0 0 52%;
   display: flex;
-  justify-content: flex-end; /* Push image to the right within its container */
+  justify-content: flex-end;
   align-items: center;
-  margin-left: auto; /* Push the entire image container to the right */
+  margin-left: auto;
+  margin-top: -20px;
+  position: relative;
 }
 
 .hero-image img {
-  max-width: 120%; /* Allow image to be larger than its container */
+  max-width: 120%;
   height: auto;
   object-fit: cover;
+  position: relative;
 }
 
 .hero-button-container {
   display: flex;
   justify-content: center;
-  margin-top: 4.5%;
+  margin-top: 0.75%;
   margin-right: 2.25%;
 }
 
@@ -508,7 +521,7 @@ code, pre {
   border: 2px solid #004990;
   border-radius: 16px;
   padding: 14px 20px;
-  font-size: 20px;
+  font-size: clamp(16px, 1.5vw, 20px); /* Responsive font size */
   font-weight: bold;
   text-decoration: none;
   cursor: pointer;
@@ -523,7 +536,23 @@ code, pre {
 }
 
 /* Responsive Design */
+@media (max-width: 1200px) {
+  .combined-hero-section {
+    width: 90vw;
+    padding: 40px 60px;
+  }
+  
+  .hero-content {
+    gap: 3vw;
+  }
+}
+
 @media (max-width: 768px) {
+  .combined-hero-section {
+    width: 95vw;
+    padding: 40px 20px;
+  }
+  
   .hero-content {
     flex-direction: column;
     text-align: center;
@@ -532,33 +561,26 @@ code, pre {
   
   .hero-text {
     text-align: center;
+    flex: none;
+    width: 100%;
   }
   
-  .hero-title {
-    font-size: 32px;
-  }
-  
-  .hero-description {
-    font-size: 16px;
-  }
-  
-  .combined-hero-section {
-    padding: 40px 20px;
+  .hero-image {
+    flex: none;
+    width: 100%;
+    justify-content: center;
+    margin-left: 0;
   }
 }
 
 @media (max-width: 480px) {
-  .hero-title {
-    font-size: 24px;
-  }
-  
-  .hero-description {
-    font-size: 14px;
+  .combined-hero-section {
+    width: 98vw;
+    padding: 30px 15px;
   }
   
   .hero-button {
-    font-size: 16px;
-    padding: 12px 20px;
+    padding: 12px 16px;
   }
 }
 

@@ -49,11 +49,11 @@ const LogoPage: React.FC<LogoPageProps> = ({ handleNavigation }) => {
         <div className="hero-content">
           <div className="hero-text">
             <h1 className="hero-title">
-              CUSTOM PAPER BAGS AT AFFORDABLE PRICES.<br />
+              CUSTOM PAPER BAGS AT THE LOWEST PRICES.<br />
               INSTANTLY DESIGNED BY YOU.
             </h1>
             <p className="hero-description">
-              Instantly create your own custom bags using our design studio. Choose your bag type and upload your logo to get started. You can easily download your blueprint and send it to us in your quote!
+              Instantly create your own custom bags using our design studio. Select your bag dimensions and upload your logo to get started. You can easily download your blueprint and send it to us in your quote!
             </p>
           </div>
           <div className="hero-image">
