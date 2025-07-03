@@ -22,9 +22,6 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   title: "TKN Bags - Custom Paper Bags",
   description: "TKN BY MTC",
-  icons: {
-    icon: '/favicon.ico',
-  },
 };
 
 export default function RootLayout({

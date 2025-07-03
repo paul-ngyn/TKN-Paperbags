@@ -150,12 +150,6 @@ const LogoPage: React.FC<LogoPageProps> = ({ handleNavigation }) => {
             </p>
           </div>
         </div>
-        <div className="attributionLink">
-          <a href="https://www.vecteezy.com/free-vector/fast-clock">Fast Clock Vectors by Vecteezy</a>
-          <a href="https://designbundles.net/kant-store/1188504-shopping-bag-icon-in-black-eco-paper-bag-handbag-i">
-            Shopping Bag Icon
-          </a>
-        </div>
       </section>
 
       <hr className="section-divider" />

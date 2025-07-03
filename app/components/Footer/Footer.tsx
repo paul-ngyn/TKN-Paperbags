@@ -31,15 +31,13 @@ const Footer: React.FC = () => {
       </div>
       <div className={styles.linksContainer}>
         <Link href="/product" className={styles.footerLink}>Bags</Link>
+        <Link href="/design" className={styles.footerLink}>Design Studio</Link>
         <Link href="/about" className={styles.footerLink}>About Us</Link>
         <Link href="/contact" className={styles.footerLink}>Contact Us</Link>
         <Link href="/orderinfo" className={styles.footerLink}>Ordering Information</Link>
       </div>
       <div className={styles.footerTextContainer}>
         <p className={styles.footerText}>© 2025 Maple Trade Corporation. All rights reserved.</p>
-        <p className={styles.iconCredit}>
-          <a target="_blank" href="https://icons8.com/icon/41fUjXXm7338/download">Download</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
-        </p>
       </div>
     </footer>
   );
