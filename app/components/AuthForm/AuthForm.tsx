@@ -6,7 +6,7 @@ import styles from './AuthForm.module.css';
 
 interface AuthFormProps {
   onClose: () => void;
-  onSuccess?: () => void; // Add optional success callback
+  onSuccess?: () => void;
 }
 
 const AuthForm: React.FC<AuthFormProps> = ({ onClose, onSuccess }) => {
@@ -21,16 +21,28 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose, onSuccess }) => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signIn, signUp, user } = useAuth(); // Add user to detect login success
+  const { signIn, signUp, user, loading: authLoading } = useAuth();
 
-  // Auto-close when user becomes authenticated
+  // Reset form when switching between login/signup
   useEffect(() => {
-    if (user && loading) {
-      console.log("AuthForm: User authenticated, closing modal");
+    setFormData({
+      email: '',
+      password: '',
+      name: '',
+      businessName: '',
+      phoneNumber: '',
+    });
+    setError('');
+    setSuccess('');
+  }, [isLogin]);
+
+  // Handle successful login
+  useEffect(() => {
+    if (user && !authLoading && loading && isLogin) {
+      console.log("AuthForm: User authenticated successfully");
       setLoading(false);
       setSuccess('Login successful!');
       
-      // Call success callback if provided
       if (onSuccess) {
         onSuccess();
       }
@@ -38,12 +50,16 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose, onSuccess }) => {
       // Close modal after short delay
       setTimeout(() => {
         onClose();
-      }, 500);
+      }, 1000);
     }
-  }, [user, loading, onSuccess, onClose]);
+  }, [user, authLoading, loading, isLogin, onSuccess, onClose]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Prevent double submission
+    if (loading) return;
+    
     console.log("AuthForm: handleSubmit initiated. isLogin:", isLogin);
     setLoading(true);
     setError('');
@@ -56,10 +72,18 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose, onSuccess }) => {
         
         if (signInError) {
           console.error("AuthForm: LOGIN FAILED", signInError);
-          setError(signInError.message);
-          setLoading(false); // Reset loading on error
+          
+          // Handle specific error messages
+          if (signInError.message.includes('Invalid login credentials')) {
+            setError('Invalid email or password. Please check your credentials.');
+          } else if (signInError.message.includes('Email not confirmed')) {
+            setError('Please check your email and click the confirmation link before logging in.');
+          } else {
+            setError(signInError.message);
+          }
+          setLoading(false);
         }
-        // Don't set loading to false here - let the useEffect handle it when user state updates
+        // Success is handled in useEffect
       } else {
         // Sign Up logic
         console.log("AuthForm: Attempting SIGN UP with email:", formData.email);
@@ -73,10 +97,18 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose, onSuccess }) => {
 
         if (signUpError) {
           console.error("AuthForm: SIGN UP FAILED", signUpError);
-          setError(signUpError.message);
+          
+          // Handle specific signup errors
+          if (signUpError.message.includes('User already registered')) {
+            setError('This email is already registered. Please try logging in instead.');
+          } else if (signUpError.message.includes('email')) {
+            setError('Email sending failed. Please try again or contact support.');
+          } else {
+            setError(signUpError.message);
+          }
         } else {
           console.log("AuthForm: SIGN UP SUCCESSFUL");
-          setSuccess('Success! Please check your email to confirm your account.');
+          setSuccess('Success! Please check your email (including spam folder) to confirm your account.');
           setFormData({
             email: '',
             password: '',
@@ -85,7 +117,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose, onSuccess }) => {
             phoneNumber: '',
           });
         }
-        setLoading(false); // Reset loading for signup
+        setLoading(false);
       }
     } catch (err) {
       console.error("AuthForm: handleSubmit CATCH block error:", err);
@@ -102,12 +134,21 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose, onSuccess }) => {
   };
 
   const handleModeSwitch = () => {
-    console.log("AuthForm: handleModeSwitch. Current isLogin:", isLogin);
+    console.log("AuthForm: Switching mode from", isLogin ? 'login' : 'signup');
     setIsLogin(!isLogin);
     setError('');
     setSuccess('');
-    setLoading(false); // Reset loading when switching modes
+    setLoading(false);
   };
+
+  // Show loading spinner during auth operations
+  if (authLoading) {
+    return (
+      <div className={styles.authForm}>
+        <div className={styles.loadingMessage}>Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.authForm}>
@@ -128,6 +169,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose, onSuccess }) => {
             value={formData.email}
             onChange={handleChange}
             required
+            disabled={loading}
           />
           <input
             type="password"
@@ -137,6 +179,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose, onSuccess }) => {
             onChange={handleChange}
             required
             minLength={6}
+            disabled={loading}
           />
           {!isLogin && (
             <>
@@ -147,6 +190,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose, onSuccess }) => {
                 value={formData.name}
                 onChange={handleChange}
                 required
+                disabled={loading}
               />
               <input
                 type="text"
@@ -155,6 +199,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose, onSuccess }) => {
                 value={formData.businessName}
                 onChange={handleChange}
                 required
+                disabled={loading}
               />
               <input
                 type="tel"
@@ -163,6 +208,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose, onSuccess }) => {
                 value={formData.phoneNumber}
                 onChange={handleChange}
                 required
+                disabled={loading}
               />
             </>
           )}
@@ -177,7 +223,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose, onSuccess }) => {
       {!loading && (!success || (success && isLogin)) && (
         <p>
           {isLogin ? "Don't have an account? " : 'Already have an account? '}
-          <button type="button" onClick={handleModeSwitch}>
+          <button type="button" onClick={handleModeSwitch} disabled={loading}>
             {isLogin ? 'Sign Up' : 'Login'}
           </button>
         </p>
