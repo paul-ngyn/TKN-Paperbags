@@ -25,7 +25,7 @@ const Footer: React.FC = () => {
       Address: 2660 W Winton Ave, Hayward, CA 94545
          </a>
       </p>
-          <p>Phone: 777-777-7777</p>
+          <p>Phone: 510-783-3888</p>
           <p>Email: admin@mapletradecorp.com</p>
         </div>
       </div>

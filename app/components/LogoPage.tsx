@@ -146,7 +146,7 @@ const LogoPage: React.FC<LogoPageProps> = ({ handleNavigation }) => {
                 contact form
               </Link>
               <br />
-              We may also be reached at 777-777-777 or admin@mapletradecorp.com
+              We may also be reached at 510-783-3888 or admin@mapletradecorp.com
             </p>
           </div>
         </div>
