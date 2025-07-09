@@ -166,10 +166,6 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ onClose }) => {
               <label>Member Since:</label>
               <span>{formatJoinDate(userProfile.created_at)}</span>
             </div>
-            <div className={styles.infoItem}>
-              <label>User ID:</label>
-              <span className={styles.userId}>{user.id}</span>
-            </div>
           </div>
         </div>
 
