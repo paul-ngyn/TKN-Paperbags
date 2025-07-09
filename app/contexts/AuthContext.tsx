@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { User, AuthError } from '@supabase/supabase-js'
+import { User, AuthError, PostgrestError } from '@supabase/supabase-js' // Add PostgrestError import
 import { supabase } from '../lib/supabase'
 
 interface UserProfile {
@@ -31,7 +31,7 @@ interface AuthContextType {
     name?: string;
     business_name?: string;
     phone_number?: string;
-  }) => Promise<{ data?: any; error: any }>;
+  }) => Promise<{ data?: UserProfile; error: PostgrestError | null }>; // Fixed: Replace any with proper types
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -42,60 +42,60 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true)
 
   const createProfileIfNeeded = async (userId: string, email: string) => {
-    try {
-      // First check if profile exists
-      const { data: existingProfile } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('id', userId)
-        .single()
-      
-      if (existingProfile) {
-        console.log('Profile already exists for user', userId)
-        return
-      }
-
-      // Try to get stored signup data
-      let name = email?.split('@')[0] || 'User'
-      let businessName = 'Business'
-      let phoneNumber = 'Not provided'
-
-      try {
-        const storedData = localStorage.getItem(`signup_data_${email}`)
-        if (storedData) {
-          const data = JSON.parse(storedData) as { name?: string; businessName?: string; phoneNumber?: string }
-          name = data.name || name
-          businessName = data.businessName || businessName
-          phoneNumber = data.phoneNumber || phoneNumber
-          // Clean up stored data
-          localStorage.removeItem(`signup_data_${email}`)
-        }
-      } catch (e) {
-        console.error('Error retrieving stored signup data:', e)
-      }
-
-      // Create profile
-      const { error } = await supabase
-        .from('user_profiles')
-        .insert([
-          {
-            id: userId,
-            email: email,
-            name: name,
-            business_name: businessName,
-            phone_number: phoneNumber,
-          }
-        ])
-
-      if (error) {
-        console.error('Error creating profile on login:', error)
-      } else {
-        console.log('Profile created successfully on login')
-      }
-    } catch (err) {
-      console.error('Unexpected error in createProfileIfNeeded:', err)
+  try {
+    // First check if profile exists
+    const { data: existingProfile } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('id', userId)
+      .single()
+    
+    if (existingProfile) {
+      console.log('Profile already exists for user', userId)
+      return
     }
+
+    // Try to get stored signup data - RENAMED VARIABLES
+    let userName = email?.split('@')[0] || 'User'  // Changed from 'name' to 'userName'
+    let userBusinessName = 'Business'              // Changed from 'businessName' to 'userBusinessName'
+    let userPhoneNumber = 'Not provided'           // Changed from 'phoneNumber' to 'userPhoneNumber'
+
+    try {
+      const storedData = localStorage.getItem(`signup_data_${email}`)
+      if (storedData) {
+        const data = JSON.parse(storedData) as { name?: string; businessName?: string; phoneNumber?: string }
+        userName = data.name || userName                    // Updated variable name
+        userBusinessName = data.businessName || userBusinessName  // Updated variable name
+        userPhoneNumber = data.phoneNumber || userPhoneNumber     // Updated variable name
+        // Clean up stored data
+        localStorage.removeItem(`signup_data_${email}`)
+      }
+    } catch (e) {
+      console.error('Error retrieving stored signup data:', e)
+    }
+
+    // Create profile - UPDATED VARIABLE NAMES
+    const { error } = await supabase
+      .from('user_profiles')
+      .insert([
+        {
+          id: userId,
+          email: email,
+          name: userName,              // Updated variable name
+          business_name: userBusinessName,  // Updated variable name
+          phone_number: userPhoneNumber,    // Updated variable name
+        }
+      ])
+
+    if (error) {
+      console.error('Error creating profile on login:', error)
+    } else {
+      console.log('Profile created successfully on login')
+    }
+  } catch (err) {
+    console.error('Unexpected error in createProfileIfNeeded:', err)
   }
+}
 
   useEffect(() => {
     // Get initial session
@@ -253,9 +253,16 @@ const updateUserProfile = async (updates: {
   name?: string;
   business_name?: string;
   phone_number?: string;
-}) => {
+}): Promise<{ data?: UserProfile; error: PostgrestError | null }> => {
   if (!user) {
-    throw new Error('No user logged in');
+    const noUserError: PostgrestError = {
+      name: 'NoUserError',
+      message: 'No user logged in',
+      details: '',
+      hint: '',
+      code: 'NO_USER'
+    };
+    return { error: noUserError };
   }
 
   try {
@@ -271,27 +278,42 @@ const updateUserProfile = async (updates: {
       return { error };
     }
 
+    // Type the data properly
+    const typedData = data as UserProfile;
+    
     // Update local state
-    setUserProfile(data);
-    return { data, error: null };
+    setUserProfile(typedData);
+    
+    return { data: typedData, error: null };
   } catch (error) {
     console.error('Update profile error:', error);
-    return { error };
+    
+    // Create a proper PostgrestError for catch block
+    const catchError: PostgrestError = {
+      name: 'UpdateError',
+      message: 'Update failed',
+      details: String(error),
+      hint: '',
+      code: 'UPDATE_ERROR'
+    };
+    
+    return { error: catchError };
   }
 };
 
-// Make sure to export it in your context value:
-const value = {
+// Properly typed context value
+const value: AuthContextType = {
   user,
   userProfile,
   loading,
   signIn,
   signUp,
   signOut,
-  updateUserProfile, // Add this line
+  updateUserProfile,
 };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+
 }
 
 export const useAuth = () => {

@@ -106,7 +106,7 @@ const ProductPage: React.FC<ProductPageProps> = () => {
           <label htmlFor="handleOptions">Select a Handle Type:</label>
           <select id="handleOptions" name="handleOptions" value={selectedHandle} onChange={handleHandleChange}>
             <option value="none">None</option>
-            <option value="rope">Rope</option>
+            <option value="rope">Twisted</option>
             <option value="flat">Flat</option>
           </select>
         </div>

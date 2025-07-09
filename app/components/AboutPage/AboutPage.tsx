@@ -22,7 +22,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ handleNavigation }) => {
           <div className={`${styles.textContainer} `}>
           <h2 style={{ fontSize: '32px', fontWeight: "bold", marginBottom: '35px' }}> About Us</h2>
             <p>
-            MTC was founded in 2006 in the heart of San Francisco, expanding our operations and facilities to Hayward, California in 2019.
+            MTC was founded in 2006 in the heart of San Francisco, expanding our operations and facilities to Hayward, California in 2016.
             </p>
             <br />
             <p>
