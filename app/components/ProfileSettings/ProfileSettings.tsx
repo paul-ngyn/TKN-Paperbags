@@ -89,7 +89,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ onClose }) => {
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
       );
 
-      const { data, error: updateError } = await supabase
+      const { error: updateError } = await supabase
         .from('user_profiles')
         .update({
           name: formData.name,
