@@ -291,7 +291,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ onClose }) => {
             required
           >
             <option value="">Please Select a Handle Type</option>
-            <option value="rope">Rope</option>
+            <option value="rope">Twisted</option>
             <option value="flat">Flat</option>
             <option value="none">None</option>
           </select>
