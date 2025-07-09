@@ -1,0 +1,253 @@
+.profileSettings {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 30px;
+  border-bottom: 1px solid #e0e0e0;
+  background: #f8f9fa;
+  border-radius: 12px 12px 0 0;
+}
+
+.header h2 {
+  margin: 0;
+  color: #1c51a3;
+  font-size: 24px;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  padding: 5px;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.closeButton:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.content {
+  padding: 30px;
+}
+
+.section {
+  margin-bottom: 40px;
+}
+
+.section h3 {
+  color: #1c51a3;
+  margin-bottom: 20px;
+  font-size: 18px;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 10px;
+}
+
+.infoGrid {
+  display: grid;
+  gap: 15px;
+}
+
+.infoItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.infoItem label {
+  font-weight: 600;
+  color: #333;
+}
+
+.statusBadge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.userId {
+  font-family: monospace;
+  font-size: 12px;
+  color: #666;
+  background: #e9ecef;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.formGroup label {
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: #333;
+}
+
+.formGroup input {
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+}
+
+.formGroup input:focus {
+  outline: none;
+  border-color: #1c51a3;
+}
+
+.formGroup input:disabled {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+.disabledInput {
+  background-color: #f8f9fa !important;
+  color: #6c757d !important;
+}
+
+.helpText {
+  margin-top: 5px;
+  font-size: 12px;
+  color: #666;
+  font-style: italic;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.saveButton {
+  background: #1c51a3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  flex: 1;
+}
+
+.saveButton:hover:not(:disabled) {
+  background: #164080;
+}
+
+.saveButton.disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.cancelButton {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.cancelButton:hover {
+  background: #5a6268;
+}
+
+.error {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  border: 1px solid #f5c6cb;
+}
+
+.success {
+  background: #d4edda;
+  color: #155724;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  border: 1px solid #c3e6cb;
+}
+
+.loadingMessage {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  font-size: 16px;
+}
+
+.securityInfo {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 6px;
+  border-left: 4px solid #1c51a3;
+}
+
+.securityInfo p {
+  margin: 10px 0;
+  color: #666;
+}
+
+.securityInfo a {
+  color: #1c51a3;
+  text-decoration: none;
+}
+
+.securityInfo a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .profileSettings {
+    width: 95%;
+    margin: 10px;
+  }
+  
+  .header {
+    padding: 15px 20px;
+  }
+  
+  .content {
+    padding: 20px;
+  }
+  
+  .buttonGroup {
+    flex-direction: column;
+  }
+}

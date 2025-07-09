@@ -1,8 +1,7 @@
-"use client";
-
 import React, { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import AuthForm from '../AuthForm/AuthForm'
+import ProfileSettings from '../ProfileSettings/ProfileSettings'
 import styles from './AuthButton.module.css'
 import Image from 'next/image'
 import avatar from '../../public/avatar.png' 
@@ -11,11 +10,17 @@ const AuthButton: React.FC = () => {
   const { user, signOut } = useAuth()
   const [showModal, setShowModal] = useState(false)
   const [showDropdown, setShowDropdown] = useState(false)
+  const [showProfileSettings, setShowProfileSettings] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   const handleOpenModal = () => setShowModal(true)
   const handleCloseModal = () => setShowModal(false)
+  const handleOpenProfileSettings = () => {
+    setShowProfileSettings(true)
+    setShowDropdown(false)
+  }
+  const handleCloseProfileSettings = () => setShowProfileSettings(false)
   
   const showDropdownMenu = () => {
     if (hoverTimerRef.current) {
@@ -27,15 +32,18 @@ const AuthButton: React.FC = () => {
   const hideDropdownMenu = () => {
     hoverTimerRef.current = setTimeout(() => {
       setShowDropdown(false)
-    }, 150) // Small delay to prevent flickering when moving between button and dropdown
+    }, 150)
   }
 
-  const handleSignOut = () => {
-    signOut()
-    setShowDropdown(false)
+  const handleSignOut = async () => {
+    try {
+      await signOut()
+      setShowDropdown(false)
+    } catch (error) {
+      console.error('Logout failed:', error)
+    }
   }
 
-  // Clean up timer on unmount
   useEffect(() => {
     return () => {
       if (hoverTimerRef.current) {
@@ -79,6 +87,12 @@ const AuthButton: React.FC = () => {
               </div>
               <hr className={styles.divider} />
               <button 
+                onClick={handleOpenProfileSettings} 
+                className={styles.dropdownItem}
+              >
+                Profile Settings
+              </button>
+              <button 
                 onClick={handleSignOut} 
                 className={styles.dropdownItem}
               >
@@ -87,6 +101,16 @@ const AuthButton: React.FC = () => {
             </div>
           )}
         </div>
+
+        {/* Profile Settings Modal */}
+        {showProfileSettings && (
+          <div className={styles.modalOverlay}>
+            <div className={styles.modalContent}>
+              <ProfileSettings onClose={handleCloseProfileSettings} />
+            </div>
+            <div className={styles.modalBackdrop} onClick={handleCloseProfileSettings}></div>
+          </div>
+        )}
       </div>
     )
   }
@@ -94,13 +118,13 @@ const AuthButton: React.FC = () => {
   return (
     <div className={styles.authWrapper}>
       <button onClick={handleOpenModal} className={styles.authButton}>
-           <Image 
-              src={avatar}
-              alt="Profile Avatar" 
-              width={26}
-              height={26}
-              className={styles.avatar}
-            />
+        <Image 
+          src={avatar}
+          alt="Profile Avatar" 
+          width={26}
+          height={26}
+          className={styles.avatar}
+        />
         Login/Sign Up
       </button>
       {showModal && (

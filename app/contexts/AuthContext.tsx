@@ -24,12 +24,17 @@ interface CustomError {
 type ErrorType = AuthError | CustomError | null;
 
 interface AuthContextType {
-  user: User | null
-  userProfile: UserProfile | null
-  loading: boolean
-  signIn: (email: string, password: string) => Promise<{ error: ErrorType }>
-  signUp: (email: string, password: string, name: string, businessName: string, phoneNumber: string) => Promise<{ error: ErrorType }>
-  signOut: () => Promise<void>
+  user: User | null;
+  userProfile: UserProfile | null;
+  loading: boolean;
+  signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
+  signUp: (email: string, password: string, name: string, businessName: string, phoneNumber: string) => Promise<{ error: AuthError | CustomError | null }>;
+  signOut: () => Promise<void>;
+  updateUserProfile: (updates: {
+    name?: string;
+    business_name?: string;
+    phone_number?: string;
+  }) => Promise<{ data?: any; error: any }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -245,14 +250,49 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 };
 
-  const value = {
-    user,
-    userProfile,
-    loading,
-    signIn,
-    signUp,
-    signOut,
+  // In your AuthContext.tsx file, add this function:
+
+const updateUserProfile = async (updates: {
+  name?: string;
+  business_name?: string;
+  phone_number?: string;
+}) => {
+  if (!user) {
+    throw new Error('No user logged in');
   }
+
+  try {
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .update(updates)
+      .eq('id', user.id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating profile:', error);
+      return { error };
+    }
+
+    // Update local state
+    setUserProfile(data);
+    return { data, error: null };
+  } catch (error) {
+    console.error('Update profile error:', error);
+    return { error };
+  }
+};
+
+// Make sure to export it in your context value:
+const value = {
+  user,
+  userProfile,
+  loading,
+  signIn,
+  signUp,
+  signOut,
+  updateUserProfile, // Add this line
+};
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
