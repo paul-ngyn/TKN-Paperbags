@@ -42,6 +42,7 @@
     "@types/raw-body": "^2.1.4",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18",
+    "@types/react-pdf": "^5.0.7",
     "@types/react-resizable": "^3.0.8",
     "@types/svg-to-pdfkit": "^0.1.3",
     "eslint": "^8",
