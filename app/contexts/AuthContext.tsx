@@ -20,9 +20,6 @@ interface CustomError {
   [key: string]: unknown;
 }
 
-// Union type for all possible errors
-type ErrorType = AuthError | CustomError | null;
-
 interface AuthContextType {
   user: User | null;
   userProfile: UserProfile | null;
