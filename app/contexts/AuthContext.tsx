@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { User, AuthError, PostgrestError } from '@supabase/supabase-js' // Add PostgrestError import
+import { User, AuthError, PostgrestError } from '@supabase/supabase-js' 
 import { supabase } from '../lib/supabase'
 
 interface UserProfile {
@@ -319,9 +319,6 @@ useEffect(() => {
 const signOut = async () => {
   try {
     console.log('AuthContext: Starting signOut process');
-    setUser(null);
-    setUserProfile(null);
-    setLoading(false);
     
     // Clear localStorage first (but keep auth tokens until after signout)
     try {
@@ -339,6 +336,10 @@ const signOut = async () => {
     const { error } = await supabase.auth.signOut({
       scope: 'global'
     });
+
+    setUser(null);
+    setUserProfile(null);
+    setLoading(false);
     
     if (error) {
       console.error('AuthContext: SignOut error:', error);
