@@ -110,23 +110,74 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     })
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth state changed:', event)
-        setUser(session?.user ?? null)
-        if (session?.user) {
-          // On login, try to create profile if it doesn't exist
-          await createProfileIfNeeded(session.user.id, session.user.email || '')
-          fetchUserProfile(session.user.id)
-        } else {
-          setUserProfile(null)
-        }
-        setLoading(false)
+   const { data: { subscription } } = supabase.auth.onAuthStateChange(
+  async (event, session) => {
+    console.log('Auth state changed:', event, 'Session:', !!session);
+    
+    if (event === 'SIGNED_OUT' || !session) {
+      // User signed out or session ended
+      setUser(null);
+      setUserProfile(null);
+      setLoading(false);
+    } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+      // User signed in or token refreshed
+      setUser(session.user);
+      if (session.user) {
+        await createProfileIfNeeded(session.user.id, session.user.email || '');
+        fetchUserProfile(session.user.id);
       }
-    )
-
+      setLoading(false);
+    } else if (event === 'INITIAL_SESSION') {
+      // Initial session load
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        await createProfileIfNeeded(session.user.id, session.user.email || '');
+        fetchUserProfile(session.user.id);
+      }
+      setLoading(false);
+    }
+  }
+);
     return () => subscription.unsubscribe()
   }, [])
+
+  useEffect(() => {
+  // Listen for storage changes (cross-tab communication)
+  const handleStorageChange = (e: StorageEvent) => {
+    if (e.key === 'supabase.auth.token' && e.newValue === null) {
+      // Auth token was removed in another tab
+      console.log('Auth token removed in another tab, signing out');
+      setUser(null);
+      setUserProfile(null);
+    }
+  };
+
+  // Listen for visibility changes (tab switching)
+  const handleVisibilityChange = async () => {
+    if (!document.hidden) {
+      // Tab became visible, check auth state
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session && user) {
+          // Session expired while tab was hidden
+          console.log('Session expired, signing out');
+          setUser(null);
+          setUserProfile(null);
+        }
+      } catch (error) {
+        console.error('Error checking session on tab focus:', error);
+      }
+    }
+  };
+
+  window.addEventListener('storage', handleStorageChange);
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+
+  return () => {
+    window.removeEventListener('storage', handleStorageChange);
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
+  };
+}, [user]);
 
   const fetchUserProfile = async (userId: string) => {
     const { data, error } = await supabase
@@ -212,38 +263,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   try {
     console.log('AuthContext: Starting signOut process');
     
-    // Clear user profile immediately
-    setUserProfile(null);
-    
-    // Sign out from Supabase
-    const { error } = await supabase.auth.signOut();
-    
-    if (error) {
-      console.error('AuthContext: SignOut error:', error);
-      throw error;
-    }
-    
-    // Clear user state immediately
+    // Clear states immediately before API call
     setUser(null);
+    setUserProfile(null);
+    setLoading(false);
     
-    // Clear any stored data
+    // Clear localStorage first
     try {
-      localStorage.clear(); // Clear all localStorage data
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('signup_data_') || key.includes('supabase')) {
+          localStorage.removeItem(key);
+        }
+      });
     } catch (e) {
       console.error('Error clearing localStorage:', e);
     }
     
-    console.log('AuthContext: SignOut successful');
+    // Sign out from Supabase
+    const { error } = await supabase.auth.signOut({
+      scope: 'global'
+    });
     
-    // Force page reload to ensure clean state
-    window.location.reload();
+    if (error) {
+      console.error('AuthContext: SignOut error:', error);
+    }
+    
+    // Force a storage event to notify other tabs
+    try {
+      localStorage.setItem('auth_logout_event', Date.now().toString());
+      localStorage.removeItem('auth_logout_event');
+    } catch (e) {
+      console.error('Error dispatching logout event:', e);
+    }
+    
+    console.log('AuthContext: SignOut successful');
     
   } catch (error) {
     console.error('AuthContext: SignOut failed:', error);
     // Force logout anyway
     setUser(null);
     setUserProfile(null);
-    window.location.reload();
+    setLoading(false);
   }
 };
 
