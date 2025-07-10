@@ -110,25 +110,55 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     })
 
     // Listen for auth changes
-   const { data: { subscription } } = supabase.auth.onAuthStateChange(
+  // Update your onAuthStateChange to handle logout more reliably:
+const { data: { subscription } } = supabase.auth.onAuthStateChange(
   async (event, session) => {
     console.log('Auth state changed:', event, 'Session:', !!session);
     
-    if (event === 'SIGNED_OUT' || !session) {
-      // User signed out or session ended
+    if (event === 'SIGNED_OUT') {
+      // This is the proper logout event - clear everything here
+      console.log('Supabase confirmed sign out');
       setUser(null);
       setUserProfile(null);
       setLoading(false);
-    } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-      // User signed in or token refreshed
+      
+      // Clear any remaining auth-related localStorage
+      try {
+        Object.keys(localStorage).forEach(key => {
+          if (key.includes('supabase')) {
+            localStorage.removeItem(key);
+          }
+        });
+      } catch (e) {
+        console.error('Error clearing auth localStorage:', e);
+      }
+      
+    } else if (!session && user) {
+      // Session is null but we have a user - session expired
+      console.log('Session expired or invalid');
+      setUser(null);
+      setUserProfile(null);
+      setLoading(false);
+      
+    } else if (event === 'SIGNED_IN' && session) {
+      // User signed in
+      console.log('User signed in');
       setUser(session.user);
       if (session.user) {
         await createProfileIfNeeded(session.user.id, session.user.email || '');
         fetchUserProfile(session.user.id);
       }
       setLoading(false);
+      
+    } else if (event === 'TOKEN_REFRESHED' && session) {
+      // Token refreshed - update user but don't reload profile
+      console.log('Token refreshed');
+      setUser(session.user);
+      setLoading(false);
+      
     } else if (event === 'INITIAL_SESSION') {
       // Initial session load
+      console.log('Initial session check');
       setUser(session?.user ?? null);
       if (session?.user) {
         await createProfileIfNeeded(session.user.id, session.user.email || '');
@@ -141,28 +171,54 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe()
   }, [])
 
-  useEffect(() => {
+  // Update your storage event handler to be more specific:
+useEffect(() => {
   // Listen for storage changes (cross-tab communication)
   const handleStorageChange = (e: StorageEvent) => {
-    if (e.key === 'supabase.auth.token' && e.newValue === null) {
-      // Auth token was removed in another tab
-      console.log('Auth token removed in another tab, signing out');
+    console.log('Storage event:', e.key, e.newValue);
+    
+    // Check for custom logout event
+    if (e.key === 'auth_logout_event') {
+      console.log('Logout event detected from another tab');
       setUser(null);
       setUserProfile(null);
+      setLoading(false);
+    }
+    
+    // Check for Supabase auth token removal
+    if (e.key?.includes('supabase.auth.token') && e.newValue === null) {
+      console.log('Auth token removed in another tab');
+      // Double-check session before logging out
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (!session) {
+          setUser(null);
+          setUserProfile(null);
+          setLoading(false);
+        }
+      });
     }
   };
 
   // Listen for visibility changes (tab switching)
   const handleVisibilityChange = async () => {
-    if (!document.hidden) {
-      // Tab became visible, check auth state
+    if (!document.hidden && !loading) {
+      console.log('Tab became visible, checking auth state');
       try {
         const { data: { session } } = await supabase.auth.getSession();
+        console.log('Current session on visibility change:', !!session);
+        
+        // Only update state if there's a real change
         if (!session && user) {
-          // Session expired while tab was hidden
-          console.log('Session expired, signing out');
+          console.log('No session found but user exists, signing out');
           setUser(null);
           setUserProfile(null);
+        } else if (session && !user) {
+          console.log('Session found but no user, signing in');
+          setUser(session.user);
+          if (session.user) {
+            await createProfileIfNeeded(session.user.id, session.user.email || '');
+            fetchUserProfile(session.user.id);
+          }
         }
       } catch (error) {
         console.error('Error checking session on tab focus:', error);
@@ -177,7 +233,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     window.removeEventListener('storage', handleStorageChange);
     document.removeEventListener('visibilitychange', handleVisibilityChange);
   };
-}, [user]);
+}, [user, loading]);
 
   const fetchUserProfile = async (userId: string) => {
     const { data, error } = await supabase
@@ -259,33 +315,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }
 
-  const signOut = async () => {
+  // Replace your signOut function with this corrected version:
+const signOut = async () => {
   try {
     console.log('AuthContext: Starting signOut process');
-    
-    // Clear states immediately before API call
     setUser(null);
     setUserProfile(null);
     setLoading(false);
     
-    // Clear localStorage first
+    // Clear localStorage first (but keep auth tokens until after signout)
     try {
       Object.keys(localStorage).forEach(key => {
-        if (key.startsWith('signup_data_') || key.includes('supabase')) {
+        if (key.startsWith('signup_data_')) {
           localStorage.removeItem(key);
         }
+        // Don't clear supabase tokens yet - let signOut handle it
       });
     } catch (e) {
       console.error('Error clearing localStorage:', e);
     }
     
-    // Sign out from Supabase
+    // Sign out from Supabase FIRST - this will trigger the auth state change
     const { error } = await supabase.auth.signOut({
       scope: 'global'
     });
     
     if (error) {
       console.error('AuthContext: SignOut error:', error);
+      // Only force clear state if there's an error
+      setUser(null);
+      setUserProfile(null);
+      setLoading(false);
     }
     
     // Force a storage event to notify other tabs
@@ -300,7 +360,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
   } catch (error) {
     console.error('AuthContext: SignOut failed:', error);
-    // Force logout anyway
+    // Only force logout if there's an unexpected error
     setUser(null);
     setUserProfile(null);
     setLoading(false);
