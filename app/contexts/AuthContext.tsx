@@ -319,10 +319,6 @@ useEffect(() => {
 const signOut = async () => {
   try {
     console.log('AuthContext: Starting signOut process');
-
-    setUser(null);
-    setUserProfile(null);
-    setLoading(false);
     
     // Clear localStorage first (but keep auth tokens until after signout)
     try {
