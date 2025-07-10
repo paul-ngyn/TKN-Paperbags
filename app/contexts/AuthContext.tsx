@@ -381,31 +381,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signIn = async (email: string, password: string) => {
-    setLoading(true);
-    
-    // Clear any existing session before signing in
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        console.log('Clearing existing session before new login...');
-        await supabase.auth.signOut({ scope: 'global' });
-        forceCleanLocalStorage();
-      }
-    } catch (e) {
-      console.log('No existing session to clear');
+  setLoading(true);
+  
+  // Clear any existing session before signing in
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      console.log('Clearing existing session before new login...');
+      await supabase.auth.signOut({ scope: 'global' });
+      forceCleanLocalStorage();
     }
+  } catch (error) {
+    console.log('No existing session to clear:', error);
+  }
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    
-    if (error) {
-      setLoading(false);
-    }
-    
-    return { error };
-  };
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+  
+  if (error) {
+    setLoading(false);
+  }
+  
+  return { error };
+};
 
   const signUp = async (email: string, password: string, name: string, businessName: string, phoneNumber: string) => {
     try {
