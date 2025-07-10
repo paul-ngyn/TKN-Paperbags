@@ -14,7 +14,6 @@ interface UserProfile {
   updated_at?: string;
 }
 
-// Custom error type for non-auth errors
 interface CustomError {
   message: string;
   [key: string]: unknown;
@@ -41,15 +40,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
   
-  // Use refs to track state without causing re-renders
   const mounted = useRef(true)
   const isSigningOut = useRef(false)
+  const currentUserId = useRef<string | null>(null)
+
+  // Force clear ALL Supabase data from localStorage
+  const forceCleanLocalStorage = () => {
+    try {
+      const keysToRemove: string[] = [];
+      
+      // Collect all keys that should be removed
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (
+          key.includes('supabase') || 
+          key.includes('auth') ||
+          key.startsWith('signup_data_') ||
+          key.includes('sb-') // Supabase prefix
+        )) {
+          keysToRemove.push(key);
+        }
+      }
+      
+      // Remove all collected keys
+      keysToRemove.forEach(key => {
+        try {
+          localStorage.removeItem(key);
+          console.log('Removed localStorage key:', key);
+        } catch (e) {
+          console.error('Error removing key:', key, e);
+        }
+      });
+      
+      console.log('Cleaned localStorage - removed', keysToRemove.length, 'keys');
+    } catch (e) {
+      console.error('Error cleaning localStorage:', e);
+    }
+  };
 
   const createProfileIfNeeded = async (userId: string, email: string) => {
     try {
       console.log('Checking if profile exists for user:', userId);
       
-      // First check if profile exists using maybeSingle to avoid errors
       const { data: existingProfile, error: checkError } = await supabase
         .from('user_profiles')
         .select('id')
@@ -67,7 +99,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       console.log('Creating new profile for user:', userId);
 
-      // Try to get stored signup data
       let userName = email?.split('@')[0] || 'User';
       let userBusinessName = 'Business';
       let userPhoneNumber = 'Not provided';
@@ -85,7 +116,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.error('Error retrieving stored signup data:', e);
       }
 
-      // Create profile
       const { error } = await supabase
         .from('user_profiles')
         .insert([
@@ -99,7 +129,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         ]);
 
       if (error) {
-        // Handle duplicate key error (profile already exists)
         if (error.code === '23505') {
           console.log('Profile already exists (duplicate key), this is fine');
           return;
@@ -128,7 +157,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
       
-      if (data && mounted.current) {
+      if (data && mounted.current && currentUserId.current === userId) {
         setUserProfile(data as UserProfile);
       }
     } catch (err) {
@@ -136,7 +165,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // FIXED: Remove the dependency loop - only run once on mount
+  // Clear all auth state
+  const clearAuthState = () => {
+    console.log('Clearing auth state...');
+    setUser(null);
+    setUserProfile(null);
+    currentUserId.current = null;
+    setLoading(false);
+  };
+
+  // Set auth state for a user
+  const setAuthState = async (newUser: User) => {
+    if (!mounted.current || isSigningOut.current) return;
+    
+    console.log('Setting auth state for user:', newUser.id);
+    currentUserId.current = newUser.id;
+    setUser(newUser);
+    
+    try {
+      await createProfileIfNeeded(newUser.id, newUser.email || '');
+      await fetchUserProfile(newUser.id);
+    } catch (error) {
+      console.error('Error setting up user profile:', error);
+    }
+    
+    setLoading(false);
+  };
+
+  // Initialize auth on mount
   useEffect(() => {
     let isMounted = true;
 
@@ -149,30 +205,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (error) {
           console.error('Session error:', error);
-          setUser(null);
-          setUserProfile(null);
-          setLoading(false);
+          clearAuthState();
           return;
         }
 
         if (session?.user) {
           console.log('Found existing session for user:', session.user.id);
-          setUser(session.user);
-          await createProfileIfNeeded(session.user.id, session.user.email || '');
-          await fetchUserProfile(session.user.id);
+          await setAuthState(session.user);
         } else {
           console.log('No existing session found');
-          setUser(null);
-          setUserProfile(null);
+          clearAuthState();
         }
-        
-        setLoading(false);
       } catch (error) {
         console.error('Error initializing auth:', error);
         if (isMounted) {
-          setUser(null);
-          setUserProfile(null);
-          setLoading(false);
+          clearAuthState();
         }
       }
     };
@@ -182,9 +229,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => {
       isMounted = false;
     };
-  }, []); // Empty dependency array - only run on mount
+  }, []);
 
-  // FIXED: Separate auth state change listener with no dependencies
+  // Auth state change listener - SIMPLIFIED
   useEffect(() => {
     console.log('Setting up auth state listener...');
     
@@ -197,37 +244,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         switch (event) {
           case 'SIGNED_OUT':
             console.log('Supabase confirmed sign out');
-            setUser(null);
-            setUserProfile(null);
-            setLoading(false);
+            clearAuthState();
             isSigningOut.current = false;
             break;
 
           case 'SIGNED_IN':
-            console.log('User signed in');
+            console.log('User signed in via auth change');
             if (session?.user && !isSigningOut.current) {
-              setUser(session.user);
-              await createProfileIfNeeded(session.user.id, session.user.email || '');
-              await fetchUserProfile(session.user.id);
+              await setAuthState(session.user);
             }
-            setLoading(false);
             break;
 
           case 'TOKEN_REFRESHED':
             console.log('Token refreshed');
             if (session?.user && !isSigningOut.current) {
+              // Only update the user object, don't reload profile
               setUser(session.user);
             }
-            setLoading(false);
             break;
-
-          case 'INITIAL_SESSION':
-            console.log('Initial session event');
-            // Don't handle this here - we handle it in initializeAuth
-            break;
-
-          default:
-            console.log('Other auth event:', event);
         }
       }
     );
@@ -236,48 +270,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('Cleaning up auth listener');
       subscription.unsubscribe();
     };
-  }, []); // Empty dependency array
+  }, []); // Remove user dependency to prevent loops
 
-  // FIXED: Separate cross-tab communication with proper dependencies
+  // Cross-tab communication
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
-      if (!mounted.current || isSigningOut.current) return;
+      if (!mounted.current) return;
 
       if (e.key === 'auth_logout_event') {
         console.log('Logout event detected from another tab');
-        setUser(null);
-        setUserProfile(null);
-        setLoading(false);
-      }
-    };
-
-    const handleVisibilityChange = async () => {
-      if (document.hidden || !mounted.current || loading || isSigningOut.current) return;
-
-      console.log('Tab became visible, checking auth state');
-      
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        // Only act if there's a mismatch
-        if (!session && user) {
-          console.log('Session lost while tab was hidden');
-          setUser(null);
-          setUserProfile(null);
+        if (!isSigningOut.current) {
+          clearAuthState();
+          forceCleanLocalStorage();
         }
-      } catch (error) {
-        console.error('Error checking session on tab focus:', error);
       }
     };
 
     window.addEventListener('storage', handleStorageChange);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [user, loading]); // Keep necessary dependencies but avoid loops
+  }, []);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -286,6 +300,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
+  // IMPROVED signOut function with complete session clearing
   const signOut = async () => {
     if (isSigningOut.current) {
       console.log('SignOut already in progress');
@@ -293,35 +308,51 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     isSigningOut.current = true;
-    console.log('AuthContext: Starting signOut process');
+    console.log('AuthContext: Starting COMPLETE signOut process');
     
     try {
-      // Clear localStorage first
-      Object.keys(localStorage).forEach(key => {
-        if (key.startsWith('signup_data_') || key.includes('supabase')) {
-          try {
-            localStorage.removeItem(key);
-          } catch (e) {
-            console.error('Error removing key:', key, e);
-          }
-        }
-      });
+      // Step 1: Clear state immediately for responsive UI
+      clearAuthState();
 
-      // Clear state immediately for responsive UI
-      setUser(null);
-      setUserProfile(null);
-      setLoading(false);
+      // Step 2: Force clean ALL localStorage data
+      forceCleanLocalStorage();
 
-      // Sign out from Supabase
+      // Step 3: Sign out from Supabase
+      console.log('Signing out from Supabase...');
       const { error } = await supabase.auth.signOut({
         scope: 'global'
       });
 
       if (error) {
         console.error('Supabase signOut error:', error);
+        // Continue with cleanup even if there's an error
       }
 
-      // Notify other tabs
+      // Step 4: Force refresh Supabase auth state
+      try {
+        console.log('Forcing auth state refresh...');
+        await supabase.auth.refreshSession();
+      } catch (refreshError) {
+        console.log('Auth refresh failed (expected after logout):', refreshError);
+      }
+
+      // Step 5: Double-check session is cleared
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          console.warn('Session still exists after logout, forcing another signout...');
+          await supabase.auth.signOut({ scope: 'global' });
+        } else {
+          console.log('Session successfully cleared');
+        }
+      } catch (sessionError) {
+        console.log('Session check failed (this is okay):', sessionError);
+      }
+
+      // Step 6: Clean localStorage again (just to be sure)
+      forceCleanLocalStorage();
+
+      // Step 7: Notify other tabs
       try {
         localStorage.setItem('auth_logout_event', Date.now().toString());
         setTimeout(() => {
@@ -335,30 +366,51 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.error('Error dispatching logout event:', e);
       }
 
-      console.log('AuthContext: SignOut successful');
+      console.log('AuthContext: COMPLETE SignOut successful');
     } catch (error) {
       console.error('AuthContext: SignOut failed:', error);
-      setUser(null);
-      setUserProfile(null);
-      setLoading(false);
+      // Force clear everything even on error
+      clearAuthState();
+      forceCleanLocalStorage();
     } finally {
-      // Reset signout flag after delay
+      // Reset signout flag
       setTimeout(() => {
         isSigningOut.current = false;
-      }, 1000);
+      }, 2000); // Longer delay to prevent rapid clicking
     }
   };
 
   const signIn = async (email: string, password: string) => {
+    setLoading(true);
+    
+    // Clear any existing session before signing in
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        console.log('Clearing existing session before new login...');
+        await supabase.auth.signOut({ scope: 'global' });
+        forceCleanLocalStorage();
+      }
+    } catch (e) {
+      console.log('No existing session to clear');
+    }
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
+    
+    if (error) {
+      setLoading(false);
+    }
+    
     return { error };
   };
 
   const signUp = async (email: string, password: string, name: string, businessName: string, phoneNumber: string) => {
     try {
+      setLoading(true);
+      
       // Store signup data for later profile creation
       try {
         localStorage.setItem(`signup_data_${email}`, JSON.stringify({
@@ -377,6 +429,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) {
         console.error('Auth signup error:', error);
+        setLoading(false);
         return { error };
       }
 
@@ -408,6 +461,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { error: null };
     } catch (unexpectedError) {
       console.error('Unexpected error in signUp:', unexpectedError);
+      setLoading(false);
       return { error: { message: 'An unexpected error occurred. Please try again.' } as CustomError };
     }
   };
@@ -443,7 +497,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const typedData = data as UserProfile;
       
-      if (mounted.current) {
+      if (mounted.current && currentUserId.current === user.id) {
         setUserProfile(typedData);
       }
       
