@@ -176,21 +176,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Set auth state for a user
   const setAuthState = async (newUser: User) => {
-    if (!mounted.current || isSigningOut.current) return;
-    
-    console.log('Setting auth state for user:', newUser.id);
-    currentUserId.current = newUser.id;
-    setUser(newUser);
-    
-    try {
-      await createProfileIfNeeded(newUser.id, newUser.email || '');
-      await fetchUserProfile(newUser.id);
-    } catch (error) {
-      console.error('Error setting up user profile:', error);
-    }
-    
+  if (!mounted.current || isSigningOut.current) {
     setLoading(false);
-  };
+    return;
+  }
+  
+  console.log('Setting auth state for user:', newUser.id);
+  currentUserId.current = newUser.id;
+  setUser(newUser);
+  
+  try {
+    await createProfileIfNeeded(newUser.id, newUser.email || '');
+    await fetchUserProfile(newUser.id);
+  } catch (error) {
+    console.error('Error setting up user profile:', error);
+  } finally {
+    // Always set loading to false when done
+    if (mounted.current) {
+      setLoading(false);
+    }
+  }
+};    
 
   // Initialize auth on mount
   useEffect(() => {
@@ -273,32 +279,79 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []); // Remove user dependency to prevent loops
 
   // Cross-tab communication
-  useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
+useEffect(() => {
+  console.log('Setting up auth state listener...');
+  
+  const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    async (event, session) => {
       if (!mounted.current) return;
 
-      if (e.key === 'auth_logout_event') {
-        console.log('Logout event detected from another tab');
-        if (!isSigningOut.current) {
-          clearAuthState();
-          forceCleanLocalStorage();
-        }
+      console.log('Auth state changed:', event, 'Session:', !!session);
+      
+      switch (event) {
+        case 'SIGNED_OUT':
+          console.log('Supabase confirmed sign out');
+          clearAuthState(); // This sets loading to false
+          isSigningOut.current = false;
+          break;
+
+        case 'SIGNED_IN':
+          console.log('User signed in via auth change');
+          if (session?.user && !isSigningOut.current) {
+            await setAuthState(session.user); // This sets loading to false at the end
+          } else {
+            setLoading(false); // Reset loading if no user
+          }
+          break;
+
+        case 'TOKEN_REFRESHED':
+          console.log('Token refreshed');
+          if (session?.user && !isSigningOut.current) {
+            setUser(session.user);
+            // Don't change loading state for token refresh
+          }
+          break;
+
+        case 'INITIAL_SESSION':
+          console.log('Initial session loaded');
+          // Handle initial session load
+          if (session?.user && !isSigningOut.current) {
+            await setAuthState(session.user);
+          } else {
+            setLoading(false);
+          }
+          break;
+
+        default:
+          console.log('Other auth event:', event);
+          // For any other events, ensure loading is false if no session
+          if (!session && !isSigningOut.current) {
+            setLoading(false);
+          }
       }
-    };
+    }
+  );
 
-    window.addEventListener('storage', handleStorageChange);
+  return () => {
+    console.log('Cleaning up auth listener');
+    subscription.unsubscribe();
+  };
+}, []);
 
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, []);
+// Add a timeout safety net for loading state:
+useEffect(() => {
+  // Safety timeout to prevent infinite loading
+  const loadingTimeout = setTimeout(() => {
+    if (loading && !isSigningOut.current) {
+      console.warn('Loading state timeout - forcing loading to false');
+      setLoading(false);
+    }
+  }, 10000); // 10 second timeout
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      mounted.current = false;
-    };
-  }, []);
+  return () => {
+    clearTimeout(loadingTimeout);
+  };
+}, [loading]);
 
   // IMPROVED signOut function with complete session clearing
   const signOut = async () => {
@@ -383,28 +436,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signIn = async (email: string, password: string) => {
   setLoading(true);
   
-  // Clear any existing session before signing in
   try {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-      console.log('Clearing existing session before new login...');
-      await supabase.auth.signOut({ scope: 'global' });
-      forceCleanLocalStorage();
+    // Clear any existing session before signing in
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        console.log('Clearing existing session before new login...');
+        await supabase.auth.signOut({ scope: 'global' });
+        forceCleanLocalStorage();
+      }
+    } catch (clearError) {
+      console.log('No existing session to clear:', clearError);
     }
-  } catch (error) {
-    console.log('No existing session to clear:', error);
-  }
 
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-  
-  if (error) {
-    setLoading(false);
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    
+    if (error) {
+      console.error('Sign in error:', error);
+      setLoading(false); // Reset loading on error
+      return { error };
+    }
+
+    // Don't set loading to false here - let the auth state change handle it
+    console.log('Sign in request successful, waiting for auth state change...');
+    return { error: null };
+    
+  } catch (unexpectedError) {
+    console.error('Unexpected sign in error:', unexpectedError);
+    setLoading(false); // Reset loading on unexpected error
+    return { error: unexpectedError as AuthError };
   }
-  
-  return { error };
 };
 
   const signUp = async (email: string, password: string, name: string, businessName: string, phoneNumber: string) => {
