@@ -1,5 +1,3 @@
-import { validatePDFFile } from './pdfConverter';
-
 // Define image requirements
 export const IMAGE_REQUIREMENTS = {
   minWidth: 100,
@@ -39,8 +37,29 @@ export const validateImageFile = (file: File): Promise<{ isValid: boolean; error
 
     // Handle PDF files with simple validation
     if (file.type === 'application/pdf') {
-      const result = await validatePDFFile(file);
-      resolve(result);
+      // Inlined validation logic from the deleted file
+      try {
+        if (file.size === 0) {
+          resolve({ isValid: false, error: 'PDF file is empty.' });
+          return;
+        }
+        
+        // Simple header check to ensure it's a valid PDF
+        const headerBytes = await file.slice(0, 5).arrayBuffer();
+        const headerView = new Uint8Array(headerBytes);
+        const header = new TextDecoder().decode(headerView);
+        
+        if (!header.startsWith('%PDF')) {
+          resolve({ isValid: false, error: 'File does not appear to be a valid PDF.' });
+          return;
+        }
+        
+        // If all checks pass for the PDF, it's valid
+        resolve({ isValid: true });
+      } catch (error) {
+        console.error('PDF validation error:', error);
+        resolve({ isValid: false, error: 'Could not validate PDF file.' });
+      }
       return;
     }
 
