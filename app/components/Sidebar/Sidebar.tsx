@@ -7,12 +7,13 @@ import downloadicon from "../../public/downloadicon.png";
 import BlueprintExample from "../../public/BlueprintExample.png"
 import { BagDimensions, mmToInches} from "../../util/BagDimensions";
 import { removeBackground } from '@imgly/background-removal';
-
+import { processPDFToImage } from '../../util/pdfConverter';
+import { validateImageFile, IMAGE_REQUIREMENTS } from '../../util/fileValidator';
 
 // Extended props to support text customization
 interface SidebarProps {
   handleLogoUpload: (files: FileList) => void;
-  onUploadError?: (message: string) => void; // For parent component to handle errors
+  onUploadError?: (message: string) => void;
   handleAddText: (text?: string, style?: TextStyle) => void;
   fileInputRef: React.RefObject<HTMLInputElement>;
   dimensions: BagDimensions;
@@ -35,62 +36,6 @@ interface TextStyle {
   rotation?: number;
 }
 
-// Define image requirements
-const IMAGE_REQUIREMENTS = {
-  minWidth: 100,        // Minimum width in pixels
-  minHeight: 100,       // Minimum height in pixels
-  maxFileSize: 10 * 1024 * 1024, // 10MB in bytes
-  allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
-};
-
-// Helper function to validate the image file
-const validateImageFile = (file: File): Promise<{ isValid: boolean; error?: string }> => {
-  return new Promise((resolve) => {
-    // Check file type
-    if (!IMAGE_REQUIREMENTS.allowedTypes.includes(file.type)) {
-      resolve({ 
-        isValid: false, 
-        error: `Invalid file type. Please use: ${IMAGE_REQUIREMENTS.allowedTypes.map(type => type.split('/')[1].toUpperCase()).join(', ')}` 
-      });
-      return;
-    }
-
-    // Check file size
-    if (file.size > IMAGE_REQUIREMENTS.maxFileSize) {
-      resolve({ 
-        isValid: false, 
-        error: `File too large. Maximum size is ${IMAGE_REQUIREMENTS.maxFileSize / (1024 * 1024)}MB.` 
-      });
-      return;
-    }
-
-    // Check image dimensions using the native Image constructor
-    const img = new window.Image(); // Use window.Image to ensure native browser API
-    img.onload = () => {
-      if (img.width < IMAGE_REQUIREMENTS.minWidth || img.height < IMAGE_REQUIREMENTS.minHeight) {
-        resolve({ 
-          isValid: false, 
-          error: `Image too small. Minimum dimensions: ${IMAGE_REQUIREMENTS.minWidth}x${IMAGE_REQUIREMENTS.minHeight}px. Your image: ${img.width}x${img.height}px.` 
-        });
-      } else {
-        resolve({ isValid: true });
-      }
-      URL.revokeObjectURL(img.src); // Clean up object URL
-    };
-    
-    img.onerror = () => {
-      resolve({ 
-        isValid: false, 
-        error: 'Invalid image file or corrupted file. Could not read dimensions.' 
-      });
-      URL.revokeObjectURL(img.src); // Clean up object URL
-    };
-    
-    img.src = URL.createObjectURL(file);
-  });
-};
-
-
 const Sidebar: React.FC<SidebarProps> = ({
   handleLogoUpload,
   onUploadError, 
@@ -107,7 +52,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   updateTextContent,
   onLogoDeselect,
 }) => {
-
+  // State management
   const [showBlueprintExample, setShowBlueprintExample] = useState(false);
   const [sidebarMode, setSidebarMode] = useState<'default' | 'text'>('default');
   const [textInput, setTextInput] = useState('Your text here');
@@ -134,17 +79,31 @@ const Sidebar: React.FC<SidebarProps> = ({
   });
   const [dragActive, setDragActive] = useState(false);
   const [fileName, setFileName] = useState<string | null>(null);
-
-  // Add state for upload validation
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isValidating, setIsValidating] = useState(false);
   const [isProcessingBackground, setIsProcessingBackground] = useState(false); 
-
-  // State for user choice on background removal
   const [showBackgroundChoiceModal, setShowBackgroundChoiceModal] = useState(false);
   const [pendingFileUpload, setPendingFileUpload] = useState<FileList | null>(null);
-  
 
+  // Constants
+  const MAX_DIMENSIONS = {
+    length: 21.65, 
+    width: 11.81,
+    height: 22.14 
+  };
+
+  const MIN_DIMENSIONS = {
+    length: 6,
+    width: 2,
+    height: 6
+  };
+
+  // Utility functions
+  const inchesToMm = (inches: number) => {
+    return +(inches * 25.4).toFixed(2);
+  };
+
+  // Effects
   useEffect(() => {
     if (activeLogoId && activeLogoText && activeLogoTextStyle) {
       setTextInput(activeLogoText);
@@ -168,43 +127,273 @@ const Sidebar: React.FC<SidebarProps> = ({
     }
   }, [activeLogoId, activeLogoText, activeLogoTextStyle, sidebarMode]);
 
-
-  const MAX_DIMENSIONS = {
-    length: 21.65, 
-    width: 11.81,
-    height: 22.14 
-  };
-
-  const MIN_DIMENSIONS = {
-    length: 6,
-    width: 2,
-    height: 6
-  };
-  
-  const inchesToMm = (inches: number) => {
-    return +(inches * 25.4).toFixed(2);
-  };
-  
-
   useEffect(() => {
     const lengthInches = mmToInches(dimensions.length, 2);
     const widthInches = mmToInches(dimensions.width, 2);
-    const tabsideHeightInches = mmToInches(dimensions.height, 2);
+    const heightInches = mmToInches(dimensions.height, 2);
     
     setTempDimensionsInches({
       length: lengthInches,
       width: widthInches,
-      height: tabsideHeightInches
+      height: heightInches
     });
     
     setInputValues({
       length: lengthInches.toString(),
       width: widthInches.toString(),
-      height: tabsideHeightInches.toString()
+      height: heightInches.toString()
     });
   }, [dimensions]);
+
+  // File processing functions
+  const processFileWithBackgroundRemoval = async (filesToProcess: FileList) => {
+    if (!filesToProcess) return;
+    const file = filesToProcess[0];
+    
+    setIsProcessingBackground(true);
+    
+    try {
+      const imageUrl = URL.createObjectURL(file);
+      console.log('Starting background removal for:', file.name, file.type);
+      
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      const processedBlob = await Promise.race([
+        removeBackground(imageUrl),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Background removal timeout')), 30000)
+        )
+      ]) as Blob;
+      
+      URL.revokeObjectURL(imageUrl);
+      console.log('Background removal successful. Blob size:', processedBlob.size);
+      
+      const processedFile = new File(
+        [processedBlob],
+        file.name.replace(/\.[^/.]+$/, "") + "_bg_removed.png",
+        { type: 'image/png' }
+      );
+      
+      requestAnimationFrame(() => {
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(processedFile);
+        handleLogoUpload(dataTransfer.files);
+        setFileName(`${processedFile.name} (background removed)`);
+      });
+      
+    } catch (error) {
+      console.error("Background removal failed:", error);
+      setUploadError("Background removal failed. Using original image.");
+      if (onUploadError) {
+        onUploadError("Background removal failed. Using original image.");
+      }
+      
+      requestAnimationFrame(() => {
+        handleLogoUpload(filesToProcess);
+        setFileName(file.name);
+      });
+    } finally {
+      setTimeout(() => {
+        setIsProcessingBackground(false);
+        setPendingFileUpload(null);
+        setShowBackgroundChoiceModal(false);
+      }, 50);
+    }
+  };
+
+  const processFileWithoutBackgroundRemoval = (filesToProcess: FileList) => {
+    if (!filesToProcess) return;
+    const file = filesToProcess[0];
+    
+    requestAnimationFrame(() => {
+      handleLogoUpload(filesToProcess);
+      setFileName(`${file.name} (original)`);
+      
+      setTimeout(() => {
+        setPendingFileUpload(null);
+        setShowBackgroundChoiceModal(false);
+      }, 50);
+    });
+  };
+
+  const validateAndUploadFiles = async (files: FileList) => {
+    if (!files || files.length === 0) return;
+    
+    setIsValidating(true);
+    setUploadError(null);
+    setFileName(null);
+    setShowBackgroundChoiceModal(false);
+
+    const file = files[0];
+    
+    await new Promise(resolve => setTimeout(resolve, 50));
+    
+    const validationResult = await validateImageFile(file);
+
+    if (!validationResult.isValid) {
+      setUploadError(validationResult.error || 'Invalid file.');
+      if (onUploadError) {
+        onUploadError(validationResult.error || 'Invalid file.');
+      }
+      setIsValidating(false);
+      return;
+    }
+    
+    setIsValidating(false);
+
+    // Handle PDF files
+    // Handle PDF files
+   // In Sidebar.tsx, update the PDF handling section
+  if (file.type === 'application/pdf') {
+    setIsProcessingBackground(true);
+    setUploadError(null);
+    
+    try {
+      console.log('Processing PDF file:', file.name);
+      
+      // Add a progress message
+      const progressTimer = setTimeout(() => {
+        setUploadError("PDF processing is taking longer than expected. Please wait...");
+      }, 5000); // Show message after 5 seconds
+      
+      const convertedFile = await processPDFToImage(file)
+        .catch(error => {
+          throw error;
+        });
+      
+      // Clear the progress message
+      clearTimeout(progressTimer);
+      setUploadError(null);
+      
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(convertedFile);
+      
+      handleLogoUpload(dataTransfer.files);
+      setFileName(`${convertedFile.name} (converted from PDF)`);
+    } catch (error) {
+      console.error('PDF conversion failed:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to convert PDF. Please try a different file.';
+      setUploadError(errorMessage);
+      if (onUploadError) {
+        onUploadError(errorMessage);
+      }
+    } finally {
+      setIsProcessingBackground(false);
+    }
+    return;
+  }
+
+    // Handle PNG files
+    if (file.type === 'image/png') {
+      processFileWithoutBackgroundRemoval(files);
+      return;
+    }
+
+    // Handle other image types with background removal choice
+    if (file.type === 'image/jpeg' || file.type === 'image/jpg' || file.type === 'image/webp' || file.type === 'image/gif') {
+      setPendingFileUpload(files);
+      setShowBackgroundChoiceModal(true);
+    } else {
+      processFileWithoutBackgroundRemoval(files);
+    }
+  };
+
+  // Event handlers
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setDragActive(true);
+    setUploadError(null); 
+  };
+
+  const handleDragLeave = () => {
+    setDragActive(false);
+  };
   
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setDragActive(false);
+    if (e.dataTransfer.files?.length) {
+      await validateAndUploadFiles(e.dataTransfer.files);
+    }
+  };
+
+  const handleFileInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files?.length) {
+      await validateAndUploadFiles(files);
+    }
+  };
+
+  const handleClick = () => {
+    setUploadError(null);
+    fileInputRef.current?.click();
+  };
+
+  const handleAddTextClick = () => {
+    setSidebarMode('text');
+    if (activeLogoId && onLogoDeselect) {
+        onLogoDeselect(); 
+    }
+    setTextInput('Your text here');
+    setTextStyle({
+      fontFamily: 'Arial',
+      fontSize: 24,
+      color: '#000000',
+      fontWeight: 'normal',
+      rotation: 0
+    });
+  };
+
+  // Text handling functions
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setTextInput(e.target.value);
+  };
+
+  const handleRotationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rotationValue = parseInt(e.target.value, 10);
+    setTextStyle(prev => ({ ...prev, rotation: rotationValue }));
+  };
   
+  const handleFontFamilyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setTextStyle(prev => ({ ...prev, fontFamily: e.target.value }));
+  };
+  
+  const handleFontSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTextStyle(prev => ({ ...prev, fontSize: parseInt(e.target.value, 10) }));
+  };
+  
+  const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTextStyle(prev => ({ ...prev, color: e.target.value }));
+  };
+  
+  const handleFontWeightChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setTextStyle(prev => ({ ...prev, fontWeight: e.target.value }));
+  };
+  
+  const applyTextChanges = () => {
+    const finalTextStyle = {
+      ...textStyle,
+      rotation: textStyle.rotation || 0 
+    };
+    if (activeLogoId && updateTextContent) {
+      updateTextContent(activeLogoId, textInput, finalTextStyle);
+    } else {
+      handleAddText(textInput, finalTextStyle);
+    }
+    setSidebarMode('default');
+     if (onLogoDeselect) {
+        onLogoDeselect();
+    }
+  };
+  
+  const cancelTextChanges = () => {
+    setSidebarMode('default');
+    if (onLogoDeselect) {
+        onLogoDeselect();
+    }
+  };
+
+  // Dimension handling functions
   const onDimensionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setInputValues({ ...inputValues, [name]: value });
@@ -251,233 +440,6 @@ const Sidebar: React.FC<SidebarProps> = ({
     setInputValues({ length: lengthInches.toString(), width: widthInches.toString(), height: heightInches.toString() });
   };
 
-  const processFileWithBackgroundRemoval = async (filesToProcess: FileList) => {
-  if (!filesToProcess) return;
-  const file = filesToProcess[0];
-  
-  setIsProcessingBackground(true);
-  
-  try {
-    // Create image URL
-    const imageUrl = URL.createObjectURL(file);
-    console.log('Starting background removal for:', file.name, file.type);
-    
-    // Add a small delay to allow UI to update
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
-    // Process in chunks to prevent freezing
-    const processedBlob = await Promise.race([
-      removeBackground(imageUrl),
-      new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Background removal timeout')), 30000)
-      )
-    ]) as Blob;
-    
-    // Clean up the original URL immediately
-    URL.revokeObjectURL(imageUrl);
-    console.log('Background removal successful. Blob size:', processedBlob.size);
-    
-    // Create processed file
-    const processedFile = new File(
-      [processedBlob],
-      file.name.replace(/\.[^/.]+$/, "") + "_bg_removed.png",
-      { type: 'image/png' }
-    );
-    
-    // Use requestAnimationFrame to ensure smooth UI updates
-    requestAnimationFrame(() => {
-      const dataTransfer = new DataTransfer();
-      dataTransfer.items.add(processedFile);
-      handleLogoUpload(dataTransfer.files);
-      setFileName(`${processedFile.name} (background removed)`);
-    });
-    
-  } catch (error) {
-    console.error("Background removal failed:", error);
-    setUploadError("Background removal failed. Using original image.");
-    if (onUploadError) {
-      onUploadError("Background removal failed. Using original image.");
-    }
-    
-    // Fallback to original with delay for UI responsiveness
-    requestAnimationFrame(() => {
-      handleLogoUpload(filesToProcess);
-      setFileName(file.name);
-    });
-  } finally {
-    // Use setTimeout to ensure state updates don't block
-    setTimeout(() => {
-      setIsProcessingBackground(false);
-      setPendingFileUpload(null);
-      setShowBackgroundChoiceModal(false);
-    }, 50);
-  }
-};
-
-const processFileWithoutBackgroundRemoval = (filesToProcess: FileList) => {
-  if (!filesToProcess) return;
-  const file = filesToProcess[0];
-  
-  // Use requestAnimationFrame for smooth transitions
-  requestAnimationFrame(() => {
-    handleLogoUpload(filesToProcess);
-    setFileName(`${file.name} (original)`);
-    
-    // Clean up state
-    setTimeout(() => {
-      setPendingFileUpload(null);
-      setShowBackgroundChoiceModal(false);
-    }, 50);
-  });
-};
-
-// Improved validateAndUploadFiles with better memory management
-const validateAndUploadFiles = async (files: FileList) => {
-  if (!files || files.length === 0) return;
-  
-  setIsValidating(true);
-  setUploadError(null);
-  setFileName(null);
-  setShowBackgroundChoiceModal(false);
-
-  const file = files[0];
-  
-  // Add small delay to allow UI to update
-  await new Promise(resolve => setTimeout(resolve, 50));
-  
-  const validationResult = await validateImageFile(file);
-
-  if (!validationResult.isValid) {
-    setUploadError(validationResult.error || 'Invalid file.');
-    if (onUploadError) {
-      onUploadError(validationResult.error || 'Invalid file.');
-    }
-    setIsValidating(false);
-    return;
-  }
-  
-  setIsValidating(false);
-
-  // For PNGs, process immediately
-  if (file.type === 'image/png') {
-    console.log('PNG detected, using original file.');
-    processFileWithoutBackgroundRemoval(files);
-    return;
-  }
-
-  // For other types, show choice modal
-  if (file.type === 'image/jpeg' || file.type === 'image/jpg' || file.type === 'image/webp' || file.type === 'image/gif') {
-    setPendingFileUpload(files);
-    // Use requestAnimationFrame to ensure smooth modal appearance
-    requestAnimationFrame(() => {
-      setShowBackgroundChoiceModal(true);
-    });
-  } else {
-    console.log(`Unsupported type for background removal choice: ${file.type}, uploading as original.`);
-    processFileWithoutBackgroundRemoval(files);
-  }
-};
-
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setDragActive(true);
-    setUploadError(null); 
-  };
-
-  const handleDragLeave = () => {
-    setDragActive(false);
-  };
-  
-  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setDragActive(false);
-    if (e.dataTransfer.files?.length) {
-      await validateAndUploadFiles(e.dataTransfer.files);
-    }
-  };
-  
-
-  const handleFileInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files?.length) {
-      await validateAndUploadFiles(files);
-    }
-  };
-
-
-
-  const handleClick = () => {
-    setUploadError(null); // Clear errors when user clicks to browse
-    fileInputRef.current?.click();
-  };
-
-
-  const handleAddTextClick = () => {
-    setSidebarMode('text');
-    // If deselecting an active logo when switching to text mode for a *new* text
-    if (activeLogoId && onLogoDeselect) {
-        onLogoDeselect(); 
-    }
-    setTextInput('Your text here'); // Reset for new text
-    setTextStyle({ // Reset style for new text
-      fontFamily: 'Arial',
-      fontSize: 24,
-      color: '#000000',
-      fontWeight: 'normal',
-      rotation: 0
-    });
-  };
-  
-  
-  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setTextInput(e.target.value);
-  };
-
-  const handleRotationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const rotationValue = parseInt(e.target.value, 10);
-    setTextStyle(prev => ({ ...prev, rotation: rotationValue }));
-  };
-  
-  const handleFontFamilyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setTextStyle(prev => ({ ...prev, fontFamily: e.target.value }));
-  };
-  
-  const handleFontSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTextStyle(prev => ({ ...prev, fontSize: parseInt(e.target.value, 10) }));
-  };
-  
-  const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTextStyle(prev => ({ ...prev, color: e.target.value }));
-  };
-  
-  const handleFontWeightChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setTextStyle(prev => ({ ...prev, fontWeight: e.target.value }));
-  };
-  
-  const applyTextChanges = () => {
-    const finalTextStyle = {
-      ...textStyle,
-      rotation: textStyle.rotation || 0 
-    };
-    if (activeLogoId && updateTextContent) {
-      updateTextContent(activeLogoId, textInput, finalTextStyle);
-    } else {
-      handleAddText(textInput, finalTextStyle);
-    }
-    setSidebarMode('default');
-     if (onLogoDeselect) { // Deselect after applying/adding text
-        onLogoDeselect();
-    }
-  };
-  
-  const cancelTextChanges = () => {
-    setSidebarMode('default');
-    if (onLogoDeselect) { // Deselect if user cancels text editing
-        onLogoDeselect();
-    }
-  };
-
   const dimensionsChanged = () => {
     const originalInches = {
       length: mmToInches(dimensions.length, 2),
@@ -510,28 +472,27 @@ const validateAndUploadFiles = async (files: FileList) => {
     <div className={styles.sidebarContainer}>
       <h2 className={styles.sidebarTitle}>Design Your Bag</h2>
 
- 
       <div className={styles.tabNavigation}>
-      <button 
-        className={`${styles.tabButton} ${sidebarMode === 'default' ? styles.activeTab : ''}`}
-        onClick={() => {
-          setSidebarMode('default');
-          if (activeLogoId && onLogoDeselect) {
-            onLogoDeselect();
-          }
-        }}
-      >
-        Upload
-      </button>
-      <button 
-        className={`${styles.tabButton} ${sidebarMode === 'text' ? styles.activeTab : ''}`}
-        onClick={handleAddTextClick} 
-      >
-        Text
-      </button>
-    </div>
+        <button 
+          className={`${styles.tabButton} ${sidebarMode === 'default' ? styles.activeTab : ''}`}
+          onClick={() => {
+            setSidebarMode('default');
+            if (activeLogoId && onLogoDeselect) {
+              onLogoDeselect();
+            }
+          }}
+        >
+          Upload
+        </button>
+        <button 
+          className={`${styles.tabButton} ${sidebarMode === 'text' ? styles.activeTab : ''}`}
+          onClick={handleAddTextClick} 
+        >
+          Text
+        </button>
+      </div>
 
-   
+      {/* Upload Section */}
       {sidebarMode === 'default' && (
         <div className={styles.uploadSection}>
           <div 
@@ -549,23 +510,23 @@ const validateAndUploadFiles = async (files: FileList) => {
               className={styles.dropIcon}
             />
             {isValidating ? (
-              <p>Validating image...</p>
+              <p>Validating file...</p>
             ) : isProcessingBackground ? (
-              <p>Processing image...</p>
+              <p>{pendingFileUpload?.[0]?.type === 'application/pdf' ? 'Converting PDF...' : 'Processing image...'}</p>
             ) : (
               <>
-                <small>Drag & drop your logos here, or click to browse</small>
+                <small>Drag & drop your logos or PDFs here, or click to browse</small>
                 <div className={styles.requirements}>
                   <small>
                     Min Dimensions: {IMAGE_REQUIREMENTS.minWidth} x {IMAGE_REQUIREMENTS.minHeight}px
                   </small>
-                  
                   <small>
                     Max Size: {IMAGE_REQUIREMENTS.maxFileSize / (1024 * 1024)}MB
                   </small>
-  
                   <small>
-                   Supported File Formats: {IMAGE_REQUIREMENTS.allowedTypes.map(type => type.split('/')[1].toUpperCase()).join(', ')}
+                    Supported Formats: {IMAGE_REQUIREMENTS.allowedTypes
+                      .map(type => type === 'application/pdf' ? 'PDF' : type.split('/')[1].toUpperCase())
+                      .join(', ')}
                   </small>
                 </div>
               </>
@@ -601,6 +562,7 @@ const validateAndUploadFiles = async (files: FileList) => {
         </div>
       )}
 
+      {/* Text Section */}
       {sidebarMode === 'text' && (
         <div className={styles.textInputSection}>
           <h3>{activeLogoId ? 'Edit Text' : 'Add New Text:'}</h3>
@@ -617,85 +579,85 @@ const validateAndUploadFiles = async (files: FileList) => {
           </div>
 
           <div className={styles.formGroup}>
-        <label htmlFor="font-family">Font:</label>
-        <select 
-          id="font-family" 
-          value={textStyle.fontFamily}
-          onChange={handleFontFamilyChange}
-          className={styles.fontSelect} 
-        >
-          <optgroup label="- Classic -">
-            <option value="Arial">Arial</option>
-            <option value="Verdana">Verdana</option>
-            <option value="Helvetica">Helvetica</option>
-            <option value="Times New Roman">Times New Roman</option>
-            <option value="Courier New">Courier New</option>
-            <option value="Georgia">Georgia</option>
-            <option value="Tahoma">Tahoma</option>
-            <option value="Trebuchet MS">Trebuchet MS</option>
-            <option value="Impact">Impact</option>
-            <option value="Comic Sans MS">Comic Sans MS</option>
-          </optgroup>
+            <label htmlFor="font-family">Font:</label>
+            <select 
+              id="font-family" 
+              value={textStyle.fontFamily}
+              onChange={handleFontFamilyChange}
+              className={styles.fontSelect} 
+            >
+              <optgroup label="- Classic -">
+                <option value="Arial">Arial</option>
+                <option value="Verdana">Verdana</option>
+                <option value="Helvetica">Helvetica</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Courier New">Courier New</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Tahoma">Tahoma</option>
+                <option value="Trebuchet MS">Trebuchet MS</option>
+                <option value="Impact">Impact</option>
+                <option value="Comic Sans MS">Comic Sans MS</option>
+              </optgroup>
 
-          <optgroup label="- Modern Sans-Serif -">
-            <option value="Inter">Inter</option>
-            <option value="Poppins">Poppins</option>
-            <option value="Montserrat">Montserrat</option>
-            <option value="Nunito">Nunito</option>
-            <option value="Rubik">Rubik</option>
-            <option value="Work Sans">Work Sans</option>
-            <option value="Exo 2">Exo 2</option>
-          </optgroup>
+              <optgroup label="- Modern Sans-Serif -">
+                <option value="Inter">Inter</option>
+                <option value="Poppins">Poppins</option>
+                <option value="Montserrat">Montserrat</option>
+                <option value="Nunito">Nunito</option>
+                <option value="Rubik">Rubik</option>
+                <option value="Work Sans">Work Sans</option>
+                <option value="Exo 2">Exo 2</option>
+              </optgroup>
 
-          <optgroup label="- Display & Impact -">
-            <option value="Oswald">Oswald</option>
-            <option value="Bebas Neue">Bebas Neue</option>
-            <option value="Anton">Anton</option>
-            <option value="Raleway">Raleway</option>
-            <option value="Fredoka One">Fredoka One</option>
-            <option value="Righteous">Righteous</option>
-            <option value="Alfa Slab One">Alfa Slab One</option>
-            <option value="Black Ops One">Black Ops One</option>
-            <option value="Bungee">Bungee</option>
-            <option value="Orbitron">Orbitron</option>
-            <option value="Russo One">Russo One</option>
-            <option value="Staatliches">Staatliches</option>
-          </optgroup>
+              <optgroup label="- Display & Impact -">
+                <option value="Oswald">Oswald</option>
+                <option value="Bebas Neue">Bebas Neue</option>
+                <option value="Anton">Anton</option>
+                <option value="Raleway">Raleway</option>
+                <option value="Fredoka One">Fredoka One</option>
+                <option value="Righteous">Righteous</option>
+                <option value="Alfa Slab One">Alfa Slab One</option>
+                <option value="Black Ops One">Black Ops One</option>
+                <option value="Bungee">Bungee</option>
+                <option value="Orbitron">Orbitron</option>
+                <option value="Russo One">Russo One</option>
+                <option value="Staatliches">Staatliches</option>
+              </optgroup>
 
-          <optgroup label="- Elegant Serif -">
-            <option value="Playfair Display">Playfair Display</option>
-            <option value="Merriweather">Merriweather</option>
-            <option value="Crimson Text">Crimson Text</option>
-            <option value="Libre Baskerville">Libre Baskerville</option>
-            <option value="Cormorant Garamond">Cormorant Garamond</option>
-            <option value="EB Garamond">EB Garamond</option>
-          </optgroup>
-          <optgroup label="- Script & Handwritten -">
-            <option value="Pacifico">Pacifico</option>
-            <option value="Dancing Script">Dancing Script</option>
-            <option value="Great Vibes">Great Vibes</option>
-            <option value="Satisfy">Satisfy</option>
-            <option value="Kaushan Script">Kaushan Script</option>
-            <option value="Caveat">Caveat</option>
-            <option value="Indie Flower">Indie Flower</option>
-            <option value="Shadows Into Light">Shadows Into Light</option>
-            <option value="Permanent Marker">Permanent Marker</option>            
-            <option value="Architects Daughter">Architects Daughter</option>
-            <option value="Kalam">Kalam</option>
-          </optgroup>
-          
-          <optgroup label="- Unique & Thematic -">
-            <option value="Amatic SC">Amatic SC</option>
-          </optgroup>
+              <optgroup label="- Elegant Serif -">
+                <option value="Playfair Display">Playfair Display</option>
+                <option value="Merriweather">Merriweather</option>
+                <option value="Crimson Text">Crimson Text</option>
+                <option value="Libre Baskerville">Libre Baskerville</option>
+                <option value="Cormorant Garamond">Cormorant Garamond</option>
+                <option value="EB Garamond">EB Garamond</option>
+              </optgroup>
 
-          <optgroup label="- Monospace & Code -">
-            <option value="Fira Code">Fira Code</option>
-            <option value="Space Mono">Space Mono</option>
-            <option value="JetBrains Mono">JetBrains Mono</option>
-          </optgroup>
-        </select>
-      </div>
+              <optgroup label="- Script & Handwritten -">
+                <option value="Pacifico">Pacifico</option>
+                <option value="Dancing Script">Dancing Script</option>
+                <option value="Great Vibes">Great Vibes</option>
+                <option value="Satisfy">Satisfy</option>
+                <option value="Kaushan Script">Kaushan Script</option>
+                <option value="Caveat">Caveat</option>
+                <option value="Indie Flower">Indie Flower</option>
+                <option value="Shadows Into Light">Shadows Into Light</option>
+                <option value="Permanent Marker">Permanent Marker</option>            
+                <option value="Architects Daughter">Architects Daughter</option>
+                <option value="Kalam">Kalam</option>
+              </optgroup>
+              
+              <optgroup label="- Unique & Thematic -">
+                <option value="Amatic SC">Amatic SC</option>
+              </optgroup>
 
+              <optgroup label="- Monospace & Code -">
+                <option value="Fira Code">Fira Code</option>
+                <option value="Space Mono">Space Mono</option>
+                <option value="JetBrains Mono">JetBrains Mono</option>
+              </optgroup>
+            </select>
+          </div>
 
           <div className={styles.formGroup}>
             <label htmlFor="font-size">Size: {textStyle.fontSize}px</label>
@@ -738,17 +700,17 @@ const validateAndUploadFiles = async (files: FileList) => {
           </div>
 
           <div className={styles.formGroup}>
-          <label htmlFor="text-rotation">Rotation: {textStyle.rotation || 0}°</label>
-          <input
-            id="text-rotation"
-            type="range"
-            min="-180"
-            max="180"
-            value={textStyle.rotation || 0}
-            onChange={handleRotationChange}
-            className={styles.slider}
-          />
-        </div>
+            <label htmlFor="text-rotation">Rotation: {textStyle.rotation || 0}°</label>
+            <input
+              id="text-rotation"
+              type="range"
+              min="-180"
+              max="180"
+              value={textStyle.rotation || 0}
+              onChange={handleRotationChange}
+              className={styles.slider}
+            />
+          </div>
         
           <div className={styles.buttonGroupText}>
             <button 
@@ -764,20 +726,21 @@ const validateAndUploadFiles = async (files: FileList) => {
               Cancel
             </button>
           </div>
+
           <div className={styles.textPreviewContainer}>
-          <p 
-            className={styles.textPreview}
-            style={{
-              fontFamily: textStyle.fontFamily,
-              fontSize: `${textStyle.fontSize}px`,
-              color: textStyle.color,
-              fontWeight: textStyle.fontWeight,
-              transform: `rotate(${textStyle.rotation || 0}deg)`
-            }}
-          >
-            {textInput || "Preview"}
-          </p>
-        </div>
+            <p 
+              className={styles.textPreview}
+              style={{
+                fontFamily: textStyle.fontFamily,
+                fontSize: `${textStyle.fontSize}px`,
+                color: textStyle.color,
+                fontWeight: textStyle.fontWeight,
+                transform: `rotate(${textStyle.rotation || 0}deg)`
+              }}
+            >
+              {textInput || "Preview"}
+            </p>
+          </div>
           
           <div className={styles.downloadButtonContainer}>
             <button 
@@ -797,6 +760,7 @@ const validateAndUploadFiles = async (files: FileList) => {
         </div>
       )}
 
+      {/* Default Mode - Dimensions and Info */}
       {sidebarMode === 'default' && (
         <>
           <div className={styles.infoLinkContainer}>
@@ -912,6 +876,7 @@ const validateAndUploadFiles = async (files: FileList) => {
         </>
       )}
       
+      {/* Blueprint Modal */}
       {showBlueprintExample && (
         <div className={styles.modal}>
           <div className={styles.modalContent}>
@@ -934,40 +899,40 @@ const validateAndUploadFiles = async (files: FileList) => {
         </div>
       )}
 
-      {/* Modal for background removal choice */}
+      {/* Background Choice Modal */}
       {showBackgroundChoiceModal && pendingFileUpload && (
-  <div className={styles.modal}>
-    <div className={styles.modalContent}>
-      <h3>Background Image Options</h3>
-      <p>This image is a {pendingFileUpload[0].type.split('/')[1].toUpperCase()} and contains a non-transparent background. Do you want to attempt to remove its background?</p>
-      <p><small>Choose <strong>Remove Background</strong> for plain logos or images. Choose <strong> Keep Original </strong> for photographs or complex images.</small></p>
-      
-      <div className={styles.buttonGroup} style={{ marginTop: '20px', justifyContent: 'center' }}>
-        <button 
-          onClick={() => processFileWithBackgroundRemoval(pendingFileUpload)} 
-          className={`${styles.applyButton} ${isProcessingBackground ? styles.loading : ''}`}
-          disabled={isProcessingBackground}
-        >
-          {isProcessingBackground ? (
-            <>
-              <span className={styles.loader}></span>
-              Processing...
-            </>
-          ) : (
-            'Remove Background'
-          )}
-        </button>
-        <button 
-          onClick={() => processFileWithoutBackgroundRemoval(pendingFileUpload)} 
-          className={styles.resetButton}
-          disabled={isProcessingBackground}
-        >
-          Keep Original
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+        <div className={styles.modal}>
+          <div className={styles.modalContent}>
+            <h3>Background Image Options</h3>
+            <p>This image is a {pendingFileUpload[0].type.split('/')[1].toUpperCase()} and contains a non-transparent background. Do you want to attempt to remove its background?</p>
+            <p><small>Choose <strong>Remove Background</strong> for plain logos or images. Choose <strong> Keep Original </strong> for photographs or complex images.</small></p>
+            
+            <div className={styles.buttonGroup} style={{ marginTop: '20px', justifyContent: 'center' }}>
+              <button 
+                onClick={() => processFileWithBackgroundRemoval(pendingFileUpload)} 
+                className={`${styles.applyButton} ${isProcessingBackground ? styles.loading : ''}`}
+                disabled={isProcessingBackground}
+              >
+                {isProcessingBackground ? (
+                  <>
+                    <span className={styles.loader}></span>
+                    Processing...
+                  </>
+                ) : (
+                  'Remove Background'
+                )}
+              </button>
+              <button 
+                onClick={() => processFileWithoutBackgroundRemoval(pendingFileUpload)} 
+                className={styles.resetButton}
+                disabled={isProcessingBackground}
+              >
+                Keep Original
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
