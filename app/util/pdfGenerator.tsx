@@ -1,26 +1,11 @@
 import jsPDF from "jspdf";
 import { svg2pdf } from "svg2pdf.js";
 import { BagDimensions, calculateBagDimensions } from "../util/BagDimensions";
+// 1. Import the Logo and TextStyle types from their single source of truth
+import { Logo } from '../components/LogoItem/LogoItem';
 
-// Define your Logo and TextStyle interfaces or import them
-interface TextStyle {
-  fontFamily: string;
-  fontSize: number;
-  color: string;
-  fontWeight: string;
-  rotation?: number; 
-}
+// 2. Remove the local, outdated interface definitions
 
-interface Logo {
-  id: string;
-  type: 'image' | 'text';
-  src?: string;
-  text?: string;
-  textStyle?: TextStyle;
-  position: { x: number, y: number };
-  size: { width: number, height: number };
-  rotation?: number;
-}
 interface TextOptions {
   align: 'left' | 'center' | 'right';
   baseline: 'top' | 'middle' | 'bottom';
@@ -29,6 +14,7 @@ interface TextOptions {
 
 export const generatePDF = async (
   dimensions: BagDimensions,
+  // 3. This now uses the correct, imported Logo type
   logos: Logo[],
   bagContainerRef: React.RefObject<HTMLDivElement>
 ) => {
@@ -102,11 +88,28 @@ export const generatePDF = async (
           const logoWidthInPDF = logo.size.width * scaleX;
           const logoHeightInPDF = logo.size.height * scaleY;
           
-          // Process based on logo type
+          // 4. Process based on logo type, now including 'pdf'
           if (logo.type === 'text' && logo.text) {
             addTextToPdf(pdf, logo, logoXInPDF, logoYInPDF, logoWidthInPDF, logoHeightInPDF, scaleX, scaleY);
           } else if (logo.type === 'image' && logo.src) {
             pdf.addImage(logo.src, 'PNG', logoXInPDF, logoYInPDF, logoWidthInPDF, logoHeightInPDF);
+          } else if (logo.type === 'pdf') {
+            // Draw a placeholder for the PDF logo
+            pdf.setDrawColor(204, 204, 204); // light grey border
+            pdf.setFillColor(247, 247, 247); // very light grey fill
+            pdf.rect(logoXInPDF, logoYInPDF, logoWidthInPDF, logoHeightInPDF, 'FD'); // Fill and Draw
+
+            // Add text to the placeholder
+            pdf.setFontSize(10);
+            pdf.setTextColor(231, 76, 60); // red-ish color for "PDF"
+            pdf.text('PDF Logo', logoXInPDF + logoWidthInPDF / 2, logoYInPDF + logoHeightInPDF / 2 - 0.05, { align: 'center' });
+
+            if (logo.fileName) {
+                pdf.setFontSize(8);
+                pdf.setTextColor(85, 85, 85); // dark grey for filename
+                const shortFileName = logo.fileName.length > 25 ? logo.fileName.substring(0, 22) + '...' : logo.fileName;
+                pdf.text(shortFileName, logoXInPDF + logoWidthInPDF / 2, logoYInPDF + logoHeightInPDF / 2 + 0.1, { align: 'center' });
+            }
           } else {
             console.warn(`Skipping logo ${logo.id} - invalid type or missing content`);
           }

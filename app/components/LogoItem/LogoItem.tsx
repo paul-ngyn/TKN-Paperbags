@@ -16,8 +16,10 @@ interface TextStyle {
 
 export interface Logo {
   id: string;
-  type: 'image' | 'text';
+  type: 'image' | 'text' | 'pdf'; // Added 'pdf' type
   src?: string;
+  file?: File; // To hold the original file object
+  fileName?: string; // To display the PDF's name
   text?: string;
   textStyle?: {
     fontFamily: string;
@@ -112,6 +114,60 @@ const LogoItem: React.FC<LogoItemProps> = ({
     ? logo.textStyle.rotation
     : (logo.rotation ?? 0);
 
+  const renderLogoContent = () => {
+    switch (logo.type) {
+      case 'pdf':
+        return (
+          <div className={styles.pdfContainer}>
+            <span className={styles.pdfFileName}>{logo.fileName || 'PDF Document'}</span>
+          </div>
+        );
+      case 'text':
+        return (
+          <div 
+            style={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontFamily: logo.textStyle?.fontFamily || 'Arial',
+              fontSize: `${logo.textStyle?.fontSize || 24}px`,
+              fontWeight: logo.textStyle?.fontWeight || 'normal',
+              color: logo.textStyle?.color || '#000000',
+              pointerEvents: "none",
+              userSelect: "none",
+              whiteSpace: "pre-wrap",
+              textAlign: "center",
+              overflow: "hidden",
+              padding: `${Math.max(4, (logo.textStyle?.fontSize || 24) * 0.15)}px`,
+              boxSizing: "border-box",
+              lineHeight: logo.text?.includes('\n') ? 1.3 : 1.1,
+              wordBreak: "break-word",
+              textOverflow: "ellipsis",
+              maxHeight: "100%"
+            }}
+          >
+            {logo.text || "Text"}
+          </div>
+        );
+      case 'image':
+      default:
+        return (
+          <img
+            src={logo.src}
+            alt={`Logo ${logo.id}`}
+            style={{ 
+              width: "100%", 
+              height: "100%",
+              pointerEvents: "none"
+            }}
+            draggable={false}
+          />
+        );
+    }
+  };
+
     return (
       <Rnd
         key={logo.id}
@@ -127,7 +183,6 @@ const LogoItem: React.FC<LogoItemProps> = ({
         disableDragging={!(isActive && isDraggable)}
         enableResizing={isActive && isDraggable ? { 
           bottomRight: true,
-          // Provide custom resize handle styles
         } : false}
         resizeHandleStyles={{
           bottomRight: {
@@ -250,45 +305,7 @@ const LogoItem: React.FC<LogoItemProps> = ({
           }}
           className={`${styles.logoOverlay} ${isActive ? styles.active : ""}`}
         >
-          {logo.type === 'text' ? (
-            <div 
-              style={{
-                width: "100%",
-                height: "100%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontFamily: logo.textStyle?.fontFamily || 'Arial',
-                fontSize: `${logo.textStyle?.fontSize || 24}px`,
-                fontWeight: logo.textStyle?.fontWeight || 'normal',
-                color: logo.textStyle?.color || '#000000',
-                pointerEvents: "none",
-                userSelect: "none",
-                whiteSpace: "pre-wrap",
-                textAlign: "center",
-                overflow: "hidden",
-                padding: `${Math.max(4, (logo.textStyle?.fontSize || 24) * 0.15)}px`,
-                boxSizing: "border-box",
-                lineHeight: logo.text?.includes('\n') ? 1.3 : 1.1,
-                wordBreak: "break-word",
-                textOverflow: "ellipsis",
-                maxHeight: "100%"
-              }}
-            >
-              {logo.text || "Text"}
-            </div>
-          ) : (
-            <img
-              src={logo.src}
-              alt={`Logo ${logo.id}`}
-              style={{ 
-                width: "100%", 
-                height: "100%",
-                pointerEvents: "none"
-              }}
-              draggable={false}
-            />
-          )}
+          {renderLogoContent()}
         </div>
         
 

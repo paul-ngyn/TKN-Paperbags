@@ -11,7 +11,7 @@ export const IMAGE_REQUIREMENTS = {
     'image/png', 
     'image/gif', 
     'image/webp',
-    'application/pdf'
+    'application/pdf'  // Keep allowing PDFs
   ]
 };
 
@@ -44,13 +44,13 @@ export const validateImageFile = (file: File): Promise<{ isValid: boolean; error
       return;
     }
 
-    // Handle image files
+    // For images, validate dimensions
     const img = new window.Image();
     img.onload = () => {
       if (img.width < IMAGE_REQUIREMENTS.minWidth || img.height < IMAGE_REQUIREMENTS.minHeight) {
         resolve({ 
           isValid: false, 
-          error: `Image too small. Minimum dimensions: ${IMAGE_REQUIREMENTS.minWidth}x${IMAGE_REQUIREMENTS.minHeight}px. Your image: ${img.width}x${img.height}px.` 
+          error: `Image too small. Minimum dimensions: ${IMAGE_REQUIREMENTS.minWidth}x${IMAGE_REQUIREMENTS.minHeight}px.` 
         });
       } else {
         resolve({ isValid: true });

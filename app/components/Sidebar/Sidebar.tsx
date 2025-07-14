@@ -7,7 +7,6 @@ import downloadicon from "../../public/downloadicon.png";
 import BlueprintExample from "../../public/BlueprintExample.png"
 import { BagDimensions, mmToInches} from "../../util/BagDimensions";
 import { removeBackground } from '@imgly/background-removal';
-import { processPDFToImage } from '../../util/pdfConverter';
 import { validateImageFile, IMAGE_REQUIREMENTS } from '../../util/fileValidator';
 
 // Extended props to support text customization
@@ -245,43 +244,25 @@ const Sidebar: React.FC<SidebarProps> = ({
     // Handle PDF files
    // In Sidebar.tsx, update the PDF handling section
   if (file.type === 'application/pdf') {
-    setIsProcessingBackground(true);
-    setUploadError(null);
+  setIsProcessingBackground(false);
+  setUploadError(null);
+  
+  try {
+    console.log('Adding PDF file directly:', file.name);
     
-    try {
-      console.log('Processing PDF file:', file.name);
-      
-      // Add a progress message
-      const progressTimer = setTimeout(() => {
-        setUploadError("PDF processing is taking longer than expected. Please wait...");
-      }, 5000); // Show message after 5 seconds
-      
-      const convertedFile = await processPDFToImage(file)
-        .catch(error => {
-          throw error;
-        });
-      
-      // Clear the progress message
-      clearTimeout(progressTimer);
-      setUploadError(null);
-      
-      const dataTransfer = new DataTransfer();
-      dataTransfer.items.add(convertedFile);
-      
-      handleLogoUpload(dataTransfer.files);
-      setFileName(`${convertedFile.name} (converted from PDF)`);
-    } catch (error) {
-      console.error('PDF conversion failed:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Failed to convert PDF. Please try a different file.';
-      setUploadError(errorMessage);
-      if (onUploadError) {
-        onUploadError(errorMessage);
-      }
-    } finally {
-      setIsProcessingBackground(false);
+    // Simply pass the PDF file directly to the handler
+    handleLogoUpload(files);
+    setFileName(`${file.name} (PDF)`);
+  } catch (error) {
+    console.error('PDF handling failed:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Failed to add PDF file. Please try again.';
+    setUploadError(errorMessage);
+    if (onUploadError) {
+      onUploadError(errorMessage);
     }
-    return;
   }
+  return;
+}
 
     // Handle PNG files
     if (file.type === 'image/png') {
