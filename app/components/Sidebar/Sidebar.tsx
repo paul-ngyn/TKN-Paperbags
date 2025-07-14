@@ -9,7 +9,7 @@ import { BagDimensions, mmToInches} from "../../util/BagDimensions";
 import { removeBackground } from '@imgly/background-removal';
 import { validateImageFile, IMAGE_REQUIREMENTS } from '../../util/fileValidator';
 
-// Extended props to support text customization
+// Extended props 
 interface SidebarProps {
   handleLogoUpload: (files: FileList) => void;
   onUploadError?: (message: string) => void;
@@ -241,8 +241,6 @@ const Sidebar: React.FC<SidebarProps> = ({
     setIsValidating(false);
 
     // Handle PDF files
-    // Handle PDF files
-   // In Sidebar.tsx, update the PDF handling section
   if (file.type === 'application/pdf') {
   setIsProcessingBackground(false);
   setUploadError(null);
