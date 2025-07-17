@@ -175,7 +175,7 @@ export const validateImageFile = (file: File): Promise<{ isValid: boolean; error
             }
             
             URL.revokeObjectURL(uri);
-          } catch (pdfError) {
+          } catch (error) {
             resolve({ isValid: false, error: 'Could not read PDF file.' });
             return;
           }
