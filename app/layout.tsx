@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import '../app/globals.css';
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { AuthProvider } from './contexts/AuthContext'
+import Script from 'next/script';
 
 // Add these two imports
 import NavBar from './components/NavBar/NavBar';
@@ -32,6 +33,21 @@ export default function RootLayout({
   return (
     <html lang="en" className={geistSans.variable}>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <Script
+          src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"
+          strategy="beforeInteractive"
+        />
+        <Script
+          id="pdf-worker-setup"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              if (typeof window !== 'undefined' && window.pdfjsLib) {
+                window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+              }
+            `,
+          }}
+        />
         <AuthProvider>
           <NavBar />
           <div className="container">
@@ -44,4 +60,3 @@ export default function RootLayout({
     </html>
   );
 }
-

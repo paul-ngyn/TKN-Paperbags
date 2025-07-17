@@ -9,8 +9,79 @@ export const IMAGE_REQUIREMENTS = {
     'image/png', 
     'image/gif', 
     'image/webp',
-    'application/pdf'  // Keep allowing PDFs
+    'application/pdf'
   ]
+};
+
+// Convert PDF to PNG using PDF.js
+export const convertPdfToPng = async (file: File): Promise<File> => {
+  // Access PDF.js from window object (you'll need to load it via CDN)
+  const PDFJS = (window as any).pdfjsLib;
+  
+  if (!PDFJS) {
+    throw new Error('PDF.js library not loaded');
+  }
+
+  try {
+    // Create object URL for the PDF file
+    const uri = URL.createObjectURL(file);
+    
+    // Load the PDF document
+    const pdfDoc = await PDFJS.getDocument({ url: uri }).promise;
+    
+    // Get the first page
+    const page = await pdfDoc.getPage(1);
+    
+    // Set scale for good quality
+    const scale = 2.0;
+    const viewport = page.getViewport({ scale });
+    
+    // Create canvas element
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    
+    if (!context) {
+      throw new Error('Could not get canvas context');
+    }
+    
+    // Set canvas dimensions
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+    
+    // Render the page
+    const renderContext = {
+      canvasContext: context,
+      viewport: viewport
+    };
+    
+    await page.render(renderContext).promise;
+    
+    // Convert canvas to blob
+    return new Promise((resolve, reject) => {
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          reject(new Error('Failed to convert canvas to blob'));
+          return;
+        }
+        
+        // Create new file with PNG extension
+        const convertedFile = new File(
+          [blob],
+          file.name.replace(/\.pdf$/i, '.png'),
+          { type: 'image/png' }
+        );
+        
+        resolve(convertedFile);
+        
+        // Clean up
+        URL.revokeObjectURL(uri);
+      }, 'image/png');
+    });
+    
+  } catch (error) {
+    console.error('PDF conversion error:', error);
+    throw new Error('Failed to convert PDF to PNG');
+  }
 };
 
 export const validateImageFile = (file: File): Promise<{ isValid: boolean; error?: string }> => {
@@ -35,16 +106,15 @@ export const validateImageFile = (file: File): Promise<{ isValid: boolean; error
       return;
     }
 
-    // Handle PDF files with simple validation
+    // Handle PDF files - validate structure
     if (file.type === 'application/pdf') {
-      // Inlined validation logic from the deleted file
       try {
         if (file.size === 0) {
           resolve({ isValid: false, error: 'PDF file is empty.' });
           return;
         }
         
-        // Simple header check to ensure it's a valid PDF
+        // Simple header check
         const headerBytes = await file.slice(0, 5).arrayBuffer();
         const headerView = new Uint8Array(headerBytes);
         const header = new TextDecoder().decode(headerView);
@@ -54,10 +124,8 @@ export const validateImageFile = (file: File): Promise<{ isValid: boolean; error
           return;
         }
         
-        // If all checks pass for the PDF, it's valid
         resolve({ isValid: true });
       } catch (error) {
-        console.error('PDF validation error:', error);
         resolve({ isValid: false, error: 'Could not validate PDF file.' });
       }
       return;

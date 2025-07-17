@@ -7,7 +7,7 @@ import downloadicon from "../../public/downloadicon.png";
 import BlueprintExample from "../../public/BlueprintExample.png"
 import { BagDimensions, mmToInches} from "../../util/BagDimensions";
 import { removeBackground } from '@imgly/background-removal';
-import { validateImageFile, IMAGE_REQUIREMENTS } from '../../util/fileValidator';
+import { validateImageFile, IMAGE_REQUIREMENTS, convertPdfToPng } from '../../util/fileValidator';
 
 // Extended props 
 interface SidebarProps {
@@ -242,25 +242,33 @@ const Sidebar: React.FC<SidebarProps> = ({
 
     // Handle PDF files
   if (file.type === 'application/pdf') {
-  setIsProcessingBackground(false);
-  setUploadError(null);
-  
-  try {
-    console.log('Adding PDF file directly:', file.name);
-    
-    // Simply pass the PDF file directly to the handler
-    handleLogoUpload(files);
-    setFileName(`${file.name} (PDF)`);
-  } catch (error) {
-    console.error('PDF handling failed:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Failed to add PDF file. Please try again.';
-    setUploadError(errorMessage);
-    if (onUploadError) {
-      onUploadError(errorMessage);
+      setIsProcessingBackground(true);
+      setUploadError(null);
+      
+      try {
+        console.log('Converting PDF to PNG:', file.name);
+        
+        const convertedFile = await convertPdfToPng(file);
+        
+        // Create a new FileList with the converted file
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(convertedFile);
+        
+        handleLogoUpload(dataTransfer.files);
+        setFileName(`${convertedFile.name} (converted from PDF)`);
+        
+      } catch (error) {
+        console.error('PDF conversion failed:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Failed to convert PDF. Please try again.';
+        setUploadError(errorMessage);
+        if (onUploadError) {
+          onUploadError(errorMessage);
+        }
+      } finally {
+        setIsProcessingBackground(false);
+      }
+      return;
     }
-  }
-  return;
-}
 
     // Handle PNG files
     if (file.type === 'image/png') {
