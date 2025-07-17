@@ -13,10 +13,38 @@ export const IMAGE_REQUIREMENTS = {
   ]
 };
 
+// Type for PDF.js library
+interface PDFJSLib {
+  getDocument: (options: { url: string }) => { promise: Promise<PDFDocument> };
+  GlobalWorkerOptions: {
+    workerSrc: string;
+  };
+}
+
+interface PDFDocument {
+  getPage: (pageNumber: number) => Promise<PDFPage>;
+  numPages: number;
+}
+
+interface PDFPage {
+  getViewport: (options: { scale: number }) => PDFViewport;
+  render: (context: PDFRenderContext) => { promise: Promise<void> };
+}
+
+interface PDFViewport {
+  width: number;
+  height: number;
+}
+
+interface PDFRenderContext {
+  canvasContext: CanvasRenderingContext2D;
+  viewport: PDFViewport;
+}
+
 // Convert PDF to PNG using PDF.js
 export const convertPdfToPng = async (file: File): Promise<File> => {
-  // Access PDF.js from window object (you'll need to load it via CDN)
-  const PDFJS = (window as any).pdfjsLib;
+  // Access PDF.js from window object with proper typing
+  const PDFJS = (window as typeof window & { pdfjsLib?: PDFJSLib }).pdfjsLib;
   
   if (!PDFJS) {
     throw new Error('PDF.js library not loaded');
@@ -28,6 +56,12 @@ export const convertPdfToPng = async (file: File): Promise<File> => {
     
     // Load the PDF document
     const pdfDoc = await PDFJS.getDocument({ url: uri }).promise;
+    
+    // Check if PDF has only 1 page
+    if (pdfDoc.numPages !== 1) {
+      URL.revokeObjectURL(uri);
+      throw new Error(`PDF must have exactly 1 page. This PDF has ${pdfDoc.numPages} pages.`);
+    }
     
     // Get the first page
     const page = await pdfDoc.getPage(1);
@@ -80,7 +114,7 @@ export const convertPdfToPng = async (file: File): Promise<File> => {
     
   } catch (error) {
     console.error('PDF conversion error:', error);
-    throw new Error('Failed to convert PDF to PNG');
+    throw error; // Re-throw to preserve the original error message
   }
 };
 
@@ -106,7 +140,7 @@ export const validateImageFile = (file: File): Promise<{ isValid: boolean; error
       return;
     }
 
-    // Handle PDF files - validate structure
+    // Handle PDF files - validate structure and page count
     if (file.type === 'application/pdf') {
       try {
         if (file.size === 0) {
@@ -123,9 +157,32 @@ export const validateImageFile = (file: File): Promise<{ isValid: boolean; error
           resolve({ isValid: false, error: 'File does not appear to be a valid PDF.' });
           return;
         }
+
+        // Check page count using PDF.js
+        const PDFJS = (window as typeof window & { pdfjsLib?: PDFJSLib }).pdfjsLib;
+        if (PDFJS) {
+          try {
+            const uri = URL.createObjectURL(file);
+            const pdfDoc = await PDFJS.getDocument({ url: uri }).promise;
+            
+            if (pdfDoc.numPages !== 1) {
+              URL.revokeObjectURL(uri);
+              resolve({ 
+                isValid: false, 
+                error: `PDF must have exactly 1 page. This PDF has ${pdfDoc.numPages} pages.` 
+              });
+              return;
+            }
+            
+            URL.revokeObjectURL(uri);
+          } catch (pdfError) {
+            resolve({ isValid: false, error: 'Could not read PDF file.' });
+            return;
+          }
+        }
         
         resolve({ isValid: true });
-      } catch (error) {
+      } catch {
         resolve({ isValid: false, error: 'Could not validate PDF file.' });
       }
       return;
