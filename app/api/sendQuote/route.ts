@@ -7,7 +7,7 @@ import { IncomingMessage } from "http";
 
 export const runtime = "nodejs";
 
-// Disabling the default Next.js body parsing so we can handle it with formidable
+// Disabling the default Next.js body parsing so we can handle it with formi                                                                                                                      dable
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request): Promise<Response> {
