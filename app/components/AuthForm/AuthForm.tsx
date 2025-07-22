@@ -11,6 +11,7 @@ interface AuthFormProps {
 
 const AuthForm: React.FC<AuthFormProps> = ({ onClose, onSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -18,12 +19,13 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose, onSuccess }) => {
     businessName: '',
     phoneNumber: '',
   });
+  const [resetEmail, setResetEmail] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signIn, signUp, user, loading: authLoading } = useAuth();
+  const { signIn, signUp, resetPassword, user, loading: authLoading } = useAuth();
 
-  // Reset form when switching between login/signup
+  // Reset form when switching between login/signup/forgot password
   useEffect(() => {
     setFormData({
       email: '',
@@ -32,9 +34,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose, onSuccess }) => {
       businessName: '',
       phoneNumber: '',
     });
+    setResetEmail('');
     setError('');
     setSuccess('');
-  }, [isLogin]);
+  }, [isLogin, showForgotPassword]);
 
   // Handle successful login
   useEffect(() => {
@@ -126,6 +129,41 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose, onSuccess }) => {
     }
   };
 
+  const handleForgotPasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (loading) return;
+    
+    console.log("AuthForm: Attempting PASSWORD RESET for email:", resetEmail);
+    setLoading(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      const { error } = await resetPassword(resetEmail);
+      
+      if (error) {
+        console.error("AuthForm: PASSWORD RESET FAILED", error);
+        setError(error.message);
+      } else {
+        console.log("AuthForm: PASSWORD RESET EMAIL SENT");
+        setSuccess('Password reset email sent! Check your inbox and spam folder.');
+        setResetEmail('');
+        
+        // Auto switch back to login after 3 seconds
+        setTimeout(() => {
+          setShowForgotPassword(false);
+          setSuccess('');
+        }, 3000);
+      }
+    } catch (err) {
+      console.error("AuthForm: handleForgotPasswordSubmit CATCH block error:", err);
+      setError('An unexpected error occurred. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
@@ -133,9 +171,21 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose, onSuccess }) => {
     });
   };
 
+  const handleResetEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setResetEmail(e.target.value);
+  };
+
   const handleModeSwitch = () => {
     console.log("AuthForm: Switching mode from", isLogin ? 'login' : 'signup');
     setIsLogin(!isLogin);
+    setShowForgotPassword(false);
+    setError('');
+    setSuccess('');
+    setLoading(false);
+  };
+
+  const toggleForgotPassword = () => {
+    setShowForgotPassword(!showForgotPassword);
     setError('');
     setSuccess('');
     setLoading(false);
@@ -155,94 +205,150 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose, onSuccess }) => {
       <button className={styles.closeButton} onClick={onClose}>
         &times;
       </button>
-      <h2>{isLogin ? 'Login' : 'Sign Up'}</h2>
-
-      {error && <div className={styles.error}>{error}</div>}
-      {success && <div className={styles.success}>{success}</div>}
-
-      {(!success || (success && isLogin)) && !loading && (
-        <form onSubmit={handleSubmit}>
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            disabled={loading}
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password (min. 6 characters)"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            minLength={6}
-            disabled={loading}
-          />
-          {!isLogin && (
-            <>
-              <input
-                type="text"
-                name="name"
-                placeholder="Full Name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-                disabled={loading}
-              />
-              <input
-                type="text"
-                name="businessName"
-                placeholder="Business Name"
-                value={formData.businessName}
-                onChange={handleChange}
-                required
-                disabled={loading}
-              />
-              <input
-                type="tel"
-                name="phoneNumber"
-                placeholder="Phone Number"
-                value={formData.phoneNumber}
-                onChange={handleChange}
-                required
-                disabled={loading}
-              />
-            </>
-          )}
-          <button type="submit" disabled={loading}>
-            {loading ? 'Processing...' : (isLogin ? 'Login' : 'Sign Up')}
-          </button>
-        </form>
-      )}
       
-      {loading && <div className={styles.loadingMessage}>Processing...</div>}
+      {showForgotPassword ? (
+        // Forgot Password Form
+        <>
+          <h2>Reset Password</h2>
+          {error && <div className={styles.error}>{error}</div>}
+          {success && <div className={styles.success}>{success}</div>}
 
-      {!loading && (!success || (success && isLogin)) && (
-        <p>
-          {isLogin ? "Don't have an account? " : 'Already have an account? '}
-          <button type="button" onClick={handleModeSwitch} disabled={loading}>
-            {isLogin ? 'Sign Up' : 'Login'}
-          </button>
-        </p>
-      )}
+          {!success && (
+            <form onSubmit={handleForgotPasswordSubmit}>
+              <input
+                type="email"
+                name="resetEmail"
+                placeholder="Enter your email address"
+                value={resetEmail}
+                onChange={handleResetEmailChange}
+                required
+                disabled={loading}
+              />
+              <button type="submit" disabled={loading || !resetEmail.trim()}>
+                {loading ? 'Sending...' : 'Send Reset Email'}
+              </button>
+            </form>
+          )}
 
-      {!loading && success && !isLogin && (
-        <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-          <button
-            type="button"
-            onClick={() => {
-              setIsLogin(true);
-              setSuccess('');
-              setError('');
-            }}
-            className={styles.switchButton}
-          >
-            Go to Login
-          </button>
-        </div>
+          {loading && <div className={styles.loadingMessage}>Sending reset email...</div>}
+
+          <div className={styles.formFooter}>
+            <button
+              type="button"
+              onClick={toggleForgotPassword}
+              className={styles.linkButton}
+              disabled={loading}
+            >
+              ← Back to Login
+            </button>
+          </div>
+        </>
+      ) : (
+        // Login/Signup Form
+        <>
+          <h2>{isLogin ? 'Login' : 'Sign Up'}</h2>
+          {error && <div className={styles.error}>{error}</div>}
+          {success && <div className={styles.success}>{success}</div>}
+
+          {(!success || (success && isLogin)) && !loading && (
+            <form onSubmit={handleSubmit}>
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                disabled={loading}
+              />
+              <input
+                type="password"
+                name="password"
+                placeholder="Password (min. 6 characters)"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                minLength={6}
+                disabled={loading}
+              />
+              {!isLogin && (
+                <>
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Full Name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                    disabled={loading}
+                  />
+                  <input
+                    type="text"
+                    name="businessName"
+                    placeholder="Business Name"
+                    value={formData.businessName}
+                    onChange={handleChange}
+                    required
+                    disabled={loading}
+                  />
+                  <input
+                    type="tel"
+                    name="phoneNumber"
+                    placeholder="Phone Number"
+                    value={formData.phoneNumber}
+                    onChange={handleChange}
+                    required
+                    disabled={loading}
+                  />
+                </>
+              )}
+              <button type="submit" disabled={loading}>
+                {loading ? 'Processing...' : (isLogin ? 'Login' : 'Sign Up')}
+              </button>
+            </form>
+          )}
+          
+          {loading && <div className={styles.loadingMessage}>Processing...</div>}
+
+          {/* Forgot Password Link - only show for login */}
+          {isLogin && !loading && (!success || (success && isLogin)) && (
+            <div className={styles.formFooter}>
+              <button
+                type="button"
+                onClick={toggleForgotPassword}
+                className={styles.linkButton}
+                disabled={loading}
+              >
+                Forgot your password?
+              </button>
+            </div>
+          )}
+
+          {!loading && (!success || (success && isLogin)) && (
+            <p>
+              {isLogin ? "Don't have an account? " : 'Already have an account? '}
+              <button type="button" onClick={handleModeSwitch} disabled={loading}>
+                {isLogin ? 'Sign Up' : 'Login'}
+              </button>
+            </p>
+          )}
+
+          {!loading && success && !isLogin && (
+            <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsLogin(true);
+                  setSuccess('');
+                  setError('');
+                }}
+                className={styles.switchButton}
+              >
+                Go to Login
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

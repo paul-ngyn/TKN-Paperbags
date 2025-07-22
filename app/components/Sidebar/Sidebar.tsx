@@ -518,9 +518,6 @@ const Sidebar: React.FC<SidebarProps> = ({
                 </div>
               </>
             )}
-            {fileName && !uploadError && (
-              <p className={styles.fileName}>Selected: {fileName}</p>
-            )}
             {uploadError && (
               <p className={styles.errorMessage}>{uploadError}</p>
             )}

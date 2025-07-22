@@ -26,6 +26,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
   signUp: (email: string, password: string, name: string, businessName: string, phoneNumber: string) => Promise<{ error: AuthError | CustomError | null }>;
   signOut: () => Promise<void>;
+  resetPassword: (email: string) => Promise<{ error: AuthError | null }>;
   updateUserProfile: (updates: {
     name?: string;
     business_name?: string;
@@ -43,6 +44,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const mounted = useRef(true)
   const isSigningOut = useRef(false)
   const currentUserId = useRef<string | null>(null)
+
+  const resetPassword = async (email: string) => {
+  try {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    
+    if (error) {
+      console.error('Password reset error:', error);
+      return { error };
+    }
+    
+    return { error: null };
+  } catch (unexpectedError) {
+    console.error('Unexpected password reset error:', unexpectedError);
+    return { error: unexpectedError as AuthError };
+  }
+};
 
   // Force clear ALL Supabase data from localStorage
   const forceCleanLocalStorage = () => {
@@ -588,6 +607,7 @@ useEffect(() => {
     signIn,
     signUp,
     signOut,
+    resetPassword,
     updateUserProfile,
   };
 

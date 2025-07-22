@@ -246,19 +246,26 @@
   text-align: center;
   transition: background-color 0.2s ease;
   min-height: 15vh;
-  max-height: 18vh;
+  max-height: 21vh;
+  overflow: hidden; /* Prevent content from spilling outside */
+  box-sizing: border-box; /* Include padding and border in total size */
 }
 
 .dropZone p {
-  margin: 10px 0 0 0;
+  margin: 5px 0;
   font-size: 14px;
   color: #666;
+  flex-shrink: 0; /* Prevent text from being compressed */
+  max-width: 100%; /* Ensure text doesn't exceed container width */
+  word-wrap: break-word; /* Break long words if needed */
 }
 
 .dropIcon {
   width: 40px;
   height: 40px;
   opacity: 0.85;
+  flex-shrink: 0; /* Prevent icon from being compressed */
+  object-fit: contain; /* Keep icon proportions */
 }
 
 .dragOver {

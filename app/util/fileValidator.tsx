@@ -12,7 +12,6 @@ export const IMAGE_REQUIREMENTS = {
     'image/jpeg', 
     'image/jpg', 
     'image/png', 
-    'image/gif', 
     'image/webp',
     'application/pdf'
   ]
