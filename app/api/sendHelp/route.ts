@@ -63,8 +63,9 @@ export async function POST(request: Request): Promise<Response> {
             });
             // 3. Compose mail:
         const mailOptionsHelp = {
-            from: process.env.SMTP_USER,
-            to: email,
+            from: process.env.SMTP_USER,        // info@mapletradecorp.com
+            to: process.env.SMTP_USER,          // SEND TO YOUR BUSINESS EMAIL
+            replyTo: email, 
             subject: `New Help Request from ${name} - ${company || 'No Company'}`,
             text: `New help request:
             Name: ${name}
