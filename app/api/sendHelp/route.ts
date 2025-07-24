@@ -58,14 +58,14 @@ export async function POST(request: Request): Promise<Response> {
             requireTLS: true,
             auth: {
                 user: process.env.SMTP_USER,  // e.g. "my_username@gmail.com"
-                pass: process.env.SMTP_PASS,  // e.g. "my_password"
+                pass: process.env.SMTP_PASS,  // e.g. "my_password
               },
             });
             // 3. Compose mail:
         const mailOptionsHelp = {
             from: process.env.SMTP_USER,
             to: email,
-            subject: `New Help Request from ${name}`,
+            subject: `New Help Request from ${name} - ${company || 'No Company'}`,
             text: `New help request:
             Name: ${name}
             Email: ${email}
