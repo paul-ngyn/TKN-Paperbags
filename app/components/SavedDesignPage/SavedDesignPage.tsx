@@ -1,41 +1,86 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useAuth } from '../../contexts/AuthContext';
 import { SavedDesign } from '../../types/design';
 import styles from './SavedDesignPage.module.css';
+import { createClient } from '@supabase/supabase-js';
 
 const SavedDesignsPage: React.FC = () => {
   const { user } = useAuth();
   const [designs, setDesigns] = useState<SavedDesign[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [hasFetched, setHasFetched] = useState(false);
 
-  useEffect(() => {
-    if (user) {
-      fetchDesigns();
-    } else {
-      setLoading(false);
+  const fetchDesigns = useCallback(async () => {
+    // Prevent multiple simultaneous requests
+    if (loading && hasFetched) {
+      console.log('Fetch already in progress, skipping...');
+      return;
     }
-  }, [user]);
 
-  const fetchDesigns = async () => {
     try {
-      const response = await fetch('/api/designs');
-      const data = await response.json();
+      setLoading(true);
+      setError('');
+      console.log('Starting fetch designs...');
       
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch designs');
+      // Get the session token from Supabase
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session?.access_token) {
+        throw new Error('No valid session found. Please log in again.');
       }
       
+      const response = await fetch('/api/designs', {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch {
+          throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+        throw new Error(errorData.error || 'Failed to fetch designs');
+      }
+      
+      const data = await response.json();
+      console.log('Fetched designs:', data.designs?.length || 0);
+      
       setDesigns(data.designs || []);
+      setHasFetched(true);
     } catch (err) {
+      console.error('Fetch error:', err);
       setError(err instanceof Error ? err.message : 'Failed to load designs');
     } finally {
       setLoading(false);
     }
-  };
+  }, [hasFetched, loading]);
+
+  useEffect(() => {
+    // Only fetch once when user is available and we haven't fetched yet
+    if (user && !hasFetched) {
+      console.log('User available, fetching designs...');
+      fetchDesigns();
+    } else if (!user) {
+      console.log('No user, setting loading to false');
+      setLoading(false);
+      setHasFetched(false);
+    }
+  }, [user, hasFetched, fetchDesigns]);
 
   const handleDeleteDesign = async (designId: string) => {
     if (!confirm('Are you sure you want to delete this design?')) {
@@ -43,8 +88,23 @@ const SavedDesignsPage: React.FC = () => {
     }
 
     try {
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session?.access_token) {
+        throw new Error('No valid session found. Please log in again.');
+      }
+
       const response = await fetch(`/api/designs/${designId}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json'
+        }
       });
       
       if (!response.ok) {
@@ -52,9 +112,19 @@ const SavedDesignsPage: React.FC = () => {
         throw new Error(data.error || 'Failed to delete design');
       }
       
-      setDesigns(designs.filter(d => d.id !== designId));
-    } catch {
+      // Update local state to remove the deleted design
+      setDesigns(prev => prev.filter(d => d.id !== designId));
+    } catch (err) {
+      console.error('Delete error:', err);
       setError('Failed to delete design');
+    }
+  };
+
+  const handleRetry = () => {
+    setHasFetched(false);
+    setError('');
+    if (user) {
+      fetchDesigns();
     }
   };
 
@@ -105,58 +175,57 @@ const SavedDesignsPage: React.FC = () => {
           <h2>No Designs Saved Currently</h2>
           <p>You haven&apos;t saved any designs yet. Start creating your custom paper bag designs and save them here for easy access.</p>
           <div className={styles.emptyActions}>
-            <a href="/design" className={styles.createButton}>
-              Create Your First Design
-            </a>
+            <Link href="/design" className={styles.createButton}>
+              Create New Design
+            </Link>
           </div>
         </div>
       ) : (
         <div className={styles.designsGrid}>
           {designs.map((design) => (
             <div key={design.id} className={styles.designCard}>
-              {design.preview_image && (
-                <div className={styles.designPreview}>
+              <div className={styles.designPreview}>
+                {design.preview_image ? (
                   <Image 
                     src={design.preview_image} 
                     alt={design.name}
-                    width={350}
-                    height={200}
+                    width={200}
+                    height={150}
                     className={styles.previewImage}
-                    style={{ objectFit: 'cover' }}
                   />
-                </div>
-              )}
+                ) : (
+                  <div className={styles.noPreview}>No preview available</div>
+                )}
+              </div>
               
               <div className={styles.designInfo}>
                 <h3>{design.name}</h3>
                 {design.description && (
                   <p className={styles.description}>{design.description}</p>
                 )}
+                
                 <div className={styles.designMeta}>
                   <div className={styles.dimensions}>
-                    📏 {design.dimensions.length}&quot; × {design.dimensions.width}&quot; × {design.dimensions.height}&quot;
+                    <span>📏 {design.dimensions.length}" × {design.dimensions.width}" × {design.dimensions.height}"</span>
                   </div>
                   <div className={styles.logoCount}>
-                    🏷️ {design.logos.length} logo{design.logos.length !== 1 ? 's' : ''}
+                    <span>🏷️ {design.logos.length} logo{design.logos.length !== 1 ? 's' : ''}</span>
                   </div>
                   <div className={styles.lastModified}>
-                    🕒 {formatDate(design.updated_at)}
+                    <span>📅 {formatDate(design.updated_at)}</span>
                   </div>
                 </div>
               </div>
               
               <div className={styles.designActions}>
-                <a 
-                  href={`/design?load=${design.id}`}
-                  className={styles.editButton}
-                >
+                <Link href={`/design?load=${design.id}`} className={styles.editButton}>
                   Edit Design
-                </a>
+                </Link>
                 <button 
                   onClick={() => handleDeleteDesign(design.id)}
                   className={styles.deleteButton}
                 >
-                  Delete
+                  🗑️
                 </button>
               </div>
             </div>
@@ -166,10 +235,10 @@ const SavedDesignsPage: React.FC = () => {
 
       {designs.length > 0 && (
         <div className={styles.footer}>
-          <p>{designs.length} design{designs.length !== 1 ? 's' : ''} saved</p>
-          <a href="/design" className={styles.newDesignButton}>
-            + Create New Design
-          </a>
+          <p>Total designs: {designs.length}</p>
+          <Link href="/design" className={styles.newDesignButton}>
+            Create New Design
+          </Link>
         </div>
       )}
     </div>

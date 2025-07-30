@@ -683,7 +683,7 @@
 .saveButton {
   width: 100%;
   padding: 12px 20px;
-  background: #28a745;
+  background: #1c51a3;
   color: white;
   border: none;
   border-radius: 6px;
@@ -694,7 +694,7 @@
 }
 
 .saveButton:hover:not(:disabled) {
-  background: #218838;
+  background: #1c51a3;
   transform: translateY(-1px);
 }
 

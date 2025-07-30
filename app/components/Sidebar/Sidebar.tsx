@@ -61,8 +61,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   activeLogoTextStyle,
   updateTextContent,
   onLogoDeselect,
-  onSaveDesign,
-  logos = [],
+  onSaveDesign
 }) => {
   // State management
   const [showBlueprintExample, setShowBlueprintExample] = useState(false);
@@ -760,10 +759,10 @@ const Sidebar: React.FC<SidebarProps> = ({
           </div>
           
           <div className={styles.downloadButtonContainer}>
-            <button 
+          <button 
               onClick={handleSaveDesign}
               className={`${styles.saveButton} ${isSaving ? styles.saving : ''} ${saveSuccess ? styles.saved : ''}`}
-              disabled={isSaving || logos.length === 0}
+              disabled={isSaving}  // Only disable when saving
             >
               {isSaving ? 'Saving...' : saveSuccess ? 'Saved!' : 'Save Design'}
             </button>
@@ -886,7 +885,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               <button 
                 onClick={handleSaveDesign}
                 className={`${styles.saveButton} ${isSaving ? styles.saving : ''} ${saveSuccess ? styles.saved : ''}`}
-                disabled={isSaving || logos.length === 0}
+                disabled={isSaving}  // Only disable when saving
               >
                 {isSaving ? 'Saving...' : saveSuccess ? 'Saved!' : 'Save Design'}
               </button>
