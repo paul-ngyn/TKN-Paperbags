@@ -25,6 +25,17 @@ interface SidebarProps {
   activeLogoTextStyle?: TextStyle;
   updateTextContent?: (id: string, text: string, style: TextStyle) => void;
   onLogoDeselect?: () => void;
+  onSaveDesign?: () => void;
+  logos?: Array<{
+    id: string;
+    type: 'image' | 'text';
+    src?: string;
+    content?: string;
+    position: { x: number; y: number };
+    size: { width: number; height: number };
+    style?: TextStyle;
+    layer: number;
+  }>;
 }
 
 interface TextStyle {
@@ -50,6 +61,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   activeLogoTextStyle,
   updateTextContent,
   onLogoDeselect,
+  onSaveDesign,
+  logos = [],
 }) => {
   // State management
   const [showBlueprintExample, setShowBlueprintExample] = useState(false);
@@ -83,6 +96,23 @@ const Sidebar: React.FC<SidebarProps> = ({
   const [isProcessingBackground, setIsProcessingBackground] = useState(false); 
   const [showBackgroundChoiceModal, setShowBackgroundChoiceModal] = useState(false);
   const [pendingFileUpload, setPendingFileUpload] = useState<FileList | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  const handleSaveDesign = async () => {
+    if (!onSaveDesign) return;
+    
+    setIsSaving(true);
+    try {
+      await onSaveDesign();
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (error) {
+      console.error('Save failed:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   // Constants
   const MAX_DIMENSIONS = {
@@ -731,6 +761,14 @@ const Sidebar: React.FC<SidebarProps> = ({
           
           <div className={styles.downloadButtonContainer}>
             <button 
+              onClick={handleSaveDesign}
+              className={`${styles.saveButton} ${isSaving ? styles.saving : ''} ${saveSuccess ? styles.saved : ''}`}
+              disabled={isSaving || logos.length === 0}
+            >
+              {isSaving ? 'Saving...' : saveSuccess ? 'Saved!' : 'Save Design'}
+            </button>
+            
+            <button 
               onClick={() => {
                 if (typeof downloadDesign === 'function') {
                   downloadDesign();
@@ -845,6 +883,14 @@ const Sidebar: React.FC<SidebarProps> = ({
             </div>
 
             <div className={styles.downloadButtonContainer}>
+              <button 
+                onClick={handleSaveDesign}
+                className={`${styles.saveButton} ${isSaving ? styles.saving : ''} ${saveSuccess ? styles.saved : ''}`}
+                disabled={isSaving || logos.length === 0}
+              >
+                {isSaving ? 'Saving...' : saveSuccess ? 'Saved!' : 'Save Design'}
+              </button>
+              
               <button 
                 onClick={() => {
                   if (typeof downloadDesign === 'function') {

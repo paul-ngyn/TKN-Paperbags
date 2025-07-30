@@ -166,9 +166,12 @@
 
 .downloadButtonContainer {
   display: flex;
+  flex-direction: column;
+  gap: 10px;
   justify-content: center;
 }
 
+/* Update the downloadButton to match saveButton styling */
 .downloadButton {
   display: flex;
   align-items: center;
@@ -177,16 +180,17 @@
   color: white;
   border: none;
   border-radius: 6px;
-  padding: 12px 16px;
-  font-size: 1rem;
-  font-weight: 500;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
   width: 100%;
 }
 
 .downloadButton:hover {
-  background-color: #3a7bc8;
+  background-color: #164080;
+  transform: translateY(-1px);
 }
 
 
@@ -672,4 +676,46 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Add these new styles for the save button */
+
+.saveButton {
+  width: 100%;
+  padding: 12px 20px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.saveButton:hover:not(:disabled) {
+  background: #218838;
+  transform: translateY(-1px);
+}
+
+.saveButton:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.saveButton.saving {
+  background: #ffc107;
+  color: #212529;
+}
+
+.saveButton.saved {
+  background: #20c997;
+  animation: pulse 0.5s ease-in-out;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
 }
