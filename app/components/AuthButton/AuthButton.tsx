@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import AuthForm from '../AuthForm/AuthForm'
 import ProfileSettings from '../ProfileSettings/ProfileSettings'
+import SavedDesignsPage from '../SavedDesignPage/SavedDesignPage'
 import styles from './AuthButton.module.css'
 import Image from 'next/image'
 import avatar from '../../public/avatar.png' 
@@ -11,6 +12,7 @@ const AuthButton: React.FC = () => {
   const [showModal, setShowModal] = useState(false)
   const [showDropdown, setShowDropdown] = useState(false)
   const [showProfileSettings, setShowProfileSettings] = useState(false)
+  const [showSavedDesigns, setShowSavedDesigns] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -21,6 +23,12 @@ const AuthButton: React.FC = () => {
     setShowDropdown(false)
   }
   const handleCloseProfileSettings = () => setShowProfileSettings(false)
+
+  const handleOpenSavedDesigns = () => {
+    setShowSavedDesigns(true)
+    setShowDropdown(false)
+  }
+  const handleCloseSavedDesigns = () => setShowSavedDesigns(false)
   
   const showDropdownMenu = () => {
     if (hoverTimerRef.current) {
@@ -93,6 +101,12 @@ const AuthButton: React.FC = () => {
                 Profile Settings
               </button>
               <button 
+                onClick={handleOpenSavedDesigns} 
+                className={styles.dropdownItem}
+              >
+                Saved Designs
+              </button>
+              <button 
                 onClick={handleSignOut} 
                 className={styles.dropdownItem}
               >
@@ -109,6 +123,24 @@ const AuthButton: React.FC = () => {
               <ProfileSettings onClose={handleCloseProfileSettings} />
             </div>
             <div className={styles.modalBackdrop} onClick={handleCloseProfileSettings}></div>
+          </div>
+        )}
+
+        {/* Saved Designs Modal */}
+        {showSavedDesigns && (
+          <div className={styles.modalOverlay}>
+            <div className={styles.modalContent}>
+              <div className={styles.modalHeader}>
+                <button 
+                  onClick={handleCloseSavedDesigns}
+                  className={styles.closeButton}
+                >
+                  ×
+                </button>
+              </div>
+              <SavedDesignsPage />
+            </div>
+            <div className={styles.modalBackdrop} onClick={handleCloseSavedDesigns}></div>
           </div>
         )}
       </div>
