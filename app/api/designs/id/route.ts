@@ -48,15 +48,16 @@ async function getAuthenticatedSupabase() {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { supabase, user } = await getAuthenticatedSupabase();
+    const { id } = await params;
 
     const { data: design, error } = await supabase
       .from('designs')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', id)
       .eq('user_id', user.id)
       .single();
 
@@ -74,10 +75,11 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { supabase, user } = await getAuthenticatedSupabase();
+    const { id } = await params;
 
     const body = await request.json();
     const { name, description, dimensions, logos, preview_image } = body;
@@ -91,7 +93,7 @@ export async function PUT(
         logos,
         preview_image
       })
-      .eq('id', params.id)
+      .eq('id', id)
       .eq('user_id', user.id)
       .select()
       .single();
@@ -110,15 +112,16 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { supabase, user } = await getAuthenticatedSupabase();
+    const { id } = await params;
 
     const { error } = await supabase
       .from('designs')
       .delete()
-      .eq('id', params.id)
+      .eq('id', id)
       .eq('user_id', user.id);
 
     if (error) {
