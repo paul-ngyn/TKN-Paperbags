@@ -165,7 +165,7 @@ const SavedDesignsPage: React.FC = () => {
         <div className={styles.error}>
           <h3>Error Loading Designs</h3>
           <p>{error}</p>
-          <button onClick={fetchDesigns} className={styles.retryButton}>
+          <button onClick={handleRetry} className={styles.retryButton}>
             Try Again
           </button>
         </div>
@@ -206,7 +206,7 @@ const SavedDesignsPage: React.FC = () => {
                 
                 <div className={styles.designMeta}>
                   <div className={styles.dimensions}>
-                    <span>📏 {design.dimensions.length}" × {design.dimensions.width}" × {design.dimensions.height}"</span>
+                    <span>📏 {design.dimensions.length}&quot; × {design.dimensions.width}&quot; × {design.dimensions.height}&quot;</span>
                   </div>
                   <div className={styles.logoCount}>
                     <span>🏷️ {design.logos.length} logo{design.logos.length !== 1 ? 's' : ''}</span>
