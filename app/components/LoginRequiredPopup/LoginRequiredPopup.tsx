@@ -7,7 +7,7 @@ interface LoginRequiredPopupProps {
   isOpen: boolean;
   onClose: () => void;
   onLogin: () => void;
-  action: 'download' | 'quote';
+  action: 'download' | 'quote' | 'save';
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
