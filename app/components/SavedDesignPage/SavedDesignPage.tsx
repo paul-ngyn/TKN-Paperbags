@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth } from '../../contexts/AuthContext';
@@ -13,21 +13,21 @@ const SavedDesignsPage: React.FC = () => {
   const [designs, setDesigns] = useState<SavedDesign[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [hasFetched, setHasFetched] = useState(false);
+  const hasFetchedRef = useRef(false); // Use ref instead of state
 
-  const fetchDesigns = useCallback(async () => {
-    // Prevent multiple simultaneous requests
-    if (loading && hasFetched) {
-      console.log('Fetch already in progress, skipping...');
+  const fetchDesigns = async () => {
+    if (!user || hasFetchedRef.current) {
+      setLoading(false);
       return;
     }
 
     try {
       setLoading(true);
       setError('');
-      console.log('Starting fetch designs...');
+      hasFetchedRef.current = true; // Set immediately to prevent duplicate calls
       
-      // Get the session token from Supabase
+      console.log('Fetching designs for user:', user.id);
+      
       const supabase = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -61,26 +61,25 @@ const SavedDesignsPage: React.FC = () => {
       console.log('Fetched designs:', data.designs?.length || 0);
       
       setDesigns(data.designs || []);
-      setHasFetched(true);
     } catch (err) {
       console.error('Fetch error:', err);
       setError(err instanceof Error ? err.message : 'Failed to load designs');
+      hasFetchedRef.current = false; // Reset on error so retry can work
     } finally {
       setLoading(false);
     }
-  }, [hasFetched, loading]);
+  };
 
   useEffect(() => {
-    // Only fetch once when user is available and we haven't fetched yet
-    if (user && !hasFetched) {
-      console.log('User available, fetching designs...');
+    if (user) {
       fetchDesigns();
-    } else if (!user) {
-      console.log('No user, setting loading to false');
+    } else {
       setLoading(false);
-      setHasFetched(false);
+      hasFetchedRef.current = false;
+      setDesigns([]);
+      setError('');
     }
-  }, [user, hasFetched, fetchDesigns]);
+  }, [user]); // Only depend on user
 
   const handleDeleteDesign = async (designId: string) => {
     if (!confirm('Are you sure you want to delete this design?')) {
@@ -112,7 +111,6 @@ const SavedDesignsPage: React.FC = () => {
         throw new Error(data.error || 'Failed to delete design');
       }
       
-      // Update local state to remove the deleted design
       setDesigns(prev => prev.filter(d => d.id !== designId));
     } catch (err) {
       console.error('Delete error:', err);
@@ -121,11 +119,9 @@ const SavedDesignsPage: React.FC = () => {
   };
 
   const handleRetry = () => {
-    setHasFetched(false);
+    hasFetchedRef.current = false;
     setError('');
-    if (user) {
-      fetchDesigns();
-    }
+    fetchDesigns();
   };
 
   const formatDate = (dateString: string) => {

@@ -12,38 +12,27 @@ async function getAuthenticatedSupabase(request: NextRequest) {
   
   if (authHeader?.startsWith('Bearer ')) {
     accessToken = authHeader.split(' ')[1];
-    console.log('Found token in Authorization header');
   }
   
   if (!accessToken) {
-    // Fallback to cookies
+    // Fallback to cookies (remove excessive logging)
     const cookieStore = await cookies();
-    
-    const allCookies = cookieStore.getAll();
-    console.log('=== COOKIE DEBUG ===');
-    console.log('All cookies:', allCookies.map(c => ({ name: c.name, hasValue: !!c.value })));
-    
-    const authCookies = allCookies.filter(cookie => 
+    const authCookies = cookieStore.getAll().filter(cookie => 
       cookie.name.includes('sb-') && cookie.name.includes('auth-token')
     );
-    
-    console.log('Auth cookies found:', authCookies.map(c => c.name));
     
     for (const cookie of authCookies) {
       if (!cookie.name.includes('.') || cookie.name.endsWith('.0')) {
         accessToken = cookie.value;
-        console.log('Selected token from cookie:', cookie.name);
         break;
       }
     }
   }
   
   if (!accessToken) {
-    console.error('=== NO TOKEN FOUND ===');
     throw new Error('No authentication token found');
   }
 
-  console.log('=== TOKEN FOUND ===');
   const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       autoRefreshToken: false,
@@ -59,7 +48,6 @@ async function getAuthenticatedSupabase(request: NextRequest) {
   const { data: { user }, error } = await supabase.auth.getUser();
   
   if (error || !user) {
-    console.error('Auth verification failed:', error);
     throw new Error('Authentication failed');
   }
 
@@ -69,8 +57,6 @@ async function getAuthenticatedSupabase(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const { supabase, user } = await getAuthenticatedSupabase(request);
-
-    console.log('User authenticated:', user.id);
 
     const { data: designs, error } = await supabase
       .from('designs')
@@ -83,7 +69,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch designs' }, { status: 500 });
     }
 
-    console.log('Found designs:', designs?.length || 0);
     return NextResponse.json({ designs: designs || [] });
   } catch (error) {
     console.error('API error:', error);

@@ -887,7 +887,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 className={`${styles.saveButton} ${isSaving ? styles.saving : ''} ${saveSuccess ? styles.saved : ''}`}
                 disabled={isSaving}  // Only disable when saving
               >
-                {isSaving ? 'Saving...' : saveSuccess ? 'Saved!' : 'Save Design'}
+                {isSaving ? 'Saving...' : saveSuccess ? 'Saved!' : 'Save Design to Profile'}
               </button>
               
               <button 
@@ -901,7 +901,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 }}
                 className={styles.downloadButton}
               >
-                Download Design
+                Download Design as PDF
               </button>
             </div>
           </div>
