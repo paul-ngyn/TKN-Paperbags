@@ -118,6 +118,12 @@ const SavedDesignsPage: React.FC = () => {
     }
   };
 
+  // Handle edit design with forced reload
+  const handleEditDesign = (designId: string) => {
+    // Force a page reload to the design page with the load parameter
+    window.location.href = `/design?load=${designId}`;
+  };
+
   const handleRetry = () => {
     hasFetchedRef.current = false;
     setError('');
@@ -214,9 +220,12 @@ const SavedDesignsPage: React.FC = () => {
               </div>
               
               <div className={styles.designActions}>
-                <Link href={`/design?load=${design.id}`} className={styles.editButton}>
+                <button 
+                  onClick={() => handleEditDesign(design.id)}
+                  className={styles.editButton}
+                >
                   Edit Design
-                </Link>
+                </button>
                 <button 
                   onClick={() => handleDeleteDesign(design.id)}
                   className={styles.deleteButton}
