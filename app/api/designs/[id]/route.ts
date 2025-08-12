@@ -5,19 +5,29 @@ import { cookies } from 'next/headers';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-async function getAuthenticatedSupabase() {
-  const cookieStore = await cookies();
-  
-  // Get the auth token from cookies (adjust the cookie name based on your Supabase project)
-  const authCookies = cookieStore.getAll().filter(cookie => 
-    cookie.name.includes('sb-') && cookie.name.includes('auth-token')
-  );
-  
+async function getAuthenticatedSupabase(request?: NextRequest) {
+  // Try to get auth token from Authorization header first (if request is provided)
   let accessToken = null;
-  for (const cookie of authCookies) {
-    if (!cookie.name.includes('.') || cookie.name.endsWith('.0')) {
-      accessToken = cookie.value;
-      break;
+  
+  if (request) {
+    const authHeader = request.headers.get('authorization');
+    if (authHeader?.startsWith('Bearer ')) {
+      accessToken = authHeader.split(' ')[1];
+    }
+  }
+  
+  if (!accessToken) {
+    // Fallback to cookies
+    const cookieStore = await cookies();
+    const authCookies = cookieStore.getAll().filter(cookie => 
+      cookie.name.includes('sb-') && cookie.name.includes('auth-token')
+    );
+    
+    for (const cookie of authCookies) {
+      if (!cookie.name.includes('.') || cookie.name.endsWith('.0')) {
+        accessToken = cookie.value;
+        break;
+      }
     }
   }
   
@@ -51,7 +61,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { supabase, user } = await getAuthenticatedSupabase();
+    const { supabase, user } = await getAuthenticatedSupabase(request);
     const { id } = await params;
 
     const { data: design, error } = await supabase
@@ -78,7 +88,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { supabase, user } = await getAuthenticatedSupabase();
+    const { supabase, user } = await getAuthenticatedSupabase(request);
     const { id } = await params;
 
     const body = await request.json();
@@ -115,7 +125,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { supabase, user } = await getAuthenticatedSupabase();
+    const { supabase, user } = await getAuthenticatedSupabase(request);
     const { id } = await params;
 
     const { error } = await supabase

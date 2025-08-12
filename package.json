@@ -41,6 +41,7 @@
     "@types/blob-stream": "^0.1.33",
     "@types/file-saver": "^2.0.7",
     "@types/formidable": "^3.4.5",
+    "@types/html2canvas": "^0.5.35",
     "@types/node": "^20.17.6",
     "@types/nodemailer": "^6.4.17",
     "@types/pdfjs-dist": "^2.10.377",

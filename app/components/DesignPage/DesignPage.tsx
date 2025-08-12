@@ -11,6 +11,7 @@ import styles from "./DesignPage.module.css";
 import { BagDimensions } from "../../util/BagDimensions";
 import { generatePDF } from "../../util/pdfGenerator";
 import { createClient } from '@supabase/supabase-js';
+import html2canvas from "html2canvas";
 
 interface DesignPageProps {
   handleNavigation: (page: string) => void;
@@ -49,6 +50,10 @@ const DesignPage: React.FC<DesignPageProps> = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   
+  // Loading states for design loading
+  const [isLoadingDesign, setIsLoadingDesign] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState('');
+  
   // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
   const logoRefs = useRef<Map<string, React.RefObject<Rnd>>>(new Map());
@@ -73,100 +78,227 @@ const DesignPage: React.FC<DesignPageProps> = () => {
 
   // Save design function - using useCallback to fix dependency warning
   const handleSaveDesign = useCallback(async (customName?: string) => {
-    if (!user) {
-      setPendingAction('save');
-      setShowLoginRequiredPopup(true);
-      return false;
+  if (!user) {
+    setPendingAction('save');
+    setShowLoginRequiredPopup(true);
+    return false;
+  }
+
+  // If no custom name provided, show the naming modal
+  if (!customName) {
+    const defaultName = `Design ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`;
+    setDesignName(defaultName);
+    setShowSaveModal(true);
+    return false;
+  }
+
+  try {
+    setIsSaving(true);
+    console.log('Saving design...');
+    
+    // Get Supabase session
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    
+    if (sessionError || !session?.access_token) {
+      throw new Error('No valid session found. Please log in again.');
     }
 
-    // If no custom name provided, show the naming modal
-    if (!customName) {
-      const defaultName = `Design ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`;
-      setDesignName(defaultName);
-      setShowSaveModal(true);
-      return false;
+    // Generate preview image using html2canvas
+    let previewImageData = null;
+    if (bagContainerRef.current) {
+      try {
+        console.log('Generating design preview...');
+        const canvas = await html2canvas(bagContainerRef.current, {
+          background: '#ffffff',
+          useCORS: true,
+          allowTaint: true,
+          logging: false,
+          width: bagContainerRef.current.offsetWidth,
+          height: bagContainerRef.current.offsetHeight
+        });
+        
+        // Scale down the canvas manually for storage
+        const scaledCanvas = document.createElement('canvas');
+        const scaledContext = scaledCanvas.getContext('2d');
+        
+        if (scaledContext) {
+          scaledCanvas.width = canvas.width * 0.5;
+          scaledCanvas.height = canvas.height * 0.5;
+          
+          scaledContext.drawImage(canvas, 0, 0, scaledCanvas.width, scaledCanvas.height);
+          previewImageData = scaledCanvas.toDataURL('image/jpeg', 0.8);
+        } else {
+          previewImageData = canvas.toDataURL('image/jpeg', 0.8);
+        }
+        
+        console.log('Preview image generated successfully');
+      } catch (previewError) {
+        console.warn('Failed to generate preview:', previewError);
+        // Continue saving without preview image
+      }
     }
 
+    // Prepare design data
+    const designData = {
+      name: customName,
+      description: `Custom bag design with ${logos.length} element${logos.length !== 1 ? 's' : ''}`,
+      dimensions,
+      logos: logos
+        .filter(logo => logo.type === 'image' || logo.type === 'text')
+        .map((logo, index) => ({
+          id: logo.id,
+          type: logo.type,
+          src: logo.src,
+          content: logo.text, // Map 'text' to 'content' for storage
+          position: logo.position,
+          size: logo.size,
+          style: logo.textStyle, // Map 'textStyle' to 'style' for storage
+          layer: index
+        })),
+      preview_image: previewImageData
+    };
+
+    // Save to API
+    const response = await fetch('/api/designs', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${session.access_token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(designData)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to save design');
+    }
+
+    const result = await response.json();
+    console.log('Design saved successfully:', result.design.id);
+    
+    // Show success state
+    setSaveSuccess(true);
+    setTimeout(() => {
+      setSaveSuccess(false);
+      setShowSaveModal(false);
+    }, 2000);
+    
+    return true;
+  } catch (error) {
+    console.error('Error saving design:', error);
+    alert('Failed to save design: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    return false;
+  } finally {
+    setIsSaving(false);
+  }
+}, [user, logos, dimensions]);
+
+  // Load design function - added for seamless loading
+  const loadDesign = useCallback(async (designId: string) => {
     try {
-      setIsSaving(true);
-      console.log('Saving design...');
+      setLoadingProgress('Connecting to server...');
+      console.log('Loading design:', designId);
       
-      // Get Supabase session
       const supabase = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
       );
       
+      setLoadingProgress('Authenticating...');
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError || !session?.access_token) {
         throw new Error('No valid session found. Please log in again.');
       }
 
-      // Create preview image (you can implement this later) - using const instead of let
-      const previewImageData = null;
-      if (bagContainerRef.current) {
-        try {
-          console.log('Design preview capture would go here');
-        } catch (previewError) {
-          console.warn('Failed to generate preview:', previewError);
-        }
-      }
-
-      // Prepare design data
-      const designData = {
-        name: customName,
-        description: `Custom bag design with ${logos.length} element${logos.length !== 1 ? 's' : ''}`,
-        dimensions,
-        logos: logos
-          .filter(logo => logo.type === 'image' || logo.type === 'text')
-          .map((logo, index) => ({
-            id: logo.id,
-            type: logo.type,
-            src: logo.src,
-            content: logo.text,
-            position: logo.position,
-            size: logo.size,
-            style: logo.textStyle,
-            layer: index
-          })),
-        preview_image: previewImageData
-      };
-
-      // Save to API
-      const response = await fetch('/api/designs', {
-        method: 'POST',
+      setLoadingProgress('Fetching design data...');
+      const response = await fetch(`/api/designs/${designId}`, {
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(designData)
+        }
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to save design');
+        throw new Error(errorData.error || 'Failed to load design');
       }
 
-      const result = await response.json();
-      console.log('Design saved successfully:', result.design.id);
+      const { design } = await response.json();
       
-      // Show success state
-      setSaveSuccess(true);
-      setTimeout(() => {
-        setSaveSuccess(false);
-        setShowSaveModal(false);
-      }, 2000);
+      setLoadingProgress('Processing design elements...');
       
-      return true;
+      // Clear everything first for better performance
+      setLogos([]);
+      setActiveLogoId(null);
+      setDraggable(false);
+      setIsActive(false);
+      logoRefs.current.clear();
+      
+      // Load dimensions immediately
+      setDimensions(design.dimensions);
+      
+      setLoadingProgress('Loading design elements...');
+      
+      // Process logos
+      if (design.logos && design.logos.length > 0) {
+        const translatedLogos: Logo[] = design.logos.map((savedLogo: any, index: number) => {
+          const logo: Logo = {
+            id: savedLogo.id || `loaded-${index}-${Date.now()}`,
+            type: savedLogo.type,
+            src: savedLogo.src,
+            text: savedLogo.content, // Translate 'content' back to 'text'
+            textStyle: savedLogo.style, // Translate 'style' back to 'textStyle'
+            position: savedLogo.position || { x: 50, y: 50 },
+            size: savedLogo.size || { width: 150, height: 150 },
+            rotation: savedLogo.style?.rotation || 0
+          };
+          
+          logoRefs.current.set(logo.id, React.createRef<Rnd>());
+          return logo;
+        });
+
+        // Use requestAnimationFrame for smoother loading
+        requestAnimationFrame(() => {
+          setLogos(translatedLogos);
+          setLoadingProgress('Finalizing...');
+          
+          setTimeout(() => {
+            setIsLoadingDesign(false);
+            setLoadingProgress('');
+            
+            // Clear URL parameter after successful load
+            const url = new URL(window.location.href);
+            url.searchParams.delete('load');
+            window.history.replaceState({}, '', url.pathname);
+            
+            console.log('Design loaded successfully:', design.name);
+          }, 200);
+        });
+      } else {
+        setIsLoadingDesign(false);
+        setLoadingProgress('');
+        
+        // Clear URL parameter
+        const url = new URL(window.location.href);
+        url.searchParams.delete('load');
+        window.history.replaceState({}, '', url.pathname);
+        
+        console.log('Design loaded (no elements):', design.name);
+      }
+      
     } catch (error) {
-      console.error('Error saving design:', error);
-      alert('Failed to save design: ' + (error instanceof Error ? error.message : 'Unknown error'));
-      return false;
-    } finally {
-      setIsSaving(false);
+      console.error('Error loading design:', error);
+      setIsLoadingDesign(false);
+      setLoadingProgress('');
+      alert('Failed to load design: ' + (error instanceof Error ? error.message : 'Unknown error'));
     }
-  }, [user, logos, dimensions]);
+  }, []);
 
   // Handle authentication success - execute pending action - fixed dependency warning
   useEffect(() => {
@@ -179,6 +311,22 @@ const DesignPage: React.FC<DesignPageProps> = () => {
       setPendingAction(null);
     }
   }, [user, pendingAction, handleGeneratePDF, handleSaveDesign]);
+
+  // URL parameter checking for design loading - added seamless loading
+  useEffect(() => {
+    // Only proceed if user is available and not currently loading
+    if (!user || isLoadingDesign) return;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const loadDesignId = urlParams.get('load');
+    
+    if (loadDesignId) {
+      console.log('Design ID found in URL:', loadDesignId);
+      setIsLoadingDesign(true);
+      setLoadingProgress('Initializing...');
+      loadDesign(loadDesignId);
+    }
+  }, [user, isLoadingDesign, loadDesign]);
 
   const handleLoginRequiredClose = () => {
     setShowLoginRequiredPopup(false);
@@ -416,6 +564,20 @@ const DesignPage: React.FC<DesignPageProps> = () => {
   
   return (
     <div className={styles.pageContainer}>
+      {/* Loading Overlay */}
+      {isLoadingDesign && (
+        <div className={styles.loadingOverlay}>
+          <div className={styles.loadingContent}>
+            <div className={styles.spinner}></div>
+            <h3>Loading Design</h3>
+            <p>{loadingProgress}</p>
+            <div className={styles.progressBar}>
+              <div className={styles.progressFill}></div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Sidebar
         handleLogoUpload={handleLogoUpload}
         handleAddText={handleAddText}
