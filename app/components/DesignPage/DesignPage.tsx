@@ -25,6 +25,30 @@ interface TextStyle {
   rotation?: number;
 }
 
+// Add interface for saved logo data
+interface SavedLogoData {
+  id: string;
+  type: 'image' | 'text';
+  src?: string;
+  content?: string;
+  position: { x: number; y: number };
+  size: { width: number; height: number };
+  style?: TextStyle;
+  layer: number;
+}
+
+// Add interface for saved design data
+interface SavedDesignData {
+  id: string;
+  name: string;
+  description?: string;
+  dimensions: BagDimensions;
+  logos: SavedLogoData[];
+  preview_image?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 const DesignPage: React.FC<DesignPageProps> = () => {
   // Get auth context
   const { user } = useAuth();
@@ -198,7 +222,7 @@ const DesignPage: React.FC<DesignPageProps> = () => {
   }
 }, [user, logos, dimensions]);
 
-  // Load design function - added for seamless loading
+  // Load design function - added for seamless loading with proper typing
   const loadDesign = useCallback(async (designId: string) => {
     try {
       setLoadingProgress('Connecting to server...');
@@ -229,7 +253,7 @@ const DesignPage: React.FC<DesignPageProps> = () => {
         throw new Error(errorData.error || 'Failed to load design');
       }
 
-      const { design } = await response.json();
+      const { design }: { design: SavedDesignData } = await response.json();
       
       setLoadingProgress('Processing design elements...');
       
@@ -245,9 +269,9 @@ const DesignPage: React.FC<DesignPageProps> = () => {
       
       setLoadingProgress('Loading design elements...');
       
-      // Process logos
+      // Process logos with proper typing
       if (design.logos && design.logos.length > 0) {
-        const translatedLogos: Logo[] = design.logos.map((savedLogo: any, index: number) => {
+        const translatedLogos: Logo[] = design.logos.map((savedLogo: SavedLogoData, index: number) => {
           const logo: Logo = {
             id: savedLogo.id || `loaded-${index}-${Date.now()}`,
             type: savedLogo.type,
@@ -300,6 +324,7 @@ const DesignPage: React.FC<DesignPageProps> = () => {
     }
   }, []);
 
+  // Rest of your component remains exactly the same...
   // Handle authentication success - execute pending action - fixed dependency warning
   useEffect(() => {
     if (user && pendingAction) {
