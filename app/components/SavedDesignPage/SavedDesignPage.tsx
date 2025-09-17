@@ -10,21 +10,25 @@ import { createClient } from '@supabase/supabase-js';
 
 const SavedDesignsPage: React.FC = () => {
   const { user } = useAuth();
-  const [designs, setDesigns] = useState<SavedDesign[]>([]);
+  const [allDesigns, setAllDesigns] = useState<SavedDesign[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const hasFetchedRef = useRef(false); // Use ref instead of state
+  const [loadingDesignId, setLoadingDesignId] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const hasFetchedRef = useRef(false);
+  const [hasInitialized, setHasInitialized] = useState(false);
+  
+  const DESIGNS_PER_PAGE = 3;
 
   const fetchDesigns = async () => {
     if (!user || hasFetchedRef.current) {
-      setLoading(false);
       return;
     }
 
     try {
       setLoading(true);
       setError('');
-      hasFetchedRef.current = true; // Set immediately to prevent duplicate calls
+      hasFetchedRef.current = true;
       
       console.log('Fetching designs for user:', user.id);
       
@@ -60,26 +64,39 @@ const SavedDesignsPage: React.FC = () => {
       const data = await response.json();
       console.log('Fetched designs:', data.designs?.length || 0);
       
-      setDesigns(data.designs || []);
+      // Add a minimum delay to prevent jarring transitions
+      const minDelay = 800; // 800ms minimum loading time
+      const startTime = Date.now();
+      
+      await new Promise(resolve => {
+        const elapsed = Date.now() - startTime;
+        const remainingDelay = Math.max(0, minDelay - elapsed);
+        setTimeout(resolve, remainingDelay);
+      });
+      
+      setAllDesigns(data.designs || []);
     } catch (err) {
       console.error('Fetch error:', err);
       setError(err instanceof Error ? err.message : 'Failed to load designs');
-      hasFetchedRef.current = false; // Reset on error so retry can work
+      hasFetchedRef.current = false;
     } finally {
       setLoading(false);
+      setHasInitialized(true);
     }
   };
 
   useEffect(() => {
     if (user) {
       fetchDesigns();
-    } else {
+    } else if (user === null && !hasInitialized) {
+      // Only set loading to false if we've confirmed there's no user and we haven't initialized yet
       setLoading(false);
+      setHasInitialized(true);
       hasFetchedRef.current = false;
-      setDesigns([]);
+      setAllDesigns([]);
       setError('');
     }
-  }, [user]); // Only depend on user
+  }, [user, hasInitialized]);
 
   const handleDeleteDesign = async (designId: string) => {
     if (!confirm('Are you sure you want to delete this design?')) {
@@ -111,22 +128,29 @@ const SavedDesignsPage: React.FC = () => {
         throw new Error(data.error || 'Failed to delete design');
       }
       
-      setDesigns(prev => prev.filter(d => d.id !== designId));
+      setAllDesigns(prev => prev.filter(d => d.id !== designId));
+      
+      // Adjust current page if needed
+      const remainingDesigns = allDesigns.length - 1;
+      const maxPages = Math.ceil(remainingDesigns / DESIGNS_PER_PAGE);
+      if (currentPage > maxPages && maxPages > 0) {
+        setCurrentPage(maxPages);
+      }
     } catch (err) {
       console.error('Delete error:', err);
       setError('Failed to delete design');
     }
   };
 
-  // Handle edit design with forced reload
   const handleEditDesign = (designId: string) => {
-    // Force a page reload to the design page with the load parameter
+    setLoadingDesignId(designId);
     window.location.href = `/design?load=${designId}`;
   };
 
   const handleRetry = () => {
     hasFetchedRef.current = false;
     setError('');
+    setLoading(true);
     fetchDesigns();
   };
 
@@ -139,6 +163,32 @@ const SavedDesignsPage: React.FC = () => {
       minute: '2-digit'
     });
   };
+
+  // Calculate pagination
+  const totalPages = Math.ceil(allDesigns.length / DESIGNS_PER_PAGE);
+  const startIndex = (currentPage - 1) * DESIGNS_PER_PAGE;
+  const endIndex = startIndex + DESIGNS_PER_PAGE;
+  const currentDesigns = allDesigns.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  // Show loading while we're still determining user state or fetching designs
+  if (loading || !hasInitialized) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <h1>My Saved Designs</h1>
+          <p>Manage all your saved paper bag designs</p>
+        </div>
+        <div className={styles.loading}>
+          <div className={styles.spinner}></div>
+          <p>Loading your designs...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!user) {
     return (
@@ -158,12 +208,7 @@ const SavedDesignsPage: React.FC = () => {
         <p>Manage all your saved paper bag designs</p>
       </div>
 
-      {loading ? (
-        <div className={styles.loading}>
-          <div className={styles.spinner}></div>
-          <p>Loading your designs...</p>
-        </div>
-      ) : error ? (
+      {error ? (
         <div className={styles.error}>
           <h3>Error Loading Designs</h3>
           <p>{error}</p>
@@ -171,79 +216,120 @@ const SavedDesignsPage: React.FC = () => {
             Try Again
           </button>
         </div>
-      ) : designs.length === 0 ? (
+      ) : allDesigns.length === 0 ? (
         <div className={styles.emptyState}>
           <div className={styles.emptyIcon}>📋</div>
           <h2>No Designs Saved Currently</h2>
           <p>You haven&apos;t saved any designs yet. Start creating your custom paper bag designs and save them here for easy access.</p>
           <div className={styles.emptyActions}>
-            <Link href="/design" className={styles.createButton}>
+            <Link href="/design" className={styles.footerButton}>
               Create New Design
             </Link>
           </div>
         </div>
       ) : (
-        <div className={styles.designsGrid}>
-          {designs.map((design) => (
-            <div key={design.id} className={styles.designCard}>
-              <div className={styles.designPreview}>
-                {design.preview_image ? (
-                  <Image 
-                    src={design.preview_image} 
-                    alt={design.name}
-                    width={200}
-                    height={150}
-                    className={styles.previewImage}
-                  />
-                ) : (
-                  <div className={styles.noPreview}>No preview available</div>
-                )}
-              </div>
-              
-              <div className={styles.designInfo}>
-                <h3>{design.name}</h3>
-                {design.description && (
-                  <p className={styles.description}>{design.description}</p>
-                )}
+        <>
+          <div className={styles.designsGrid}>
+            {currentDesigns.map((design) => (
+              <div key={design.id} className={styles.designCard}>
+                <div className={styles.designPreview}>
+                  {design.preview_image ? (
+                    <Image 
+                      src={design.preview_image} 
+                      alt={design.name}
+                      width={200}
+                      height={150}
+                      className={styles.previewImage}
+                    />
+                  ) : (
+                    <div className={styles.noPreview}>No preview available</div>
+                  )}
+                </div>
                 
-                <div className={styles.designMeta}>
-                  <div className={styles.dimensions}>
-                    <span>📏 {design.dimensions.length}&quot; × {design.dimensions.width}&quot; × {design.dimensions.height}&quot;</span>
-                  </div>
-                  <div className={styles.logoCount}>
-                    <span>🏷️ {design.logos.length} logo{design.logos.length !== 1 ? 's' : ''}</span>
-                  </div>
-                  <div className={styles.lastModified}>
-                    <span>📅 {formatDate(design.updated_at)}</span>
+                <div className={styles.designInfo}>
+                  <h3>{design.name}</h3>
+                  {design.description && (
+                    <p className={styles.description}>{design.description}</p>
+                  )}
+                  
+                  <div className={styles.designMeta}>
+                    <div className={styles.dimensions}>
+                      <span>📏 {design.dimensions.length}&quot; × {design.dimensions.width}&quot; × {design.dimensions.height}&quot;</span>
+                    </div>
+                    <div className={styles.logoCount}>
+                      <span>🏷️ {design.logos.length} logo{design.logos.length !== 1 ? 's' : ''}</span>
+                    </div>
+                    <div className={styles.lastModified}>
+                      <span>📅 {formatDate(design.updated_at)}</span>
+                    </div>
                   </div>
                 </div>
+                
+                <div className={styles.designActions}>
+                  <button 
+                    onClick={() => handleEditDesign(design.id)}
+                    className={styles.editButton}
+                    disabled={loadingDesignId === design.id}
+                  >
+                    {loadingDesignId === design.id ? (
+                      <>
+                        <span className={styles.buttonSpinner}></span>
+                        Loading...
+                      </>
+                    ) : (
+                      'Edit Design'
+                    )}
+                  </button>
+                  <button 
+                    onClick={() => handleDeleteDesign(design.id)}
+                    className={styles.deleteButton}
+                    disabled={loadingDesignId === design.id}
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className={styles.pagination}>
+              <button 
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className={styles.paginationButton}
+              >
+                ← Previous
+              </button>
+              
+              <div className={styles.paginationNumbers}>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    className={`${styles.paginationNumber} ${page === currentPage ? styles.active : ''}`}
+                  >
+                    {page}
+                  </button>
+                ))}
               </div>
               
-              <div className={styles.designActions}>
-                <button 
-                  onClick={() => handleEditDesign(design.id)}
-                  className={styles.editButton}
-                >
-                  Edit Design
-                </button>
-                <button 
-                  onClick={() => handleDeleteDesign(design.id)}
-                  className={styles.deleteButton}
-                >
-                  🗑️
-                </button>
-              </div>
+              <button 
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className={styles.paginationButton}
+              >
+                Next →
+              </button>
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
 
-      {designs.length > 0 && (
+      {allDesigns.length > 0 && (
         <div className={styles.footer}>
-          <p>Total designs: {designs.length}</p>
-          <Link href="/design" className={styles.newDesignButton}>
-            Create New Design
-          </Link>
+          <p>Total designs: {allDesigns.length}</p>
         </div>
       )}
     </div>
