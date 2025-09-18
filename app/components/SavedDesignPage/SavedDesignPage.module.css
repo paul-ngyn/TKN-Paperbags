@@ -677,3 +677,49 @@
     max-width: 120px;
   }
 }
+
+/* Loading hint overlay/modal */
+.loadingHintOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.loadingHintModal {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  padding: 24px;
+  max-width: 420px;
+  width: 90%;
+  text-align: center;
+}
+
+.loadingHintModal h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.loadingHintModal p {
+  margin: 0 0 16px 0;
+  color: #555;
+}
+
+.loadingHintClose {
+  padding: 8px 16px;
+  background: #1c51a3;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.loadingHintClose:hover {
+  background: #164080;
+}

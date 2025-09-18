@@ -17,6 +17,7 @@ const SavedDesignsPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const hasFetchedRef = useRef(false);
   const [hasInitialized, setHasInitialized] = useState(false);
+  const [showLoadingHint, setShowLoadingHint] = useState(false);
   
   const DESIGNS_PER_PAGE = 3;
 
@@ -65,7 +66,7 @@ const SavedDesignsPage: React.FC = () => {
       console.log('Fetched designs:', data.designs?.length || 0);
       
       // Add a minimum delay to prevent jarring transitions
-      const minDelay = 800; // 800ms minimum loading time
+      const minDelay = 300; // 800ms minimum loading time
       const startTime = Date.now();
       
       await new Promise(resolve => {
@@ -97,6 +98,22 @@ const SavedDesignsPage: React.FC = () => {
       setError('');
     }
   }, [user, hasInitialized]);
+
+  // Show a helpful hint if loading exceeds 5 seconds
+  useEffect(() => {
+    let timer: NodeJS.Timeout | undefined;
+    if (loading) {
+      setShowLoadingHint(false);
+      timer = setTimeout(() => {
+        setShowLoadingHint(true);
+      }, 5000);
+    } else {
+      setShowLoadingHint(false);
+    }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [loading]);
 
   const handleDeleteDesign = async (designId: string) => {
     if (!confirm('Are you sure you want to delete this design?')) {
@@ -186,6 +203,20 @@ const SavedDesignsPage: React.FC = () => {
           <div className={styles.spinner}></div>
           <p>Loading your designs...</p>
         </div>
+        {showLoadingHint && (
+          <div className={styles.loadingHintOverlay} role="dialog" aria-modal="true">
+            <div className={styles.loadingHintModal}>
+              <h3>Still loading…</h3>
+              <p>Please refresh the page if loading takes longer than expected.</p>
+              <button
+                className={styles.loadingHintClose}
+                onClick={() => setShowLoadingHint(false)}
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
