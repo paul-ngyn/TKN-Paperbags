@@ -44,6 +44,7 @@ interface TextStyle {
   color: string;
   fontWeight: string;
   rotation?: number;
+  textShape?: 'normal' | 'pyramid' | 'cone' | 'arc-up' | 'arc-down' | 'wave' | 'circle';
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -72,7 +73,8 @@ const Sidebar: React.FC<SidebarProps> = ({
     fontSize: 24,
     color: '#000000',
     fontWeight: 'normal',
-    rotation: 0 
+    rotation: 0,
+    textShape: 'normal'
   });
   const [inputValues, setInputValues] = useState({
     length: "",
@@ -140,7 +142,8 @@ const Sidebar: React.FC<SidebarProps> = ({
         fontSize: activeLogoTextStyle.fontSize, 
         color: activeLogoTextStyle.color,
         fontWeight: activeLogoTextStyle.fontWeight,
-        rotation: activeLogoTextStyle.rotation || 0
+        rotation: activeLogoTextStyle.rotation || 0,
+        textShape: activeLogoTextStyle.textShape || 'normal'
       });
       setSidebarMode('text');
     } else if (sidebarMode === 'text' && !activeLogoId) {
@@ -150,7 +153,8 @@ const Sidebar: React.FC<SidebarProps> = ({
         fontSize: 24, 
         color: '#000000',
         fontWeight: 'normal',
-        rotation: 0 
+        rotation: 0,
+        textShape: 'normal'
       });
     }
   }, [activeLogoId, activeLogoText, activeLogoTextStyle, sidebarMode]);
@@ -270,7 +274,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     setIsValidating(false);
 
     // Handle PDF files
-  if (file.type === 'application/pdf') {
+    if (file.type === 'application/pdf') {
       setIsProcessingBackground(true);
       setUploadError(null);
       
@@ -356,7 +360,8 @@ const Sidebar: React.FC<SidebarProps> = ({
       fontSize: 24,
       color: '#000000',
       fontWeight: 'normal',
-      rotation: 0
+      rotation: 0,
+      textShape: 'normal'
     });
   };
 
@@ -384,6 +389,10 @@ const Sidebar: React.FC<SidebarProps> = ({
   
   const handleFontWeightChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setTextStyle(prev => ({ ...prev, fontWeight: e.target.value }));
+  };
+
+  const handleTextShapeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setTextStyle(prev => ({ ...prev, textShape: e.target.value as TextStyle['textShape'] }));
   };
   
   const applyTextChanges = () => {
@@ -482,6 +491,209 @@ const Sidebar: React.FC<SidebarProps> = ({
     return dimensionOutOfRange(name, value) 
       ? `${styles.dimensionInput} ${styles.outOfRange}` 
       : styles.dimensionInput;
+  };
+
+  // Text shape preview component
+  const TextShapePreview = () => {
+    const previewText = textInput || "Preview";
+    const shape = textStyle.textShape || 'normal';
+    
+    if (shape === 'normal') {
+      return (
+        <p 
+          className={styles.textPreview}
+          style={{
+            fontFamily: textStyle.fontFamily,
+            fontSize: `${Math.min(textStyle.fontSize, 20)}px`,
+            color: textStyle.color,
+            fontWeight: textStyle.fontWeight,
+            transform: `rotate(${textStyle.rotation || 0}deg)`
+          }}
+        >
+          {previewText}
+        </p>
+      );
+    }
+
+    // Simple SVG previews for different shapes
+    const renderShapePreview = () => {
+      const letters = previewText.split('');
+      const centerX = 100;
+      const centerY = 50;
+      
+      switch (shape) {
+        case 'pyramid':
+          return letters.map((letter, index) => {
+            const totalLetters = letters.length;
+            const rowSize = Math.ceil(Math.sqrt(totalLetters));
+            const row = Math.floor(index / rowSize);
+            const col = index % rowSize;
+            const rowWidth = Math.max(1, rowSize - row);
+            const x = centerX + (col - (rowWidth - 1) / 2) * 15;
+            const y = 20 + row * 15;
+            
+            return (
+              <text
+                key={index}
+                x={x}
+                y={y}
+                fontSize={Math.min(textStyle.fontSize * 0.3, 12)}
+                fontFamily={textStyle.fontFamily}
+                fill={textStyle.color}
+                fontWeight={textStyle.fontWeight}
+                textAnchor="middle"
+              >
+                {letter}
+              </text>
+            );
+          });
+          
+        case 'cone':
+          return letters.map((letter, index) => {
+            const totalLetters = letters.length;
+            const rowSize = Math.ceil(Math.sqrt(totalLetters));
+            const row = Math.floor(index / rowSize);
+            const col = index % rowSize;
+            const rowWidth = Math.min(rowSize, row + 1);
+            const x = centerX + (col - (rowWidth - 1) / 2) * 15;
+            const y = 20 + row * 15;
+            
+            return (
+              <text
+                key={index}
+                x={x}
+                y={y}
+                fontSize={Math.min(textStyle.fontSize * 0.3, 12)}
+                fontFamily={textStyle.fontFamily}
+                fill={textStyle.color}
+                fontWeight={textStyle.fontWeight}
+                textAnchor="middle"
+              >
+                {letter}
+              </text>
+            );
+          });
+          
+        case 'arc-up':
+          return letters.map((letter, index) => {
+            const angle = (Math.PI / (letters.length - 1)) * index - Math.PI / 2;
+            const radius = 30;
+            const x = centerX + Math.cos(angle) * radius;
+            const y = centerY + Math.sin(angle) * radius + 20;
+            
+            return (
+              <text
+                key={index}
+                x={x}
+                y={y}
+                fontSize={Math.min(textStyle.fontSize * 0.3, 12)}
+                fontFamily={textStyle.fontFamily}
+                fill={textStyle.color}
+                fontWeight={textStyle.fontWeight}
+                textAnchor="middle"
+                transform={`rotate(${(angle * 180) / Math.PI + 90} ${x} ${y})`}
+              >
+                {letter}
+              </text>
+            );
+          });
+          
+        case 'arc-down':
+          return letters.map((letter, index) => {
+            const angle = (Math.PI / (letters.length - 1)) * index + Math.PI / 2;
+            const radius = 30;
+            const x = centerX + Math.cos(angle) * radius;
+            const y = centerY + Math.sin(angle) * radius - 10;
+            
+            return (
+              <text
+                key={index}
+                x={x}
+                y={y}
+                fontSize={Math.min(textStyle.fontSize * 0.3, 12)}
+                fontFamily={textStyle.fontFamily}
+                fill={textStyle.color}
+                fontWeight={textStyle.fontWeight}
+                textAnchor="middle"
+                transform={`rotate(${(angle * 180) / Math.PI - 90} ${x} ${y})`}
+              >
+                {letter}
+              </text>
+            );
+          });
+          
+        case 'wave':
+          return letters.map((letter, index) => {
+            const x = 20 + (index * 160) / letters.length;
+            const y = centerY + Math.sin((index / letters.length) * Math.PI * 2) * 15;
+            
+            return (
+              <text
+                key={index}
+                x={x}
+                y={y}
+                fontSize={Math.min(textStyle.fontSize * 0.3, 12)}
+                fontFamily={textStyle.fontFamily}
+                fill={textStyle.color}
+                fontWeight={textStyle.fontWeight}
+                textAnchor="middle"
+              >
+                {letter}
+              </text>
+            );
+          });
+          
+        case 'circle':
+          return letters.map((letter, index) => {
+            const angle = (2 * Math.PI / letters.length) * index;
+            const radius = 35;
+            const x = centerX + Math.cos(angle) * radius;
+            const y = centerY + Math.sin(angle) * radius;
+            
+            return (
+              <text
+                key={index}
+                x={x}
+                y={y}
+                fontSize={Math.min(textStyle.fontSize * 0.3, 12)}
+                fontFamily={textStyle.fontFamily}
+                fill={textStyle.color}
+                fontWeight={textStyle.fontWeight}
+                textAnchor="middle"
+                transform={`rotate(${(angle * 180) / Math.PI + 90} ${x} ${y})`}
+              >
+                {letter}
+              </text>
+            );
+          });
+          
+        default:
+          return (
+            <text
+              x={centerX}
+              y={centerY}
+              fontSize={Math.min(textStyle.fontSize * 0.3, 12)}
+              fontFamily={textStyle.fontFamily}
+              fill={textStyle.color}
+              fontWeight={textStyle.fontWeight}
+              textAnchor="middle"
+            >
+              {previewText}
+            </text>
+          );
+      }
+    };
+
+    return (
+      <svg 
+        className={styles.textShapePreview}
+        width="200" 
+        height="100"
+        viewBox="0 0 200 100"
+      >
+        {renderShapePreview()}
+      </svg>
+    );
   };
 
   return (
@@ -727,6 +939,24 @@ const Sidebar: React.FC<SidebarProps> = ({
               className={styles.slider}
             />
           </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="text-shape">Text Shape:</label>
+            <select
+              id="text-shape"
+              value={textStyle.textShape || 'normal'}
+              onChange={handleTextShapeChange}
+              className={styles.select}
+            >
+              <option value="normal">Normal</option>
+              <option value="pyramid">△ Pyramid</option>
+              <option value="cone">▽ Inverted Pyramid</option>
+              <option value="arc-up">⌒ Arc Up</option>
+              <option value="arc-down">⌓ Arc Down</option>
+              <option value="wave">〜 Wave</option>
+              <option value="circle">○ Circle</option>
+            </select>
+          </div>
         
           <div className={styles.buttonGroupText}>
             <button 
@@ -744,18 +974,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           </div>
 
           <div className={styles.textPreviewContainer}>
-            <p 
-              className={styles.textPreview}
-              style={{
-                fontFamily: textStyle.fontFamily,
-                fontSize: `${textStyle.fontSize}px`,
-                color: textStyle.color,
-                fontWeight: textStyle.fontWeight,
-                transform: `rotate(${textStyle.rotation || 0}deg)`
-              }}
-            >
-              {textInput || "Preview"}
-            </p>
+            <TextShapePreview />
           </div>
           
           <div className={styles.downloadButtonContainer}>

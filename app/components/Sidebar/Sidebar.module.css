@@ -714,6 +714,20 @@
   animation: pulse 0.5s ease-in-out;
 }
 
+.textShapePreview {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #f9f9f9;
+  margin-top: 10px;
+  display: block;
+  max-width: 100%;
+}
+
+.formGroup select[id="text-shape"] {
+  font-family: monospace;
+  padding: 8px;
+}
+
 @keyframes pulse {
   0% { transform: scale(1); }
   50% { transform: scale(1.05); }

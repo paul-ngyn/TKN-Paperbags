@@ -12,6 +12,7 @@ interface TextStyle {
   color: string;
   fontWeight: string;
   rotation?: number;
+  textShape?: 'normal' | 'pyramid' | 'cone' | 'arc-up' | 'arc-down' | 'wave' | 'circle';
 }
 
 export interface Logo {
@@ -21,13 +22,7 @@ export interface Logo {
   file?: File; // To hold the original file object
   fileName?: string; // To display the PDF's name
   text?: string;
-  textStyle?: {
-    fontFamily: string;
-    fontSize: number;
-    color: string;
-    fontWeight: string;
-    rotation?: number;
-  };
+  textStyle?: TextStyle; // Changed from inline type to use TextStyle interface
   position: { x: number; y: number; };
   size: {
     width: number;
@@ -123,34 +118,130 @@ const LogoItem: React.FC<LogoItemProps> = ({
           </div>
         );
       case 'text':
-        return (
-          <div 
-            style={{
-              width: "100%",
-              height: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontFamily: logo.textStyle?.fontFamily || 'Arial',
-              fontSize: `${logo.textStyle?.fontSize || 24}px`,
-              fontWeight: logo.textStyle?.fontWeight || 'normal',
-              color: logo.textStyle?.color || '#000000',
-              pointerEvents: "none",
-              userSelect: "none",
-              whiteSpace: "pre-wrap",
-              textAlign: "center",
-              overflow: "hidden",
-              padding: `${Math.max(4, (logo.textStyle?.fontSize || 24) * 0.15)}px`,
-              boxSizing: "border-box",
-              lineHeight: logo.text?.includes('\n') ? 1.3 : 1.1,
-              wordBreak: "break-word",
-              textOverflow: "ellipsis",
-              maxHeight: "100%"
-            }}
-          >
-            {logo.text || "Text"}
-          </div>
-        );
+  const textShape = logo.textStyle?.textShape || 'normal';
+  
+  if (textShape === 'normal') {
+    return (
+      <div 
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontFamily: logo.textStyle?.fontFamily || 'Arial',
+          fontSize: `${logo.textStyle?.fontSize || 24}px`,
+          fontWeight: logo.textStyle?.fontWeight || 'normal',
+          color: logo.textStyle?.color || '#000000',
+          pointerEvents: "none",
+          userSelect: "none",
+          whiteSpace: "pre-wrap",
+          textAlign: "center",
+          overflow: "hidden",
+          padding: `${Math.max(4, (logo.textStyle?.fontSize || 24) * 0.15)}px`,
+          boxSizing: "border-box",
+          lineHeight: logo.text?.includes('\n') ? 1.3 : 1.1,
+          wordBreak: "break-word",
+          textOverflow: "ellipsis",
+          maxHeight: "100%"
+        }}
+      >
+        {logo.text || "Text"}
+      </div>
+    );
+  } else {
+    // Render shaped text using SVG
+    const letters = (logo.text || "Text").split('');
+    const fontSize = logo.textStyle?.fontSize || 24;
+    const fontFamily = logo.textStyle?.fontFamily || 'Arial';
+    const color = logo.textStyle?.color || '#000000';
+    const fontWeight = logo.textStyle?.fontWeight || 'normal';
+    
+    return (
+  <svg
+    width="100%"
+    height="100%"
+    viewBox="0 0 200 100"
+    preserveAspectRatio="xMidYMid meet"
+    style={{
+      pointerEvents: "none",
+      userSelect: "none",
+      overflow: "visible"
+    }}
+  >
+        {letters.map((letter, index) => {
+          let x = 100, y = 50;
+          let rotation = 0;
+          
+          switch (textShape) {
+            case 'pyramid':
+              const rowSize = Math.ceil(Math.sqrt(letters.length));
+              const row = Math.floor(index / rowSize);
+              const col = index % rowSize;
+              const rowWidth = Math.max(1, rowSize - row);
+              x = 100 + (col - (rowWidth - 1) / 2) * 30;
+              y = 20 + row * 25;
+              break;
+              
+            case 'cone':
+              const coneRowSize = Math.ceil(Math.sqrt(letters.length));
+              const coneRow = Math.floor(index / coneRowSize);
+              const coneCol = index % coneRowSize;
+              const coneRowWidth = Math.min(coneRowSize, coneRow + 1);
+              x = 100 + (coneCol - (coneRowWidth - 1) / 2) * 30;
+              y = 20 + coneRow * 25;
+              break;
+              
+            case 'arc-up':
+              const upAngle = (Math.PI / (letters.length - 1)) * index - Math.PI / 2;
+              const upRadius = 60;
+              x = 100 + Math.cos(upAngle) * upRadius;
+              y = 50 + Math.sin(upAngle) * upRadius + 30;
+              rotation = (upAngle * 180) / Math.PI + 90;
+              break;
+              
+            case 'arc-down':
+              const downAngle = (Math.PI / (letters.length - 1)) * index + Math.PI / 2;
+              const downRadius = 60;
+              x = 100 + Math.cos(downAngle) * downRadius;
+              y = 50 + Math.sin(downAngle) * downRadius - 20;
+              rotation = (downAngle * 180) / Math.PI - 90;
+              break;
+              
+            case 'wave':
+              x = 20 + (index * 160) / letters.length;
+              y = 50 + Math.sin((index / letters.length) * Math.PI * 2) * 25;
+              break;
+              
+            case 'circle':
+              const circleAngle = (2 * Math.PI / letters.length) * index;
+              const circleRadius = 70;
+              x = 100 + Math.cos(circleAngle) * circleRadius;
+              y = 50 + Math.sin(circleAngle) * circleRadius;
+              rotation = (circleAngle * 180) / Math.PI + 90;
+              break;
+          }
+          
+           return (
+        <text
+          key={index}
+          x={x}
+          y={y}
+          fontSize={Math.min(fontSize * 0.3, 16)} // Reduced scaling for better fit
+          fontFamily={fontFamily}
+          fill={color}
+          fontWeight={fontWeight}
+          textAnchor="middle"
+          dominantBaseline="central" // Changed from "middle" for better alignment
+          transform={rotation ? `rotate(${rotation} ${x} ${y})` : undefined}
+        >
+          {letter}
+        </text>
+      );
+    })}
+  </svg>
+);
+  }
       case 'image':
       default:
         return (
