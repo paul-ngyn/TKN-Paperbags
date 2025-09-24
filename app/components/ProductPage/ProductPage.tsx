@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import ProductImageCarousel from '../ProductImageCarousel/ProductImageCarousel';
-import recyclelogo from '../../public/recyclelogo.png';
-import tknlogo from '../../public/tkn_products.png';
+import recyclelogo from '../../public/recyclelogo (1).png';
+import tknlogo from '../../public/tkn_products (1).png';
 import quoteicon from '../../public/quoteicon.png';
 import customerserviceicon from '../../public/customerservice.png';
 import packicon from '../../public/pack.png';
