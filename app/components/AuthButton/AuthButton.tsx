@@ -156,6 +156,7 @@ const AuthButton: React.FC = () => {
           width={26}
           height={26}
           className={styles.avatar}
+          suppressHydrationWarning={true}
         />
         Login/Sign Up
       </button>

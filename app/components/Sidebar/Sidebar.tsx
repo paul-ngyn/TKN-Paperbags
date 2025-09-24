@@ -736,6 +736,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               width={40}
               height={40}
               className={styles.dropIcon}
+              suppressHydrationWarning={true}
             />
             {isValidating ? (
               <p>Validating file...</p>
