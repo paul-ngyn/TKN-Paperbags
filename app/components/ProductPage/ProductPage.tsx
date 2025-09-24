@@ -15,13 +15,13 @@ import ProductTable from '../ProductTable/ProductTable';
 import LoginRequiredPopup from '../LoginRequiredPopup/LoginRequiredPopup';
 import AuthForm from '../AuthForm/AuthForm';
 import { useAuth } from '../../contexts/AuthContext';
-import ropehandle from '../../public/paperbagproduct.jpg';
-import flathandle from '../../public/onebag-christmas-side-white.png';
-import thankyou from '../../public/onebag-thankyou-front-white.png';
-import smileRope from '../../public/one-bag-smile-side.png';
-import nohandle from '../../public/onebagnohandle.png';
-import twobag from '../../public/twobag-nohandle.png'
-import christmasFront from '../../public/onebag-white-front-christmas.png'
+import ropehandle from '../../public/paperbagproduct.png';
+import flathandle from '../../public/expos/onebag-christmas-side-white-expos.png';
+import thankyou from '../../public/expos/onebag-thankyou-front-white-1.png';
+import smileRope from '../../public/expos/one-bag-smile-side-white-expos.png';
+import nohandle from '../../public/expos/onebagnohandle-expos.png';
+import twobag from '../../public/expos/two-bag-no-handle-expos.png'
+import christmasFront from '../../public/expos/onebag-white-front-christmas-expos.png'
 
 interface ProductPageProps {
   handleNavigation: (page: string) => void;

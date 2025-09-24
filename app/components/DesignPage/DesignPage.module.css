@@ -4,14 +4,14 @@
     align-items: flex-start;
     padding: 20px;
     gap: 20px;                /* Space between sidebar and bag container */
-    background-color: #fffbfb; 
+    background-color: var(--background); 
   }
     
   .bagContainer {
     position: relative;
     width: 700px;
     max-width: 69%;
-    border: 1px solid #fffbfb;
+    border: 1px solid var(--background);
     margin-top: 3%;
     left: 1%;
     overflow: hidden; /* Ensures child elements cannot be seen outside */
@@ -93,7 +93,7 @@
     position: contain;
     max-width: 100%;
     max-height: 100%;
-    background-color: #fffbfb;
+    background-color: var(--background);
     border-radius: 10px;
     pointer-events: none; /* Prevents interaction with the blueprint */
   }
@@ -107,7 +107,7 @@
     width: 100%;
     overflow: hidden;
     position: relative;
-    background-color: #fffbfb;
+    background-color: var(--background);
     padding: 5px;
     right: 7%;
   }
@@ -170,7 +170,8 @@
 }
 
 .modalContent {
-  background: white;
+  background: var(--background);
+  color: var(--foreground);
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
@@ -187,14 +188,14 @@
 .modalContent h3 {
   margin-top: 0;
   margin-bottom: 1rem;
-  color: #333;
+  color: var(--foreground);
   font-size: 1.5rem;
   font-weight: 600;
 }
 
 .modalContent p {
   margin-bottom: 1.5rem;
-  color: #666;
+  color: var(--foreground);
   line-height: 1.5;
 }
 
@@ -206,7 +207,7 @@
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: #555;
+  color: var(--foreground);
   font-size: 0.9rem;
 }
 
@@ -217,6 +218,8 @@
   border-radius: 6px;
   font-size: 1rem;
   box-sizing: border-box;
+  background-color: var(--background);
+  color: var(--foreground);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -306,7 +309,7 @@
 
 .successContent p {
   margin-bottom: 0;
-  color: #666;
+  color: var(--foreground);
   font-size: 0.95rem;
 }
 
@@ -328,7 +331,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(0, 0, 0, 0.5);
   z-index: 9999;
   display: flex;
   justify-content: center;
@@ -338,7 +341,8 @@
 
 .loadingContent {
   text-align: center;
-  background: white;
+  background: var(--background);
+  color: var(--foreground);
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
@@ -354,7 +358,7 @@
 
 .loadingContent p {
   margin: 0.5rem 0 1.5rem 0;
-  color: #666;
+  color: var(--foreground);
   font-size: 0.9rem;
 }
 

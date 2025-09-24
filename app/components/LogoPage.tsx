@@ -2,10 +2,10 @@
 
 import React, { useRef, useEffect } from 'react';
 import Image from 'next/image';
-import baglogo from '../public/baglogo.jpg';
-import timelogo from '../public/fastclock.jpg';
-import biodegradable from '../public/biodegradablelogo.jpg';
-import tknlogo from '../public/tkn_products.png';
+import baglogo from '../public/baglogo.png';
+import timelogo from '../public/fastclock.png';
+import biodegradable from '../public/biodegradablelogo.png';
+import tknlogo from '../public/tkn_products (1).png';
 import paperbagheader from '../public/paperbagfullheader2.jpg';
 import custombag from '../public/two-bag-homepage.png';
 import Link from 'next/link';

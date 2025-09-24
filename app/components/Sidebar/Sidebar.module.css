@@ -14,6 +14,8 @@
   margin-bottom: 15%;
   padding-bottom: 2%;
   padding-right: 1.5%;
+  background-color: var(--background);
+  color: var(--foreground);
 
 }
 
@@ -85,14 +87,16 @@
 
 .minDimension {
   font-size: 12px;
-  color: #777;
+  color: var(--foreground);
+  opacity: 0.6;
   font-style: italic;
   padding-left: 2px;
 }
 
 .maxDimension {
   font-size: 12px;
-  color: #777;
+  color: var(--foreground);
+  opacity: 0.6;
   text-align: right;
   font-style: italic;
   padding-right: 2px;
@@ -117,7 +121,7 @@
 }
 
 .linkSeparator {
-  color: #0c0c0c;
+  color: var(--foreground);
   font-size: 12px;
   font-weight: bold;
 }
@@ -133,6 +137,8 @@
   border-radius: 4px;
   width: 100%;
   box-sizing: border-box;
+  background-color: var(--background);
+  color: var(--foreground);
 }
 
 .applyButton, .resetButton, .textButton {
@@ -155,13 +161,14 @@
 }
 
 .resetButton {
-  background-color: #f2f2f2;
-  color: #333;
+  background-color: rgba(108, 117, 125, 0.2);
+  color: var(--foreground);
+  border: 1px solid rgba(108, 117, 125, 0.5);
   flex: 1;
 }
 
 .resetButton:hover {
-  background-color: #e2e2e2;
+  background-color: rgba(108, 117, 125, 0.3);
 }
 
 .downloadButtonContainer {
@@ -218,7 +225,8 @@
 
 .logoCount {
   font-size: 14px;
-  color: #555;
+  color: var(--foreground);
+  opacity: 0.8;
   margin: 5px 0;
 }
 
@@ -258,7 +266,8 @@
 .dropZone p {
   margin: 5px 0;
   font-size: 14px;
-  color: #666;
+  color: var(--foreground);
+  opacity: 0.8;
   flex-shrink: 0; /* Prevent text from being compressed */
   max-width: 100%; /* Ensure text doesn't exceed container width */
   word-wrap: break-word; /* Break long words if needed */
@@ -273,14 +282,14 @@
 }
 
 .dragOver {
-  background-color: #f0f8ff;
+  background-color: rgba(28, 81, 163, 0.1);
   border-color: #1c51a3;
 }
 
 .fileName {
   margin-top: 2px;
   font-size: 0.9rem;
-  color: #333;
+  color: var(--foreground);
   word-break: break-all;
 }
 
@@ -304,7 +313,8 @@
 }
 
 .modalContent {
-  background-color: white;
+  background-color: var(--background);
+  color: var(--foreground);
   padding: 10px;
   border-radius: 8px;
   position: relative;
@@ -392,6 +402,7 @@
   display: block;
   margin-bottom: 5px;
   font-weight: 500;
+  color: var(--foreground);
 }
 
 .textArea {
@@ -402,6 +413,8 @@
   font-family: inherit;
   resize: vertical;
   min-height: 47px;
+  background-color: var(--background);
+  color: var(--foreground);
 }
 
 .select {
@@ -409,7 +422,8 @@
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  background-color: white;
+  background-color: var(--background);
+  color: var(--foreground);
 }
 
 .slider {
@@ -462,14 +476,14 @@
   margin-top: 8px;
   text-align: center;
   padding: 4px 8px;
-  background-color: #ffe6e6; /* Light red background for errors */
+  background-color: rgba(255, 59, 48, 0.1); /* Light red background for errors - transparent */
   border-radius: 4px;
-  border: 1px solid #ffcccb; /* Light red border */
+  border: 1px solid #ff3b30; /* Red border */
 }
 
 .dropZone.error {
   border-color: #ff3b30; 
-  background-color: #fff5f5; 
+  background-color: rgba(255, 59, 48, 0.05); 
 }
 
 .addLogoButton:disabled {

@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import styles from "./AboutPage.module.css";
-import tknLogo from "../../public/tkn_products.png";
+import tknLogo from "../../public/tkn_products (1).png";
 import locationplaceholda from "../../public/locationplaceholder1.png";
 
 interface AboutPageProps {
